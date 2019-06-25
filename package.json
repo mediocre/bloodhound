@@ -1,0 +1,37 @@
+{
+    "description": "Shipment tracking library.",
+    "dependencies": {
+        "moment-timezone": "~0.5.25",
+        "pitney-bowes": "~0.1.0"
+    },
+    "devDependencies": {
+        "coveralls": "*",
+        "istanbul": "*",
+        "mocha": "*"
+    },
+    "homepage": "https://github.com/mediocre/bloodhound",
+    "keywords": [
+        "fedex",
+        "logistics",
+        "newgistics",
+        "pitney-bowes",
+        "shipping",
+        "tracking",
+        "usps"
+    ],
+    "license": "Apache-2.0",
+    "main": "index.js",
+    "name": "@mediocre/bloodhound",
+    "scripts": {
+        "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- --exit --reporter spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+        "test": "mocha --exit --reporter spec"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mediocre/bloodhound.git"
+    },
+    "bugs": {
+        "url": "https://github.com/mediocre/bloodhound/issues"
+    },
+    "version": "0.0.1"
+}
