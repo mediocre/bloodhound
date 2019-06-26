@@ -6,9 +6,14 @@ const PitneyBowes = require('pitney-bowes');
 // Remove these words from cities to turn cities like `FEDEX SMARTPOST INDIANAPOLIS` into `INDIANAPOLIS`
 const CITY_BLACKLIST = /fedex|smartpost/ig;
 
-// https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
+// These tracking status codes indicate the shipment was delivered: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
 const FEDEX_DELIVERED_TRACKING_STATUS_CODES = ['DL'];
+
+// These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created): https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
 const FEDEX_SHIPPED_TRACKING_STATUS_CODES = ['AR', 'DP', 'IT', 'OD'];
+
+// The events from these tracking status codes are filtered because their timestamps are nonsensical: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
+const FEDEX_TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
 function Bloodhound(options) {
     const fedEx = new FedEx(options && options.fedEx);
@@ -55,6 +60,10 @@ function Bloodhound(options) {
                 }
 
                 trackReply.CompletedTrackDetails[0].TrackDetails[0].Events.forEach(e => {
+                    if (FEDEX_TRACKING_STATUS_CODES_BLACKLIST.includes(e.EventType)) {
+                        return;
+                    }
+
                     if (FEDEX_DELIVERED_TRACKING_STATUS_CODES.includes(e.EventType)) {
                         results.deliveredAt = new Date(e.Timestamp);
                     }

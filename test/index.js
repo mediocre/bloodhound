@@ -107,16 +107,6 @@ describe('FedEx', function() {
                 const expected = {
                     events: [
                         {
-                            date: new Date('2014-01-06T15:18:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'FLORENCE',
-                                country: 'US',
-                                state: 'SC',
-                                zip: '29506'
-                            }
-                        },
-                        {
                             date: new Date('2014-01-03T22:58:00.000Z'),
                             description: 'Shipment information sent to FedEx',
                             address: {
@@ -146,8 +136,7 @@ describe('FedEx', function() {
             });
         });
 
-        // Skipping this test because FedEx returns time in a different timezone for the "Picked Up" event
-        it.skip('At local FedEx facility', function(done) {
+        it('At local FedEx facility', function(done) {
             bloodhound.track('920241085725456', 'fedex', function(err, actual) {
                 assert.ifError(err);
 
@@ -212,16 +201,6 @@ describe('FedEx', function() {
                                 state: undefined,
                                 zip: '27260'
                             }
-                        },
-                        {
-                            date: new Date('2014-01-03T06:00:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'KERNERSVILLE',
-                                country: 'US',
-                                state: 'NC',
-                                zip: '27284'
-                            }
                         }
                     ],
                     shippedAt: new Date('2014-01-03T22:09:00.000Z')
@@ -277,16 +256,6 @@ describe('FedEx', function() {
                                 state: 'TN',
                                 zip: '38118'
                             }
-                        },
-                        {
-                            date: new Date('2014-01-05T17:31:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'MEMPHIS',
-                                country: 'US',
-                                state: 'TN',
-                                zip: '38185'
-                            }
                         }
                     ],
                     shippedAt: new Date('2014-01-06T01:23:00.000Z')
@@ -316,16 +285,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2014-01-07T06:37:00.000Z'),
                             description: 'Arrived at FedEx location',
-                            address: {
-                                city: 'SAINT PAUL',
-                                country: 'US',
-                                state: 'MN',
-                                zip: '55115'
-                            }
-                        },
-                        {
-                            date: new Date('2014-01-07T00:41:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'SAINT PAUL',
                                 country: 'US',
@@ -449,16 +408,6 @@ describe('FedEx', function() {
                             }
                         },
                         {
-                            date: new Date('2013-12-31T21:21:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'WICHITA',
-                                country: 'US',
-                                state: 'KS',
-                                zip: '67226'
-                            }
-                        },
-                        {
                             date: new Date('2013-12-31T18:58:00.000Z'),
                             description: 'Shipment information sent to FedEx',
                             address: {
@@ -556,16 +505,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2014-02-04T20:03:00.000Z'),
                             description: 'At FedEx origin facility',
-                            address: {
-                                city: 'SESTO ULTERIANO',
-                                country: 'IT',
-                                state: undefined,
-                                zip: '20098'
-                            }
-                        },
-                        {
-                            date: new Date('2014-02-04T16:27:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'SESTO ULTERIANO',
                                 country: 'IT',
@@ -680,16 +619,6 @@ describe('FedEx', function() {
                             }
                         },
                         {
-                            date: new Date('2013-12-12T19:39:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'COLUMBUS',
-                                country: 'US',
-                                state: 'OH',
-                                zip: '43213'
-                            }
-                        },
-                        {
                             date: new Date('2013-12-11T13:14:00.000Z'),
                             description: 'Shipment information sent to FedEx',
                             address: {
@@ -708,8 +637,7 @@ describe('FedEx', function() {
             });
         });
 
-        // Skipping this test because FedEx returns time in a different timezone for the "Picked Up" event
-        it.skip('Local Delivery Restriction (Delivery Exception 083)', function(done) {
+        it('Local Delivery Restriction (Delivery Exception 083)', function(done) {
             bloodhound.track('852426136339213', 'fedex', function(err, actual) {
                 assert.ifError(err);
 
@@ -789,16 +717,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2013-12-19T04:05:00.000Z'),
                             description: 'Arrived at FedEx location',
-                            address: {
-                                city: 'SAN DIEGO',
-                                country: 'US',
-                                state: 'CA',
-                                zip: '92154'
-                            }
-                        },
-                        {
-                            date: new Date('2013-12-19T02:23:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'SAN DIEGO',
                                 country: 'US',
@@ -914,16 +832,6 @@ describe('FedEx', function() {
                             }
                         },
                         {
-                            date: new Date('2014-01-13T23:00:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'MIAMI',
-                                country: 'US',
-                                state: 'FL',
-                                zip: '33172'
-                            }
-                        },
-                        {
                             date: new Date('2014-01-13T15:42:39.000Z'),
                             description: 'Shipment information sent to FedEx',
                             address: {
@@ -992,16 +900,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2014-01-28T02:23:00.000Z'),
                             description: 'Arrived at FedEx location',
-                            address: {
-                                city: 'AUSTIN',
-                                country: 'US',
-                                state: 'TX',
-                                zip: '78744'
-                            }
-                        },
-                        {
-                            date: new Date('2014-01-28T01:13:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'AUSTIN',
                                 country: 'US',
@@ -1168,16 +1066,6 @@ describe('FedEx', function() {
                             }
                         },
                         {
-                            date: new Date('2014-01-10T21:11:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'TAMPA',
-                                country: 'US',
-                                state: 'FL',
-                                zip: '33634'
-                            }
-                        },
-                        {
                             date: new Date('2014-01-10T20:25:00.000Z'),
                             description: 'Shipment information sent to FedEx',
                             address: {
@@ -1304,16 +1192,6 @@ describe('FedEx', function() {
                                 state: 'OH',
                                 zip: '45140'
                             }
-                        },
-                        {
-                            date: new Date('2014-02-04T21:09:00.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'LOVELAND',
-                                country: 'US',
-                                state: 'OH',
-                                zip: '45140'
-                            }
                         }
                     ],
                     shippedAt: new Date('2014-02-05T02:30:00.000Z')
@@ -1414,16 +1292,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2014-01-04T02:33:00.000Z'),
                             description: 'Arrived at FedEx location',
-                            address: {
-                                city: 'SPOKANE',
-                                country: 'US',
-                                state: 'WA',
-                                zip: '99216'
-                            }
-                        },
-                        {
-                            date: new Date('2014-01-03T23:00:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'SPOKANE',
                                 country: 'US',
@@ -1627,16 +1495,6 @@ describe('FedEx', function() {
                         {
                             date: new Date('2013-12-27T06:42:00.000Z'),
                             description: 'Arrived at FedEx location',
-                            address: {
-                                city: 'NASHVILLE',
-                                country: 'US',
-                                state: 'TN',
-                                zip: '37207'
-                            }
-                        },
-                        {
-                            date: new Date('2013-12-27T02:59:00.000Z'),
-                            description: 'Picked up',
                             address: {
                                 city: 'NASHVILLE',
                                 country: 'US',
@@ -1975,18 +1833,7 @@ describe('FedEx', function() {
                 assert.ifError(err);
 
                 const expected = {
-                    events: [
-                        {
-                            date: new Date('2015-02-26T16:20:25.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'ALLENTOWN',
-                                country: 'US',
-                                state: 'PA',
-                                zip: '18101'
-                            }
-                        }
-                    ]
+                    events: []
                 };
 
                 assert.deepStrictEqual(actual, expected);
@@ -2018,16 +1865,6 @@ describe('FedEx', function() {
                                 country: 'US',
                                 state: 'IA',
                                 zip: '50313'
-                            }
-                        },
-                        {
-                            date: new Date('2015-03-19T17:17:38.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'MACKSBURG',
-                                country: 'US',
-                                state: 'IA',
-                                zip: '50155'
                             }
                         }
                     ],
@@ -2095,16 +1932,6 @@ describe('FedEx', function() {
                                 country: 'US',
                                 state: 'OH',
                                 zip: '45390'
-                            }
-                        },
-                        {
-                            date: new Date('2015-02-26T16:13:39.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'TROY',
-                                country: 'US',
-                                state: 'OH',
-                                zip: '45373'
                             }
                         }
                     ],
@@ -2193,16 +2020,6 @@ describe('FedEx', function() {
                                 country: 'US',
                                 state: 'WI',
                                 zip: '54301'
-                            }
-                        },
-                        {
-                            date: new Date('2015-02-26T18:02:02.000Z'),
-                            description: 'Picked up',
-                            address: {
-                                city: 'MENOMINEE',
-                                country: 'US',
-                                state: 'MI',
-                                zip: '49858'
                             }
                         }
                     ],
