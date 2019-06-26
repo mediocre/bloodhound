@@ -21,11 +21,11 @@ function Bloodhound(options) {
 
     this.track = function(trackingNumber, carrier, callback) {
         if (!trackingNumber) {
-            return callback(new Error('Tracking number is not specified'));
+            return callback(new Error('Tracking number is not specified.'));
         }
 
         if (!carrier) {
-            return callback(new Error('Carrier is not specified'));
+            return callback(new Error('Carrier is not specified.'));
         }
 
         const results = {

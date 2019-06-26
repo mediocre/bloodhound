@@ -8,7 +8,7 @@ describe('Error handling', function() {
     it('Should return an error when a tracking number is not specified', function(done) {
         bloodhound.track(null, 'fedex', function(err, data) {
             assert(err);
-            assert.strictEqual(err.message, 'Tracking number is not specified');
+            assert.strictEqual(err.message, 'Tracking number is not specified.');
             assert.strictEqual(data, undefined);
 
             done();
@@ -18,7 +18,17 @@ describe('Error handling', function() {
     it('Should return an error when a carrier is not specified', function(done) {
         bloodhound.track('449044304137821', null, function(err, data) {
             assert(err);
-            assert.strictEqual(err.message, 'Carrier is not specified');
+            assert.strictEqual(err.message, 'Carrier is not specified.');
+            assert.strictEqual(data, undefined);
+
+            done();
+        });
+    });
+
+    it('Should return an error when a carrier is not supported', function(done) {
+        bloodhound.track('449044304137821', 'foo', function(err, data) {
+            assert(err);
+            assert.strictEqual(err.message, 'Carrier foo is not supported.');
             assert.strictEqual(data, undefined);
 
             done();
