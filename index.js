@@ -73,26 +73,23 @@ function Bloodhound(options) {
                     }
 
                     const event = {
-                        date: new Date(e.Timestamp),
-                        description: e.EventDescription
-                    };
-
-                    if (e.Address) {
-                        event.address = {
+                        address: {
                             city: e.Address.City,
                             country: e.Address.CountryCode,
                             state: e.Address.StateOrProvinceCode,
                             zip: e.Address.PostalCode
-                        }
-
-                        // Remove blacklisted words
-                        if (event.address.city) {
-                            event.address.city = event.address.city.replace(CITY_BLACKLIST, '').trim();
-                        }
-                    }
+                        },
+                        date: new Date(e.Timestamp),
+                        description: e.EventDescription
+                    };
 
                     if (e.StatusExceptionDescription) {
                         event.details = e.StatusExceptionDescription;
+                    }
+
+                    // Remove blacklisted words
+                    if (event.address.city) {
+                        event.address.city = event.address.city.replace(CITY_BLACKLIST, '').trim();
                     }
 
                     results.events.push(event);
