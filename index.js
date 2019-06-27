@@ -7,7 +7,7 @@ const PitneyBowes = require('pitney-bowes');
 const request = require('request');
 
 // Remove these words from cities to turn cities like `FEDEX SMARTPOST INDIANAPOLIS` into `INDIANAPOLIS`
-const CITY_BLACKLIST = /fedex|smartpost/ig;
+const CITY_BLACKLIST = /fedex|smartpost|DISTRIBUTION CENTER/ig;
 
 // These tracking status codes indicate the shipment was delivered: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
 const FEDEX_DELIVERED_TRACKING_STATUS_CODES = ['DL'];
@@ -137,32 +137,56 @@ function Bloodhound(options) {
             }
 
             var xml = builder.create(obj, { headless: true }).end({ pretty: false });
-            xml = encodeURIComponent(xml);
+            const url = host + encodeURIComponent(xml);
 
-            request(host + xml, function(err, res) {
+            request(url, function(err, res) {
                 if (err) {
                     return callback(err);
-                } else {
-                    parser.parseString(res.body, function(err, data) {
-                        if (err) {
-                            return callback(err);
-                        }
-                        const statuses = data.TrackResponse.TrackInfo[0].TrackDetail.map(scanDetails => {
+                }
+
+                parser.parseString(res.body, function(err, data) {
+                    // Kind of like checking status code
+                    // Possibly combine these if statements?
+                    if(err) {
+                        return callback(err);
+                    }
+
+                    if (data.TrackResponse.TrackInfo[0].Error) {
+                        return callback(data.TrackResponse.TrackInfo[0].Error[0].Description[0]);
+                    }
+
+                    var statuses = [];
+
+                    // TrackSummary[0] exists for every item (with valid tracking number)
+                    const summary = data.TrackResponse.TrackInfo[0].TrackSummary[0];
+
+                    // If we have tracking details, push them into statuses
+                    if (data.TrackResponse.TrackInfo[0].TrackDetail) {
+                        statuses = data.TrackResponse.TrackInfo[0].TrackDetail.map(scanDetails => {
                             return {
                                 address: {
-                                    city: scanDetails.EventCity[0],
+                                    city: scanDetails.EventCity[0].replace(CITY_BLACKLIST, '').trim(),
                                     state: scanDetails.EventState[0],
                                     zip: scanDetails.EventZIPCode[0]
                                 },
-                                // There's probably a better way to format this date
-                                date: moment(`${new Date(scanDetails.EventDate[0]).toISOString().split('T')[0]} ${moment(scanDetails.EventTime[0], 'h:mm a').format('H:mm')}`, 'YYYY-MM-DD HH:mm:ss').toDate(),
+                                date: moment(`${scanDetails.EventDate[0]} ${scanDetails.EventTime[0]}`, 'MMMM D, YYYY h:mm a').toDate(),
                                 description: scanDetails.Event[0]
                             };
                         });
+                    }
 
-                        return callback(null, statuses);
+                    // Push TrackSummary since it always exists
+                    statuses.push({
+                        address: {
+                            city: summary.EventCity[0],
+                            state: summary.EventState[0]
+                        },
+                        date: moment(`${summary.EventDate[0]} ${summary.EventTime[0]}`, 'MMMM D, YYYY h:mm a').toDate(),
+                        description: data.TrackResponse.TrackInfo[0].StatusSummary[0]
                     });
-                }
+
+                    return callback(null, statuses);
+                });
             });
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
