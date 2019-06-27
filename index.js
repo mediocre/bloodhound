@@ -1,7 +1,10 @@
 const async = require('async');
+const builder = require('xmlbuilder');
 const FedEx = require('shipping-fedex');
 const moment = require('moment-timezone');
+const parser = require('xml2js');
 const PitneyBowes = require('pitney-bowes');
+const request = require('request');
 
 // Remove these words from cities to turn cities like `FEDEX SMARTPOST INDIANAPOLIS` into `INDIANAPOLIS`
 const CITY_BLACKLIST = /fedex|smartpost/ig;
@@ -18,6 +21,7 @@ const FEDEX_TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 function Bloodhound(options) {
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
+    const usps = options && options.usps;
 
     this.track = function(trackingNumber, carrier, callback) {
         if (!trackingNumber) {
@@ -115,6 +119,50 @@ function Bloodhound(options) {
                 });
 
                 callback(null, statuses);
+            });
+        } else if (carrier == 'usps') {
+
+            const host = 'http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2&XML=';
+
+            const obj = {
+                TrackFieldRequest: {
+                    '@USERID': usps.USERID,
+                    Revision: '1',
+                    ClientIp: '127.0.0.1',
+                    SourceId: usps.SourceId,
+                    TrackID: {
+                        '@ID': trackingNumber
+                    }
+                }
+            }
+
+            var xml = builder.create(obj, { headless: true }).end({ pretty: false });
+            xml = encodeURIComponent(xml);
+
+            request(host + xml, function(err, res) {
+                if (err) {
+                    return callback(err);
+                } else {
+                    parser.parseString(res.body, function(err, data) {
+                        if (err) {
+                            return callback(err);
+                        }
+                        const statuses = data.TrackResponse.TrackInfo[0].TrackDetail.map(scanDetails => {
+                            return {
+                                address: {
+                                    city: scanDetails.EventCity[0],
+                                    state: scanDetails.EventState[0],
+                                    zip: scanDetails.EventZIPCode[0]
+                                },
+                                // There's probably a better way to format this date
+                                date: moment(`${new Date(scanDetails.EventDate[0]).toISOString().split('T')[0]} ${moment(scanDetails.EventTime[0], 'h:mm a').format('H:mm')}`, 'YYYY-MM-DD HH:mm:ss').toDate(),
+                                description: scanDetails.Event[0]
+                            };
+                        });
+
+                        return callback(null, statuses);
+                    });
+                }
             });
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));

@@ -2059,3 +2059,24 @@ describe.skip('Newgistics', function() {
         });
     });
 });
+
+describe.skip('USPS', function() {
+    this.timeout(10000);
+
+    const bloodhound = new Bloodhound({
+        usps: {
+            USERID: process.env.USERID,
+            SourceId: process.env.SourceId
+        }
+    });
+
+    describe('USPS Tracking', function() {
+        it('should return a response', function(done) {
+            bloodhound.track('9400110200830244685403', 'usps', function(err, actual) {
+                assert.ifError(err);
+                console.log(actual)
+                done();
+            });
+        });
+    });
+});
