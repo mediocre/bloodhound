@@ -2044,7 +2044,7 @@ describe('FedEx', function() {
     });
 });
 
-describe('Newgistics', function() {
+describe.only('Newgistics', function() {
     it('4206336792748927005269000010615207', function(done) {
         const bloodhound = new Bloodhound({
             pitneyBowes: {
@@ -2102,7 +2102,7 @@ describe('USPS', function() {
                 done();
             });
         });
-        it.only('should return tracking information with no errors', function (done) {
+        it('should return tracking information with no errors', function (done) {
             bloodhound.track('4204210192612927005269000027623688', 'usps', function (err) {
                 assert.ifError(err);
                 done();
