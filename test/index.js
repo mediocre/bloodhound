@@ -2070,7 +2070,32 @@ describe('USPS', function() {
         }
     });
 
-    describe('USPS Tracking', function() {
+    describe.only('Invalid USPS Credentials', function() {
+        it('should return an error for invalid USERID', function(done) {
+            const bloodhound1 = new Bloodhound({
+                usps: {
+                    SourceId: process.env.SourceId
+                }
+            });
+            bloodhound1.track('4204210192612927005269000027623688', 'usps', function(err) {
+                assert(err);
+                done();
+            });
+        });
+        it('should return an error for invalid SourceId', function (done) {
+            const bloodhound2 = new Bloodhound({
+                usps: {
+                    USERID: process.env.USERID
+                }
+            });
+            bloodhound2.track('4204210192612927005269000027623688', 'usps', function (err) {
+                assert(err);
+                done();
+            });
+        });
+    });
+
+    describe.only('USPS Tracking', function() {
         it('should return an error for an invalid tracking number', function(done) {
             bloodhound.track('An Invalid Tracking Number', 'usps', function(err) {
                 assert(err);
