@@ -6,6 +6,13 @@ const request = require('request');
 const CITY_BLACKLIST = /DISTRIBUTION CENTER/ig;
 
 function USPS(options) {
+    this.isTrackingNumberValid = function(trackingNumber) {
+        if ([/^(91|92|93|94|95|96)\d{20}$/, /^(91|92|93|94|95|96)\d{18}$/, /^940\d{19}$/, /^940\d{17}$/, /^\d{22}$/, /^\d{20}$/].some(regex => regex.test(trackingNumber))){
+            return true;
+        }
+
+        return false;
+    };
     this.track = function(trackingNumber, callback) {
         const host = 'http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2&XML=';
 
