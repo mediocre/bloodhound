@@ -145,13 +145,15 @@ function Bloodhound(options) {
                 }
 
                 parser.parseString(res.body, function(err, data) {
-                    // Kind of like checking status code
-                    // Possibly combine these if statements?
+                    // Kind of like checking status code?
+                    // 1. Invalid XML in parser
+                    // 2. Invalid credentials
+                    // 3. Invalid tracking number
                     if(err) {
                         return callback(err);
-                    }
-
-                    if (data.TrackResponse.TrackInfo[0].Error) {
+                    } else if (data.Error) {
+                        return callback(data.Error.Description[0]);
+                    } else if (data.TrackResponse.TrackInfo[0].Error) {
                         return callback(data.TrackResponse.TrackInfo[0].Error[0].Description[0]);
                     }
 
@@ -161,6 +163,7 @@ function Bloodhound(options) {
                     const summary = data.TrackResponse.TrackInfo[0].TrackSummary[0];
 
                     // If we have tracking details, push them into statuses
+                    // Tracking details only exist if the item has more than one status update
                     if (data.TrackResponse.TrackInfo[0].TrackDetail) {
                         statuses = data.TrackResponse.TrackInfo[0].TrackDetail.map(scanDetails => {
                             return {

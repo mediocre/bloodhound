@@ -2053,15 +2053,14 @@ describe('Newgistics', function() {
             }
         });
 
-        bloodhound.track('4206336792748927005269000010615207', 'newgistics', function(err, data) {
+        bloodhound.track('4206336792748927005269000010615207', 'newgistics', function(err) {
             assert.ifError(err);
-            console.log(data);
             done();
         });
     });
 });
 
-describe.only('USPS', function() {
+describe('USPS', function() {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
@@ -2071,18 +2070,16 @@ describe.only('USPS', function() {
         }
     });
 
-    describe.only('USPS Tracking', function() {
+    describe('USPS Tracking', function() {
         it('should return an error for an invalid tracking number', function(done) {
-            bloodhound.track('07497934857938', 'usps', function(err) {
-                assert.strictEqual(err, 'The tracking number may be incorrect or the status update is not yet available. Please verify your tracking number and try again later.');
+            bloodhound.track('An Invalid Tracking Number', 'usps', function(err) {
+                assert(err);
                 done();
             });
         });
-        it.only('should return tracking information', function (done) {
-            bloodhound.track('4204210192612927005269000027623688', 'usps', function (err, actual) {
-                // assert.ifError(err);
-                if (err) console.log(err)
-                console.log(actual)
+        it('should return tracking information with no errors', function (done) {
+            bloodhound.track('4204210192612927005269000027623688', 'usps', function (err) {
+                assert.ifError(err);
                 done();
             });
         });
