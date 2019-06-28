@@ -128,8 +128,8 @@ function Bloodhound(options) {
                 TrackFieldRequest: {
                     '@USERID': usps.USERID,
                     Revision: '1',
-                    ClientIp: '127.0.0.1',
-                    SourceId: usps.SourceId,
+                    ClientIp: usps.ClientIp || '127.0.0.1',
+                    SourceId: usps.SourceId || 'Mediocre/bloodhound',
                     TrackID: {
                         '@ID': trackingNumber
                     }
