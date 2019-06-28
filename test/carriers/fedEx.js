@@ -7,20 +7,28 @@ const FedEx = require('../../carriers/fedEx');
 describe('fedEx.isTrackingNumberValid', function() {
     const fedEx = new FedEx();
 
-    it('61299998620341515252', function() {
-        assert(fedEx.isTrackingNumberValid('61299998620341515252'));
-    });
+    const validTrackingNumbers = [
+        '02931503799192766595',
+        '41999998135520738841',
+        '61299998620341515252',
+        '74899992242124855076',
+        '771613423732',
+        '7716 1342 3732',
+        '9261293148703201595357',
+        '9274899992136003821767',
+        '9611804010639001854878',
+        '9611804512604749366900',
+        '997048950367429',
+        '9970 4895 0367 429',
+        'DT771613423732'
+    ];
 
-    it('74899992242124855076', function() {
-        assert(fedEx.isTrackingNumberValid('74899992242124855076'));
-    });
-
-    it('9261293148703201595357', function() {
-        assert(fedEx.isTrackingNumberValid('9261293148703201595357'));
-    });
-
-    it('9274899992136003821767', function() {
-        assert(fedEx.isTrackingNumberValid('9274899992136003821767'));
+    it('should detect valid FedEx tracking numbers', function() {
+        validTrackingNumbers.forEach(trackingNumber => {
+            if (!fedEx.isTrackingNumberValid(trackingNumber)) {
+                assert.fail(`${trackingNumber} is not recognized as a valid FedEx tracking number`);
+            }
+        });
     });
 });
 

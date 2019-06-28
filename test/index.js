@@ -16,7 +16,7 @@ describe('Error handling', function() {
     });
 
     it('Should return an error when a carrier is not specified', function(done) {
-        bloodhound.track('449044304137821', null, function(err, data) {
+        bloodhound.track('hello world', null, function(err, data) {
             assert(err);
             assert.strictEqual(err.message, 'Unknown carrier.');
             assert.strictEqual(data, undefined);
@@ -31,6 +31,13 @@ describe('Error handling', function() {
             assert.strictEqual(err.message, 'Carrier foo is not supported.');
             assert.strictEqual(data, undefined);
 
+            done();
+        });
+    });
+
+    it('Should not return an error when a carrier is not specified but carrier can be guessed', function(done) {
+        bloodhound.track('449044304137821', null, function(err) {
+            assert.ifError(err);
             done();
         });
     });
