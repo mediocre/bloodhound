@@ -1,6 +1,8 @@
 const async = require('async');
 const FedExClient = require('shipping-fedex');
 
+const checkDigit = require('../util/checkDigit');
+
 // Remove these words from cities to turn cities like `FEDEX SMARTPOST INDIANAPOLIS` into `INDIANAPOLIS`
 const CITY_BLACKLIST = /fedex|smartpost/ig;
 
@@ -17,8 +19,51 @@ function FedEx(options) {
     const fedExClient = new FedExClient(options);
 
     this.isTrackingNumberValid = function(trackingNumber) {
+        // Remove whitespace
+        trackingNumber = trackingNumber.replace(/\s/g, '');
+
         if ([/^6129\d{16}$/, /^7489\d{16}$/, /^926129\d{16}$/, /^927489\d{16}$/].some(regex => regex.test(trackingNumber))) {
             return true;
+        }
+
+        if (/^02\d{18}$/.test(trackingNumber)) {
+            return checkDigit(`91${trackingNumber}`, [3, 1], 10);
+        }
+
+        if (/^96\d{20}$/.test(trackingNumber)) {
+            if (checkDigit(trackingNumber, [3, 1, 7], 11)) {
+                return true;
+            }
+
+            if (checkDigit(trackingNumber.slice(7), [1, 3], 10)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        if (/^DT\d{12}$/.test(trackingNumber)) {
+            return checkDigit(trackingNumber.match(/^DT(\d{12})$/)[1], [3, 1, 7], 11);
+        }
+
+        if (/^\d{12}$/.test(trackingNumber)) {
+            return checkDigit(trackingNumber, [3, 1, 7], 11);
+        }
+
+        if (/^\d{15}$/.test(trackingNumber)) {
+            return checkDigit(trackingNumber, [1, 3], 10);
+        }
+
+        if (/^\d{20}$/.test(trackingNumber)) {
+            if (checkDigit(trackingNumber, [3, 1, 7], 11)) {
+                return true;
+            }
+
+            if (checkDigit(`92${trackingNumber}`, [3, 1], 10)) {
+                return true;
+            }
+
+            return false;
         }
 
         return false;

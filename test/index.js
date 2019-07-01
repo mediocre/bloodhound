@@ -16,7 +16,7 @@ describe('Error handling', function() {
     });
 
     it('Should return an error when a carrier is not specified', function(done) {
-        bloodhound.track('449044304137821', null, function(err, data) {
+        bloodhound.track('hello world', null, function(err, data) {
             assert(err);
             assert.strictEqual(err.message, 'Unknown carrier.');
             assert.strictEqual(data, undefined);
@@ -34,6 +34,13 @@ describe('Error handling', function() {
             done();
         });
     });
+
+    it('Should not return an error when a carrier is not specified but carrier can be guessed', function(done) {
+        bloodhound.track('449044304137821', null, function(err) {
+            assert.ifError(err);
+            done();
+        });
+    });
 });
 
 describe('bloodhound.guessCarrier', function() {
@@ -45,22 +52,6 @@ describe('bloodhound.guessCarrier', function() {
 
     it('Should guess a FedEx tracking number', function() {
         assert.strictEqual(bloodhound.guessCarrier('61299998620341515252'), 'FedEx');
-    });
-});
-
-describe.only('Newgistics', function() {
-    it('4206336792748927005269000010615207', function(done) {
-        const bloodhound = new Bloodhound({
-            pitneyBowes: {
-                api_key: process.env.PITNEY_BOWES_API_KEY,
-                api_secret: process.env.PITNEY_BOWES_API_SECRET
-            }
-        });
-
-        bloodhound.track('4206336792748927005269000010615207', 'newgistics', function(err) {
-            assert.ifError(err);
-            done();
-        });
     });
 });
 
