@@ -3,6 +3,14 @@ const assert = require('assert');
 const geography = require('../../util/geography');
 
 describe('geography.addressToString', function() {
+    it('New York', function() {
+        const address = {
+            city: 'New York'
+        };
+
+        assert.strictEqual(geography.addressToString(address), 'New York');
+    });
+
     it('NY', function() {
         const address = {
             state: 'NY'
@@ -39,6 +47,14 @@ describe('geography.addressToString', function() {
         };
 
         assert.strictEqual(geography.addressToString(address), 'New York, NY 10001, US');
+    });
+
+    it('US', function() {
+        const address = {
+            country: 'US'
+        };
+
+        assert.strictEqual(geography.addressToString(address), 'US');
     });
 });
 
