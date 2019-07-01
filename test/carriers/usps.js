@@ -2,7 +2,7 @@ const assert = require('assert');
 
 const Bloodhound = require('../../index');
 
-describe.only('USPS', function () {
+describe('USPS', function () {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
