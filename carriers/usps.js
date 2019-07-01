@@ -65,7 +65,6 @@ function USPS(options) {
 
                 // If we have tracking details, push them into statuses
                 // Tracking details only exist if the item has more than one status update
-
                 if (trackDetailList) {
                     trackDetailList.forEach((trackDetail) => {
                         scanDetailsList.push(trackDetail);
@@ -132,7 +131,7 @@ function USPS(options) {
                     });
 
                     // Change description of most recent event to be StatusSummary (more descriptive)
-                    results.events[0].description = data.TrackResponse.TrackInfo[0].StatusSummary[0];
+                    results.events[0].details = data.TrackResponse.TrackInfo[0].StatusSummary[0];
 
                     callback(null, results);
                 });
