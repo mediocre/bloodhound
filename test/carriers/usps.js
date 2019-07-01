@@ -7,8 +7,7 @@ describe.only('USPS', function () {
 
     const bloodhound = new Bloodhound({
         usps: {
-            USERID: process.env.USERID,
-            SourceId: process.env.SourceId
+            USPS_USERID: process.env.USPS_USERID
         }
     });
 
@@ -16,8 +15,7 @@ describe.only('USPS', function () {
         it('should return an error for invalid USERID', function (done) {
             const bloodhound1 = new Bloodhound({
                 usps: {
-                    USERID: 'invalid',
-                    SourceId: process.env.SourceId
+                    USPS_USERID: 'invalid'
                 }
             });
             bloodhound1.track('4204210192612927005269000027623688', 'usps', function (err) {

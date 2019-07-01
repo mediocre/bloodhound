@@ -21,10 +21,10 @@ function USPS(options) {
 
         const obj = {
             TrackFieldRequest: {
-                '@USERID': options.USERID,
+                '@USERID': options.USPS_USERID,
                 Revision: '1',
                 ClientIp: options.ClientIp || '127.0.0.1',
-                SourceId: options.SourceId || 'Mediocre/bloodhound',
+                SourceId: options.SourceId || '@mediocre/bloodhound (+https://github.com/mediocre/bloodhound)',
                 TrackID: {
                     '@ID': trackingNumber
                 }
