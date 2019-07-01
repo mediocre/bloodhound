@@ -1,10 +1,11 @@
 const FedEx = require('./carriers/fedEx');
 const PitneyBowes = require('./carriers/pitneyBowes');
-
+const UPS = require('./carriers/ups');
 function Bloodhound(options) {
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
-
+    const ups = new UPS(options && options.ups);
+    
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
@@ -40,6 +41,8 @@ function Bloodhound(options) {
             fedEx.track(trackingNumber, callback);
         } else if (carrier === 'newgistics') {
             pitneyBowes.track(trackingNumber, callback);
+        } else if (carrier === 'ups'){
+            ups.track(trackingNumber, callback);
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
         }
