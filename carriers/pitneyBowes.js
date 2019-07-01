@@ -50,16 +50,28 @@ function PitneyBowes(options) {
 
                 data.scanDetailsList.forEach(scanDetail => {
                     const address = addresses.find(a => a.location === scanDetail.location);
+                    let timezone = 'America/New_York';
+
+                    if (address && address.timezone) {
+                        timezone = address.timezone;
+                    }
 
                     const event = {
                         address: scanDetail.address,
-                        date: moment.tz(`${scanDetail.eventDate} ${scanDetail.eventTime}`, 'YYYY-MM-DD HH:mm:ss', address.timezone).toDate(),
+                        date: moment.tz(`${scanDetail.eventDate} ${scanDetail.eventTime}`, 'YYYY-MM-DD HH:mm:ss', timezone).toDate(),
                         description: scanDetail.scanDescription
                     };
 
                     // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
-                    event.address.city = address.city;
-                    event.address.state = address.state;
+                    if (address) {
+                        if (address.city) {
+                            event.address.city = address.city;
+                        }
+
+                        if (address.state) {
+                            event.address.state = address.state;
+                        }
+                    }
 
                     results.events.push(event);
                 });
