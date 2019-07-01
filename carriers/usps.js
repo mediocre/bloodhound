@@ -1,7 +1,10 @@
+const async = require('async');
 const builder = require('xmlbuilder');
 const moment = require('moment-timezone');
 const parser = require('xml2js');
 const request = require('request');
+
+const geography = require('../util/geography');
 
 const CITY_BLACKLIST = /DISTRIBUTION CENTER/ig;
 
@@ -37,7 +40,6 @@ function USPS(options) {
             }
 
             parser.parseString(res.body, function (err, data) {
-                // Kind of like checking status code?
                 // 1. Invalid XML in parser
                 // 2. Invalid credentials
                 // 3. Invalid tracking number
@@ -49,38 +51,91 @@ function USPS(options) {
                     return callback(new Error(data.TrackResponse.TrackInfo[0].Error[0].Description[0]));
                 }
 
-                var statuses = [];
+                const results = {
+                    events: []
+                };
+
+                var scanDetailsList = [];
 
                 // TrackSummary[0] exists for every item (with valid tracking number)
                 const summary = data.TrackResponse.TrackInfo[0].TrackSummary[0];
 
+                scanDetailsList.push(summary);
+                var trackDetailList = data.TrackResponse.TrackInfo[0].TrackDetail;
+
                 // If we have tracking details, push them into statuses
                 // Tracking details only exist if the item has more than one status update
-                if (data.TrackResponse.TrackInfo[0].TrackDetail) {
-                    statuses = data.TrackResponse.TrackInfo[0].TrackDetail.map(scanDetails => {
-                        return {
-                            address: {
-                                city: scanDetails.EventCity[0].replace(CITY_BLACKLIST, '').trim(),
-                                state: scanDetails.EventState[0],
-                                zip: scanDetails.EventZIPCode[0]
-                            },
-                            date: moment(`${scanDetails.EventDate[0]} ${scanDetails.EventTime[0]}`, 'MMMM D, YYYY h:mm a').toDate(),
-                            description: scanDetails.Event[0]
-                        };
+
+                if (trackDetailList) {
+                    trackDetailList.forEach((trackDetail) => {
+                        scanDetailsList.push(trackDetail);
                     });
                 }
 
-                // Push TrackSummary since it always exists
-                statuses.push({
-                    address: {
-                        city: summary.EventCity[0],
-                        state: summary.EventState[0]
-                    },
-                    date: moment(`${summary.EventDate[0]} ${summary.EventTime[0]}`, 'MMMM D, YYYY h:mm a').toDate(),
-                    description: data.TrackResponse.TrackInfo[0].StatusSummary[0]
+                // Set address and location of each scan detail
+                scanDetailsList.forEach(scanDetail => {
+                    scanDetail.address = {
+                        city: scanDetail.EventCity[0].replace(CITY_BLACKLIST, '').trim(),
+                        country: scanDetail.EventCountry[0],
+                        state: scanDetail.EventState[0],
+                        zip: scanDetail.EventZIPCode[0]
+                    };
+
+                    scanDetail.location = geography.addressToString(scanDetail.address);
                 });
 
-                return callback(null, statuses);
+                // Get unqiue array of locations
+                const locations = Array.from(new Set(scanDetailsList.map(scanDetail => scanDetail.location)));
+
+                // Lookup each location
+                async.mapLimit(locations, 10, function (location, callback) {
+                    geography.parseLocation(location, function (err, address) {
+                        if (err) {
+                            return callback(err);
+                        }
+
+                        address.location = location;
+
+                        callback(null, address);
+                    });
+                }, function (err, addresses) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    scanDetailsList.forEach(scanDetail => {
+                        const address = addresses.find(a => a.location === scanDetail.location);
+                        let timezone = 'America/New_York';
+
+                        if (address && address.timezone) {
+                            timezone = address.timezone;
+                        }
+
+                        const event = {
+                            address: scanDetail.address,
+                            date: moment.tz(`${scanDetail.EventDate[0]} ${scanDetail.EventTime[0]}`, 'MMMM D, YYYY h:mm a', timezone).toDate(),
+                            description: scanDetail.Event[0]
+                        };
+
+                        // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
+                        if (address) {
+                            if (address.city) {
+                                event.address.city = address.city;
+                            }
+
+                            if (address.state) {
+                                event.address.state = address.state;
+                            }
+                        }
+
+                        results.events.push(event);
+                    });
+
+                    // Change description of most recent event to be StatusSummary (more descriptive)
+                    results.events[0].description = data.TrackResponse.TrackInfo[0].StatusSummary[0];
+
+                    callback(null, results);
+                });
             });
         });
     }
