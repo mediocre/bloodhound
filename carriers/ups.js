@@ -49,16 +49,14 @@ function UPS(options) {
             })
 
             const locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
-            // console.log(locations);
+
             async.mapLimit(locations, 10, function(location, callback) {
                 geography.parseLocation(location, function (err, address) {
                     if (err) {
-                        // console.log(err);
                         return callback(err);
                     }
-                    // console.log('here')
                     address.location = location;
-                    // console.log(address);
+
                     callback(null, address);
                 });
             }, function (err, addresses) {
@@ -66,10 +64,7 @@ function UPS(options) {
                     return callback(err);
                 }
 
-                // console.log(activitiesList);
-
                 activitiesList.forEach(activity => {
-                    // console.log(activity);
                     const address = addresses.find(a => a.location === activity.location);
                     let timezone = 'America/New_York';
 
@@ -82,8 +77,6 @@ function UPS(options) {
                         date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
                         description: activity.Status.Description
                     };
-
-                    // console.log(event);
 
                     // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
                     if (address) {
@@ -99,11 +92,9 @@ function UPS(options) {
                     results.events.push(event);
                 });
 
+                // console.log(JSON.stringify(results, null, 4));
                 callback(null, results);
             });
-
-            console.log(results);
-            callback(err, res);
         })
     }
 }
