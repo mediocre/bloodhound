@@ -14,6 +14,9 @@ const DELIVERED_TRACKING_STATUS_CODES = ['01'];
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created): https://about.usps.com/publications/pub97/pub97_appi.htm
 const SHIPPED_TRACKING_STATUS_CODES = ['80', '81', '82', 'OF'];
 
+// The events from these tracking status codes are filtered because they do not provide any useful information: https://about.usps.com/publications/pub97/pub97_appi.htm
+const TRACKING_STATUS_CODES_BLACKLIST = ['NT'];
+
 function USPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
         // remove whitespace
@@ -94,6 +97,10 @@ function USPS(options) {
                 // Tracking details only exist if the item has more than one status update
                 if (trackDetailList) {
                     trackDetailList.forEach((trackDetail) => {
+                        if(TRACKING_STATUS_CODES_BLACKLIST.includes(trackDetail.EventCode[0])) {
+                            return;
+                        }
+
                         scanDetailsList.push(trackDetail);
                     });
                 }
