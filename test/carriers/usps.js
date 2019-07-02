@@ -2,7 +2,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const USPS = require('../../carriers/usps.js')
 
-describe.only('usps.isTrackingNumberValid', function() {
+describe('usps.isTrackingNumberValid', function() {
     const usps = new USPS();
 
     const validTrackingNumbers = [
@@ -36,7 +36,7 @@ describe.only('usps.isTrackingNumberValid', function() {
     });
 });
 
-describe.only('USPS', function () {
+describe('USPS', function () {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
