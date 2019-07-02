@@ -10,7 +10,28 @@ const CITY_BLACKLIST = /DISTRIBUTION CENTER/ig;
 
 function USPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
-        if ([/^(91|92|93|94|95|96)\d{20}$/, /^(91|92|93|94|95|96)\d{18}$/, /^940\d{19}$/, /^940\d{17}$/, /^\d{22}$/, /^\d{20}$/].some(regex => regex.test(trackingNumber))){
+        // remove whitespace
+        trackingNumber = trackingNumber.replace(/\s/g, '');
+
+        if (/^(94001)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(92055)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(94073)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(93033)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(92701)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(92088)\d{17}$/.test(trackingNumber)){
+            return true;
+        }
+        if (/^(92021)\d{17}$/.test(trackingNumber)){
             return true;
         }
 
