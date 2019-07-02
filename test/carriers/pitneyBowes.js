@@ -118,7 +118,9 @@ describe('Newgistics', function() {
                         date: new Date('2019-06-25T13:09:00.000Z'),
                         description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
                     }
-                ]
+                ],
+                deliveredAt: new Date('2019-06-30T18:03:00.000Z'),
+                shippedAt: new Date('2019-06-29T16:10:00.000Z')
             };
 
             assert.deepStrictEqual(actual, expected);
