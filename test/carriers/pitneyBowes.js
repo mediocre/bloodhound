@@ -120,7 +120,7 @@ describe('Newgistics', function() {
                     }
                 ],
                 deliveredAt: new Date('2019-06-30T18:03:00.000Z'),
-                shippedAt: new Date('2019-06-29T16:10:00.000Z')
+                shippedAt: new Date('2019-06-28T21:43:00.000Z')
             };
 
             assert.deepStrictEqual(actual, expected);
