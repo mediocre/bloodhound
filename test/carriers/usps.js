@@ -41,14 +41,19 @@ describe('USPS', function () {
 
     const bloodhound = new Bloodhound({
         usps: {
-            USPS_USERID: process.env.USPS_USERID,
-            baseUrl: 'https://www.google.com'
+            USPS_USERID: process.env.USPS_USERID
         }
     });
 
     describe('Invalid USPS Access', function() {
+        const bloodhound1 = new Bloodhound({
+            usps: {
+                USPS_USERID: process.env.USPS_USERID,
+                baseUrl: 'https://google.com'
+            }
+        });
         it('should return an error for invalid URL', function (done) {
-            bloodhound.track('9400111899223837861141', 'usps', function (err) {
+            bloodhound1.track('9400111899223837861141', 'usps', function (err) {
                 assert(err);
                 done();
             });
