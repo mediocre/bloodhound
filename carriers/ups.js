@@ -2,8 +2,30 @@ const async = require('async');
 const geography = require('../util/geography');
 const moment = require('moment-timezone');
 const request = require('request');
+const confirmUpsFreight = require('../util/confirmUpsFreight');
+const confirmUps = require('../util/confirmUps');
 
 function UPS(options) {
+    this.isTrackingNumberValid = function(trackingNumber) {
+        // Remove whitespace
+        trackingNumber = trackingNumber.replace(/\s/g, '');
+
+        // https://www.ups.com/us/en/tracking/help/tracking/tnh.page
+        // https://www.codeproject.com/Articles/21224/Calculating-the-UPS-Tracking-Number-Check-Digit
+        if (/^1Z[0-9A-Z]{16}$/.test(trackingNumber)) {
+            if (confirmUps(trackingNumber)){
+                return true;
+            }
+        }
+        if (/^(H|T|J|K|F|W|M|Q|A)\d{10}$/.test(trackingNumber)) {
+            if (confirmUpsFreight(trackingNumber)){
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     this.track = function(trackingNumber, callback) {
         const baseUrl = options.baseUrl || 'https://onlinetools.ups.com/rest/Track';
 
