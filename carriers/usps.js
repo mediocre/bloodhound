@@ -8,6 +8,12 @@ const geography = require('../util/geography');
 
 const CITY_BLACKLIST = /DISTRIBUTION CENTER/ig;
 
+// These tracking status codes indicate the shipment was delivered: https://about.usps.com/publications/pub97/pub97_appi.htm
+const DELIVERED_TRACKING_STATUS_CODES = ['01'];
+
+// These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created): https://about.usps.com/publications/pub97/pub97_appi.htm
+const SHIPPED_TRACKING_STATUS_CODES = ['80', '81', '82', 'OF'];
+
 function USPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
         // remove whitespace
@@ -38,7 +44,7 @@ function USPS(options) {
         return false;
     };
     this.track = function(trackingNumber, callback) {
-        const host = 'http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2&XML=';
+        const baseUrl = options.baseUrl || 'http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2&XML=';
 
         const obj = {
             TrackFieldRequest: {
@@ -53,7 +59,7 @@ function USPS(options) {
         }
 
         var xml = builder.create(obj, { headless: true }).end({ pretty: false });
-        const url = host + encodeURIComponent(xml);
+        const url = baseUrl + encodeURIComponent(xml);
 
         request(url, function (err, res) {
             if (err) {
@@ -136,6 +142,14 @@ function USPS(options) {
                             date: moment.tz(`${scanDetail.EventDate[0]} ${scanDetail.EventTime[0]}`, 'MMMM D, YYYY h:mm a', timezone).toDate(),
                             description: scanDetail.Event[0]
                         };
+
+                        if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
+                            results.deliveredAt = new Date(event.date);
+                        }
+
+                        if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
+                            results.shippedAt = new Date(event.date);
+                        }
 
                         // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
                         if (address) {
