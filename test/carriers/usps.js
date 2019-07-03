@@ -54,6 +54,24 @@ describe('USPS', function () {
         }
     });
 
+    describe('Error Handling', function() {
+        this.timeout(60000);
+
+        it('should return an error for invalid base URL', function(done) {
+            const bloodhound = new Bloodhound({
+                usps: {
+                    baseUrl: 'https://httpbin.org/delay/10#',
+                    userId: process.env.USPS_USERID
+                }
+            });
+
+            bloodhound.track('9400111899223837861141', 'usps', function(err) {
+                assert(err);
+                done();
+            });
+        });
+    });
+
     describe('Invalid USPS Access', function() {
         const bloodhound = new Bloodhound({
             usps: {
@@ -62,8 +80,8 @@ describe('USPS', function () {
             }
         });
 
-        it('should return an error for invalid URL', function (done) {
-            bloodhound.track('9400111899223837861141', 'usps', function (err) {
+        it('should return an error for invalid URL', function(done) {
+            bloodhound.track('9400111899223837861141', 'usps', function(err) {
                 assert(err);
                 done();
             });
