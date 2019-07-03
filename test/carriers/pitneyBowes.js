@@ -7,7 +7,7 @@ describe('Newgistics', function() {
 
     it('should return an error for invalid base URL', function(done) {
         const bloodhound = new Bloodhound({
-            usps: {
+            pitneyBowes: {
                 baseUrl: 'https://httpbin.org/status/500#'
             }
         });
