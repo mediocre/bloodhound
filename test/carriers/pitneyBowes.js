@@ -5,6 +5,19 @@ const Bloodhound = require('../../index.js');
 describe('Newgistics', function() {
     this.timeout(10000);
 
+    it('should return an error for invalid base URL', function(done) {
+        const bloodhound = new Bloodhound({
+            usps: {
+                baseUrl: 'https://httpbin.org/status/500#'
+            }
+        });
+
+        bloodhound.track('9400111899223837861141', 'newgistics', function(err) {
+            assert(err);
+            done();
+        });
+    });
+
     it('4206336792748927005269000010615207', function(done) {
         const bloodhound = new Bloodhound({
             pitneyBowes: {
