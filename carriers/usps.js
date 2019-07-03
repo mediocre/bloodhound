@@ -151,11 +151,11 @@ function USPS(options) {
                         };
 
                         if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
-                            results.deliveredAt = new Date(event.date);
+                            results.deliveredAt = event.date;
                         }
 
                         if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
-                            results.shippedAt = new Date(event.date);
+                            results.shippedAt = event.date;
                         }
 
                         // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
