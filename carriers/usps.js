@@ -40,14 +40,11 @@ function USPS(options) {
         }
 
         if (/^420\d{31}$/.test(trackingNumber)) {
-            if (checkDigit(trackingNumber.match(/^420\d{9}(\d{22})$/)[1], [3, 1], 10)){
+            if (checkDigit(trackingNumber.match(/^420\d{9}(\d{22})$/)[1], [3, 1], 10)) {
+                return true;
+            } else if (checkDigit(trackingNumber.match(/^420\d{5}(\d{26})$/)[1], [3, 1], 10)) {
                 return true;
             }
-            if (checkDigit(trackingNumber.match(/^420\d{5}(\d{26})$/)[1], [3, 1], 10)){
-                return true;
-            }
-
-            return false;
         }
 
         return false;
