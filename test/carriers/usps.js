@@ -232,7 +232,7 @@ describe('USPS', function () {
                         }
                     ],
                     deliveredAt: new Date('2019-07-01T19:25:00.000Z'),
-                    shippedAt: new Date('2019-06-30T22:02:00.000Z')
+                    shippedAt: new Date('2019-06-29T02:26:00.000Z')
                 }
 
                 assert.deepStrictEqual(actual, expected);
