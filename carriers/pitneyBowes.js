@@ -6,7 +6,7 @@ const PitneyBowesClient = require('pitney-bowes');
 const DELIVERED_TRACKING_STATUS_CODES = ['01'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', 'OF', 'PC'];
+const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'OF', 'PC'];
 
 const geography = require('../util/geography');
 
