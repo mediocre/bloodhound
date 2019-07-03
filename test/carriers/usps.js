@@ -93,7 +93,7 @@ describe('USPS', function () {
     });
 
     describe('USPS Tracking', function () {
-        it.only('should return an empty result if there is no tracking information available ', function (done) {
+        it('should return an empty result if there is no tracking information available ', function (done) {
             bloodhound.track('0987654321234567890', 'usps', function (err, actual) {
                 const expected = {
                     events: []
