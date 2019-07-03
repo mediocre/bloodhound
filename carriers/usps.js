@@ -26,15 +26,19 @@ function USPS(options) {
         if ([/^[A-Z]{2}\d{9}[A-Z]{2}$/, /^926129\d{16}$/, /^927489\d{16}$/].some(regex => regex.test(trackingNumber))) {
             return true;
         }
+
         if (/^\d{20}$/.test(trackingNumber)) {
             return checkDigit(trackingNumber, [3, 1], 10);
         }
+
         if (/^(91|92|93|94|95|96)\d{20}$/.test(trackingNumber)) {
             return checkDigit(trackingNumber, [3, 1], 10);
         }
+
         if (/^\d{26}$/.test(trackingNumber)) {
             return checkDigit(trackingNumber, [3, 1], 10);
         }
+
         if (/^420\d{27}$/.test(trackingNumber)) {
             return checkDigit(trackingNumber.match(/^420\d{5}(\d{22})$/)[1], [3, 1], 10);
         }
@@ -62,7 +66,7 @@ function USPS(options) {
 
         async.retry(function(callback) {
             request(req, callback);
-        }, function (err, res) {
+        }, function(err, res) {
             if (err) {
                 return callback(err);
             }
