@@ -3,6 +3,8 @@ const assert = require('assert');
 const Bloodhound = require('../index.js');
 
 describe('Error handling', function() {
+    this.timeout(10000);
+
     const bloodhound = new Bloodhound({
         fedEx: {
             account_number: process.env.FEDEX_ACCOUNT_NUMBER,
