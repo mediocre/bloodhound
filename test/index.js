@@ -61,4 +61,8 @@ describe('bloodhound.guessCarrier', function() {
     it('Should guess a FedEx tracking number', function() {
         assert.strictEqual(bloodhound.guessCarrier('61299998620341515252'), 'FedEx');
     });
+
+    it('Should guess a USPS tracking number', function() {
+        assert.strictEqual(bloodhound.guessCarrier('9400111699000271800200'), 'USPS');
+    });
 });
