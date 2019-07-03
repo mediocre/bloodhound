@@ -37,10 +37,22 @@ describe('usps.isTrackingNumberValid', function() {
         '70131710000012912087'
     ];
 
+    const invalidTrackingNumbers = [
+        '4206810692612927005269000028978090'
+    ];
+
     it('should detect valid USPS tracking numbers', function() {
         validTrackingNumbers.forEach(trackingNumber => {
             if (!usps.isTrackingNumberValid(trackingNumber)) {
                 assert.fail(`${trackingNumber} is not recognized as a valid USPS tracking number`);
+            }
+        });
+    });
+
+    it('should not detect invalid USPS tracking numbers', function() {
+        invalidTrackingNumbers.forEach(trackingNumber => {
+            if (usps.isTrackingNumberValid(trackingNumber)) {
+                assert.fail(`${trackingNumber} should not be recognized as a valid USPS tracking number`);
             }
         });
     });
