@@ -36,24 +36,25 @@ describe('usps.isTrackingNumberValid', function() {
     });
 });
 
-describe('USPS', function () {
+describe.only('USPS', function () {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
         usps: {
-            USPS_USERID: process.env.USPS_USERID
+            userId: process.env.USPS_USERID
         }
     });
 
     describe('Invalid USPS Access', function() {
-        const bloodhound1 = new Bloodhound({
+        const bloodhound = new Bloodhound({
             usps: {
-                USPS_USERID: process.env.USPS_USERID,
-                baseUrl: 'https://google.com'
+                baseUrl: 'https://google.com',
+                userId: process.env.USPS_USERID
             }
         });
+
         it('should return an error for invalid URL', function (done) {
-            bloodhound1.track('9400111899223837861141', 'usps', function (err) {
+            bloodhound.track('9400111899223837861141', 'usps', function (err) {
                 assert(err);
                 done();
             });
@@ -62,12 +63,13 @@ describe('USPS', function () {
 
     describe('Invalid USPS Credentials', function () {
         it('should return an error for invalid USERID', function (done) {
-            const bloodhound1 = new Bloodhound({
+            const bloodhound = new Bloodhound({
                 usps: {
-                    USPS_USERID: 'invalid'
+                    userId: 'invalid'
                 }
             });
-            bloodhound1.track('9400111899223837861141', 'usps', function (err) {
+
+            bloodhound.track('9400111899223837861141', 'usps', function (err) {
                 assert(err);
                 done();
             });
@@ -81,6 +83,7 @@ describe('USPS', function () {
                 done();
             });
         });
+
         it('should return tracking information with no errors', function (done) {
             bloodhound.track('9400111899223837861141', 'usps', function (err) {
                 assert.ifError(err);

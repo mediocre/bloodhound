@@ -1,11 +1,11 @@
 const async = require('async');
-const builder = require('xmlbuilder');
 const moment = require('moment-timezone');
 const parser = require('xml2js');
 const request = require('request');
 
 const geography = require('../util/geography');
 
+// Remove these words from cities to turn cities like `DISTRIBUTION CENTER INDIANAPOLIS` into `INDIANAPOLIS`
 const CITY_BLACKLIST = /DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
 
 // These tracking status codes indicate the shipment was delivered: https://about.usps.com/publications/pub97/pub97_appi.htm
@@ -46,38 +46,32 @@ function USPS(options) {
 
         return false;
     };
+
     this.track = function(trackingNumber, callback) {
-        const baseUrl = options.baseUrl || 'http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2&XML=';
+        const xml = `<TrackFieldRequest USERID="${options.userId}"><Revision>1</Revision><ClientIp>${options.clientIp || '127.0.0.1'}</ClientIp><SourceId>${options.sourceId || '@mediocre/bloodhound (+https://github.com/mediocre/bloodhound)'}</SourceId><TrackID ID="${trackingNumber}"/></TrackFieldRequest>`;
 
-        const obj = {
-            TrackFieldRequest: {
-                '@USERID': options.USPS_USERID,
-                Revision: '1',
-                ClientIp: options.ClientIp || '127.0.0.1',
-                SourceId: options.SourceId || '@mediocre/bloodhound (+https://github.com/mediocre/bloodhound)',
-                TrackID: {
-                    '@ID': trackingNumber
-                }
-            }
-        }
+        const req = {
+            baseUrl: options.baseUrl || 'http://production.shippingapis.com',
+            method: 'GET',
+            timeout: 5000,
+            url: `/ShippingAPI.dll?API=TrackV2&XML=${encodeURIComponent(xml)}`
+        };
 
-        var xml = builder.create(obj, { headless: true }).end({ pretty: false });
-        const url = baseUrl + encodeURIComponent(xml);
-
-        request(url, function (err, res) {
+        async.retry(function(callback) {
+            request(req, callback);
+        }, function (err, res) {
             if (err) {
                 return callback(err);
             }
 
             parser.parseString(res.body, function (err, data) {
-                // 1. Invalid XML in parser
-                // 2. Invalid credentials
-                // 3. Invalid tracking number
                 if (err) {
                     return callback(err);
                 } else if (data.Error) {
+                    // Invalid credentials
                     return callback(new Error(data.Error.Description[0]));
                 } else if (data.TrackResponse.TrackInfo[0].Error) {
+                    // Invalid tracking number
                     return callback(new Error(data.TrackResponse.TrackInfo[0].Error[0].Description[0]));
                 }
 
@@ -172,7 +166,7 @@ function USPS(options) {
                         results.events.push(event);
                     });
 
-                    // Change description of most recent event to be StatusSummary (more descriptive)
+                    // Add details to the most recent event
                     results.events[0].details = data.TrackResponse.TrackInfo[0].StatusSummary[0];
 
                     callback(null, results);
