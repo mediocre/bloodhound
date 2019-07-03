@@ -10,9 +10,11 @@ function Bloodhound(options) {
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
-        }else if (usps.isTrackingNumberValid(trackingNumber)) {
+        } else if (usps.isTrackingNumberValid(trackingNumber)) {
             return 'USPS';
-        }else return undefined;
+        } else {
+            return undefined;
+        }
     };
 
     this.track = function(trackingNumber, carrier, callback) {
