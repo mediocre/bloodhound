@@ -83,12 +83,24 @@ describe('USPS', function () {
                 done();
             });
         });
+
+        it('should return an error for a tracking number that contains invalid characters', function (done) {
+            bloodhound.track('12c &^trackf0', 'usps', function (err) {
+                assert(err);
+                done();
+            })
+        })
     });
 
     describe('USPS Tracking', function () {
-        it('should return an error for an invalid tracking number', function (done) {
-            bloodhound.track('An Invalid Tracking Number', 'usps', function (err) {
-                assert(err);
+        it.only('should return an empty result if there is no tracking information available ', function (done) {
+            bloodhound.track('0987654321234567890', 'usps', function (err, actual) {
+                const expected = {
+                    events: []
+                }
+
+                assert.ifError(err);
+                assert.deepStrictEqual(actual, expected);
                 done();
             });
         });
@@ -196,5 +208,11 @@ describe('USPS', function () {
                 done();
             });
         });
+        it('should skip Track Details that do no have time stamps', function (done) {
+            bloodhound.track('9400110200830244685403', 'usps', function (err) {
+                assert.ifError(err);
+                done();
+            });
+        })
     });
 });

@@ -71,19 +71,19 @@ function USPS(options) {
             }
 
             parser.parseString(res.body, function(err, data) {
-                if (err) {
-                    return callback(err);
-                } else if (data.Error) {
-                    // Invalid credentials
-                    return callback(new Error(data.Error.Description[0]));
-                } else if (data.TrackResponse.TrackInfo[0].Error) {
-                    // Invalid tracking number
-                    return callback(new Error(data.TrackResponse.TrackInfo[0].Error[0].Description[0]));
-                }
-
                 const results = {
                     events: []
                 };
+
+                if (err) {
+                    return callback(err);
+                } else if (data.Error) {
+                    // Invalid credentials or Invalid Tracking Number
+                    return callback(new Error(data.Error.Description[0]));
+                } else if (data.TrackResponse.TrackInfo[0].Error) {
+                    // No Tracking Information
+                    return callback(null, results);
+                }
 
                 const scanDetailsList = [];
 
