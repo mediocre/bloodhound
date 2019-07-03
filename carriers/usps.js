@@ -64,7 +64,7 @@ function USPS(options) {
                 return callback(err);
             }
 
-            parser.parseString(res.body, function (err, data) {
+            parser.parseString(res.body, function(err, data) {
                 if (err) {
                     return callback(err);
                 } else if (data.Error) {
@@ -79,19 +79,19 @@ function USPS(options) {
                     events: []
                 };
 
-                var scanDetailsList = [];
+                const scanDetailsList = [];
 
                 // TrackSummary[0] exists for every item (with valid tracking number)
                 const summary = data.TrackResponse.TrackInfo[0].TrackSummary[0];
-
                 scanDetailsList.push(summary);
-                var trackDetailList = data.TrackResponse.TrackInfo[0].TrackDetail;
+
+                const trackDetailList = data.TrackResponse.TrackInfo[0].TrackDetail;
 
                 // If we have tracking details, push them into statuses
                 // Tracking details only exist if the item has more than one status update
                 if (trackDetailList) {
-                    trackDetailList.forEach((trackDetail) => {
-                        if(TRACKING_STATUS_CODES_BLACKLIST.includes(trackDetail.EventCode[0])) {
+                    trackDetailList.forEach(trackDetail => {
+                        if (TRACKING_STATUS_CODES_BLACKLIST.includes(trackDetail.EventCode[0])) {
                             return;
                         }
 
