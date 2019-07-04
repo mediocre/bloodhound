@@ -26,79 +26,79 @@ describe('Newgistics', function() {
             }
         });
 
-        bloodhound.track('4209302392612927005269000027783702', 'newgistics', function(err, actual) {
+        bloodhound.track('4206336792748927005269000010615207', 'newgistics', function(err, actual) {
             assert.ifError(err);
 
             const expected = {
                 events: [
                     {
                         address: {
-                            city: 'Ojai',
+                            city: 'Lake Saint Louis',
                             country: null,
-                            state: 'CA',
+                            state: 'MO',
                             zip: null
                         },
-                        date: new Date('2019-06-30T18:03:00.000Z'),
-                        description: 'Delivered, Front Door/Porch'
+                        date: new Date('2019-03-28T18:35:00.000Z'),
+                        description: 'Delivered, In/At Mailbox'
                     },
                     {
                         address: {
-                            city: 'Ojai',
+                            city: 'Lake Saint Louis',
                             country: null,
-                            state: 'CA',
+                            state: 'MO',
                             zip: null
                         },
-                        date: new Date('2019-06-30T02:51:00.000Z'),
-                        description: 'Delivery Attempted - No Access to Delivery Location'
-                    },
-                    {
-                        address: {
-                            city: 'Ojai',
-                            country: null,
-                            state: 'CA',
-                            zip: null
-                        },
-                        date: new Date('2019-06-29T16:10:00.000Z'),
+                        date: new Date('2019-03-28T14:19:00.000Z'),
                         description: 'Out for Delivery'
                     },
                     {
                         address: {
-                            city: 'Ojai',
+                            city: 'Lake Saint Louis',
                             country: null,
-                            state: 'CA',
+                            state: 'MO',
                             zip: null
                         },
-                        date: new Date('2019-06-29T16:00:00.000Z'),
+                        date: new Date('2019-03-28T14:09:00.000Z'),
                         description: 'Sorting Complete'
                     },
                     {
                         address: {
-                            city: 'Ojai',
+                            city: 'O FALLON',
                             country: null,
-                            state: 'CA',
+                            state: 'MO',
                             zip: null
                         },
-                        date: new Date('2019-06-28T22:58:00.000Z'),
+                        date: new Date('2019-03-27T16:21:00.000Z'),
                         description: 'Arrived at Post Office'
                     },
                     {
                         address: {
-                            city: 'Ojai',
+                            city: 'O FALLON',
                             country: null,
-                            state: 'CA',
+                            state: 'MO',
                             zip: null
                         },
-                        date: new Date('2019-06-28T21:43:00.000Z'),
+                        date: new Date('2019-03-27T15:06:00.000Z'),
                         description: 'Accepted at USPS Destination Facility'
                     },
                     {
                         address: {
-                            city: 'LA',
+                            city: 'Greenwood',
                             country: null,
-                            state: 'CA',
+                            state: 'IN',
                             zip: null
                         },
-                        date: new Date('2019-06-28T01:49:00.000Z'),
+                        date: new Date('2019-03-22T20:05:00.000Z'),
+                        description: 'Departed Shipping Partner Facility, USPS Awaiting Item'
+                    },
+                    {
+                        address: {
+                            city: 'Greenwood',
+                            country: null,
+                            state: 'IN',
+                            zip: null
+                        },
+                        date: new Date('2019-03-22T15:39:00.000Z'),
                         description: 'Arrived Shipping Partner Facility, USPS Awaiting Item'
                     },
                     {
@@ -108,7 +108,7 @@ describe('Newgistics', function() {
                             state: 'TX',
                             zip: null
                         },
-                        date: new Date('2019-06-26T20:26:00.000Z'),
+                        date: new Date('2019-03-21T22:16:00.000Z'),
                         description: 'Departed Shipping Partner Facility, USPS Awaiting Item'
                     },
                     {
@@ -118,7 +118,7 @@ describe('Newgistics', function() {
                             state: 'TX',
                             zip: null
                         },
-                        date: new Date('2019-06-26T13:04:00.000Z'),
+                        date: new Date('2019-03-21T13:18:00.000Z'),
                         description: 'Arrived Shipping Partner Facility, USPS Awaiting Item'
                     },
                     {
@@ -128,12 +128,12 @@ describe('Newgistics', function() {
                             state: 'TX',
                             zip: null
                         },
-                        date: new Date('2019-06-25T13:09:00.000Z'),
+                        date: new Date('2019-03-18T16:06:00.000Z'),
                         description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
                     }
                 ],
-                deliveredAt: new Date('2019-06-30T18:03:00.000Z'),
-                shippedAt: new Date('2019-06-28T21:43:00.000Z')
+                deliveredAt: new Date('2019-03-28T18:35:00.000Z'),
+                shippedAt: new Date('2019-03-27T15:06:00.000Z')
             };
 
             assert.deepStrictEqual(actual, expected);

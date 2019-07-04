@@ -124,8 +124,8 @@ function USPS(options) {
                 // Lookup each location
                 async.mapLimit(locations, 10, function (location, callback) {
                     geography.parseLocation(location, function (err, address) {
-                        if (err) {
-                            return callback(err);
+                        if (err || !address) {
+                            return callback(err, address);
                         }
 
                         address.location = location;
@@ -138,7 +138,7 @@ function USPS(options) {
                     }
 
                     scanDetailsList.forEach(scanDetail => {
-                        const address = addresses.find(a => a.location === scanDetail.location);
+                        const address = addresses.find(a => a && a.location === scanDetail.location);
                         let timezone = 'America/New_York';
 
                         if (address && address.timezone) {

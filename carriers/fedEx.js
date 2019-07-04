@@ -16,8 +16,6 @@ const SHIPPED_TRACKING_STATUS_CODES = ['AR', 'DP', 'IT', 'OD'];
 const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
 function FedEx(options) {
-    const fedExClient = new FedExClient(options);
-
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
         trackingNumber = trackingNumber.replace(/\s/g, '');
@@ -70,6 +68,8 @@ function FedEx(options) {
     };
 
     this.track = function(trackingNumber, callback) {
+        const fedExClient = new FedExClient(options);
+
         // Create a FedEx track request: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Service_Optionsbc-3&rhtocid=_26_0_2
         const trackRequest = {
             SelectionDetails: {
