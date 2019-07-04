@@ -25,6 +25,10 @@ function PitneyBowes(options) {
                 events: []
             };
 
+            if (!data | !data.scanDetailsList) {
+                return callback(null, results);
+            }
+
             // Set address and location of each scan detail
             data.scanDetailsList.forEach(scanDetail => {
                 scanDetail.address = {
