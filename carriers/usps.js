@@ -122,8 +122,8 @@ function USPS(options) {
                 const locations = Array.from(new Set(scanDetailsList.map(scanDetail => scanDetail.location)));
 
                 // Lookup each location
-                async.mapLimit(locations, 10, function (location, callback) {
-                    geography.parseLocation(location, function (err, address) {
+                async.mapLimit(locations, 10, function(location, callback) {
+                    geography.parseLocation(location, options, function(err, address) {
                         if (err || !address) {
                             return callback(err, address);
                         }
@@ -132,7 +132,7 @@ function USPS(options) {
 
                         callback(null, address);
                     });
-                }, function (err, addresses) {
+                }, function(err, addresses) {
                     if (err) {
                         return callback(err);
                     }

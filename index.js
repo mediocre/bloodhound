@@ -3,6 +3,16 @@ const FedEx = require('./carriers/fedEx');
 const USPS = require('./carriers/usps');
 
 function Bloodhound(options) {
+    // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.pitneyBowes) {
+        options.pitneyBowes.pettyCache = options.pettyCache;
+    }
+
+    // Allow USPS to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.usps) {
+        options.usps.pettyCache = options.pettyCache;
+    }
+
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const usps = new USPS(options && options.usps);

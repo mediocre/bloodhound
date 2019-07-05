@@ -46,7 +46,7 @@ function PitneyBowes(options) {
 
             // Lookup each location
             async.mapLimit(locations, 10, function(location, callback) {
-                geography.parseLocation(location, function(err, address) {
+                geography.parseLocation(location, options, function(err, address) {
                     if (err || !address) {
                         return callback(err, address);
                     }

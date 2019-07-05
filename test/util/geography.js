@@ -85,3 +85,20 @@ describe('geography.parseLocation', function() {
         });
     });
 });
+
+describe('petty-cache', function() {
+    it('should store results in Redis (via petty-cache)', function(done) {
+        geography.parseLocation('Carrollton, TX', { pettyCache: {} }, function(err, actual) {
+            assert.ifError(err);
+
+            const expected = {
+                city: 'Carrollton',
+                state: 'TX',
+                timezone: 'America/Chicago'
+            };
+
+            assert.deepStrictEqual(actual, expected);
+            done();
+        });
+    });
+});
