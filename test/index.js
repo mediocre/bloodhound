@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../index.js');
 
 describe('Error handling', function() {
-    this.timeout(10000);
+    this.timeout(20000);
 
     const bloodhound = new Bloodhound({
         fedEx: {
