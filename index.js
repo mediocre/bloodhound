@@ -1,17 +1,34 @@
-const FedEx = require('./carriers/fedEx');
 const PitneyBowes = require('./carriers/pitneyBowes');
 const UPS = require('./carriers/ups');
+const FedEx = require('./carriers/fedEx');
+const USPS = require('./carriers/usps');
+
 function Bloodhound(options) {
+    // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.pitneyBowes) {
+        options.pitneyBowes.pettyCache = options.pettyCache;
+    }
+
+    // Allow USPS to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.usps) {
+        options.usps.pettyCache = options.pettyCache;
+    }
+
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
+    const usps = new USPS(options && options.usps);
 
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
+        } else if (usps.isTrackingNumberValid(trackingNumber)) {
+            return 'USPS';
+        } else if (ups.isTrackingNumberValid(trackingNumber)) {
+            return 'UPS';
+        } else {
+            return undefined;
         }
-
-        return undefined;
     };
 
     this.track = function(trackingNumber, carrier, callback) {
@@ -43,6 +60,8 @@ function Bloodhound(options) {
             pitneyBowes.track(trackingNumber, callback);
         } else if (carrier === 'ups'){
             ups.track(trackingNumber, callback);
+        } else if (carrier === 'usps') {
+            usps.track(trackingNumber, callback);
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
         }

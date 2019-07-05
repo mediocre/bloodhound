@@ -4,6 +4,7 @@
         "async": "~3.1.0",
         "moment-timezone": "~0.5.25",
         "node-geocoder": "~3.23.0",
+        "petty-cache": "~2.4.1",
         "pitney-bowes": "~0.1.0",
         "shipping-fedex": "0.2.0",
         "shipping-ups": "^0.5.7",
@@ -36,5 +37,5 @@
         "type": "git",
         "url": "https://github.com/mediocre/bloodhound.git"
     },
-    "version": "0.0.2"
+    "version": "0.3.1"
 }
