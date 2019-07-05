@@ -74,11 +74,11 @@ function PitneyBowes(options) {
                         description: scanDetail.scanDescription
                     };
 
-                    if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType)) {
+                    if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
                         results.deliveredAt = new Date(event.date);
                     }
 
-                    if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.scanType)) {
+                    if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
                         results.shippedAt = new Date(event.date);
                     }
 
