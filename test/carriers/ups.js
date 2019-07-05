@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
-describe.only('ups.isTrackingNumberValid', function () {
+describe('ups.isTrackingNumberValid', function () {
     const ups = new UPS();
 
     const validTrackingNumbers = [
@@ -34,7 +34,7 @@ describe.only('ups.isTrackingNumberValid', function () {
         });
     });
 });
-describe.only('UPS', function(){
+describe('UPS', function(){
     const bloodhound = new Bloodhound({
         ups: {
             UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
