@@ -5,6 +5,12 @@ const request = require('request');
 const confirmUpsFreight = require('../util/confirmUpsFreight');
 const confirmUps = require('../util/confirmUps');
 
+// These are all of the status descriptions related to delivery provided by UPS.
+const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', 'DELIVERED TO UPS ACCESS POINT AWAITING CUSTOMER PICKUP'];
+
+// These are all of the status descriptions related to shipping provided by UPS.
+const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DESTINATION SCAN', 'ORIGIN SCAN', 'OUT FOR DELIVERY', 'OUT FOR DELIVERY TODAY', 'PACKAGE DEPARTED UPS MAIL INNOVATIONS FACILITY ENROUTE TO USPS FOR INDUCTION', 'PACKAGE PROCESSED BY UPS MAIL INNOVATIONS ORIGIN FACILITY', 'PACKAGE RECEIVED FOR PROCESSING BY UPS MAIL INNOVATIONS', 'PACKAGE RECEIVED FOR SORT BY DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE TRANSFERRED TO DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE OUT FOR POST OFFICE DELIVERY', 'PACKAGE SORTED BY POST OFFICE', 'RECEIVED BY THE POST OFFICE', 'SHIPMENT ACCEPTANCE AT POST OFFICE', 'YOUR PACKAGE IS IN TRANSIT TO THE UPS FACILITY.', 'LOADED ON DELIVERY VEHICLE'];
+
 function UPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -59,7 +65,7 @@ function UPS(options) {
                 events: []
             };
 
-            activitiesList.forEach(activity => {
+            activitiesList.reverse().forEach(activity => {
                 activity.address = {
                     city: activity.ActivityLocation.Address.City,
                     state: activity.ActivityLocation.Address.StateProvinceCode,
@@ -100,6 +106,13 @@ function UPS(options) {
                         description: activity.Status.Description
                     };
 
+                    if (DELIVERED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+                        results.deliveredAt = event.date;
+                    }
+                    if (SHIPPED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+                        results.shippedAt = event.date;
+                    }
+
                     // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
                     if (address) {
                         if (address.city) {
@@ -114,7 +127,6 @@ function UPS(options) {
                     results.events.push(event);
                 });
 
-                // console.log(JSON.stringify(results, null, 4));
                 callback(null, results);
             });
         })

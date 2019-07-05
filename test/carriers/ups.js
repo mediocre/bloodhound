@@ -46,16 +46,57 @@ describe.only('UPS', function(){
     it('should return a track response', function(done){
         bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
             const expected = {
+                deliveredAt: new Date('2019-06-28T16:28:58.000Z'),
                 events : [
                     {
                         address: {
-                            city: 'Glendale Heights',
+                            city: 'Huez',
+                            state: undefined,
+                            country: 'US',
+                            zipcode: null
+                        },
+                        date: new Date('2019-06-24T15:37:18.000Z'),
+                        description: 'Order Processed: Ready for UPS'
+                    },
+                    {
+                        address: {
+                            city: 'Cerritos',
+                            state: 'CA',
+                            country: 'US',
+                            zipcode: null
+                        },
+                        date: new Date('2019-06-25T02:48:00.000Z'),
+                        description: 'Origin Scan'
+                    },
+                    {
+                        address: {
+                            city: 'Cerritos',
+                            state: 'CA',
+                            country: 'US',
+                            zipcode: null
+                        },
+                        date: new Date('2019-06-25T05:50:00.000Z'),
+                        description: 'Departure Scan'
+                    },
+                    {
+                        address: {
+                            city: 'Hodgkins',
                             state: 'IL',
                             country: 'US',
-                            zipcode: '60139'
+                            zipcode: null
                         },
-                        date: new Date('2019-06-28T16:28:58.000Z'),
-                        description: 'Delivered'
+                        date: new Date('2019-06-27T13:33:00.000Z'),
+                        description: 'Arrival Scan'
+                    },
+                    {
+                        address: {
+                            city: 'Hodgkins',
+                            state: 'IL',
+                            country: 'US',
+                            zipcode: null
+                        },
+                        date: new Date('2019-06-28T05:02:00.000Z'),
+                        description: 'Departure Scan'
                     },
                     {
                         address: {
@@ -64,18 +105,8 @@ describe.only('UPS', function(){
                             country: 'US',
                             zipcode: null
                         },
-                        date: new Date('2019-06-28T14:00:49.000Z'),
-                        description: 'Out For Delivery Today'
-                    },
-                    {
-                        address: {
-                            city: 'Addison',
-                            state: 'IL',
-                            country: 'US',
-                            zipcode: null
-                        },
-                        date: new Date('2019-06-28T12:19:33.000Z'),
-                        description: 'Loaded on Delivery Vehicle'
+                        date: new Date('2019-06-28T05:58:00.000Z'),
+                        description: 'Arrival Scan'
                     },
                     {
                         address: {
@@ -94,62 +125,34 @@ describe.only('UPS', function(){
                             country: 'US',
                             zipcode: null
                         },
-                        date: new Date('2019-06-28T05:58:00.000Z'),
-                        description: 'Arrival Scan'
+                        date: new Date('2019-06-28T12:19:33.000Z'),
+                        description: 'Loaded on Delivery Vehicle'
                     },
                     {
                         address: {
-                            city: 'Hodgkins',
+                            city: 'Addison',
                             state: 'IL',
                             country: 'US',
                             zipcode: null
                         },
-                        date: new Date('2019-06-28T05:02:00.000Z'),
-                        description: 'Departure Scan'
+                        date: new Date('2019-06-28T14:00:49.000Z'),
+                        description: 'Out For Delivery Today'
                     },
                     {
                         address: {
-                            city: 'Hodgkins',
+                            city: 'Glendale Heights',
                             state: 'IL',
                             country: 'US',
-                            zipcode: null
+                            zipcode: '60139'
                         },
-                        date: new Date('2019-06-27T13:33:00.000Z'),
-                        description: 'Arrival Scan'
-                    },
-                    {
-                        address: {
-                            city: 'Cerritos',
-                            state: 'CA',
-                            country: 'US',
-                            zipcode: null
-                        },
-                        date: new Date('2019-06-25T05:50:00.000Z'),
-                        description: 'Departure Scan'
-                    },
-                    {
-                        address: {
-                            city: 'Cerritos',
-                            state: 'CA',
-                            country: 'US',
-                            zipcode: null
-                        },
-                        date: new Date('2019-06-25T02:48:00.000Z'),
-                        description: 'Origin Scan'
-                    },
-                    {
-                        address: {
-                            city: 'Huez',
-                            state: undefined,
-                            country: 'US',
-                            zipcode: null
-                        },
-                        date: new Date('2019-06-24T15:37:18.000Z'),
-                        description: 'Order Processed: Ready for UPS'
+                        date: new Date('2019-06-28T16:28:58.000Z'),
+                        description: 'Delivered'
                     }
-                ]
+                ],
+                shippedAt: new Date('2019-06-28T16:28:58.000Z')
             }
             assert.ifError(err);
+            // console.log(actual);
             assert.deepStrictEqual(actual, expected);
             done();
         });
