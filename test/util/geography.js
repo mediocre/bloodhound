@@ -101,4 +101,19 @@ describe('petty-cache', function() {
             done();
         });
     });
+
+    it('should store results in Redis (via petty-cache)', function(done) {
+        geography.parseLocation('Lake Saint Louis, MO', { pettyCache: {} }, function(err, actual) {
+            assert.ifError(err);
+
+            const expected = {
+                city: 'Lake Saint Louis',
+                state: 'MO',
+                timezone: 'America/Chicago'
+            };
+
+            assert.deepStrictEqual(actual, expected);
+            done();
+        });
+    });
 });
