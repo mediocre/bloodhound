@@ -152,7 +152,7 @@ describe.only('UPS', function(){
                 shippedAt: new Date('2019-06-28T16:28:58.000Z')
             }
             assert.ifError(err);
-            // console.log(actual);
+
             assert.deepStrictEqual(actual, expected);
             done();
         });

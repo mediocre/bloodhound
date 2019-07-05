@@ -5,7 +5,7 @@ function Bloodhound(options) {
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
-    
+
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
