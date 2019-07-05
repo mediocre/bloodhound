@@ -59,11 +59,23 @@ function UPS(options) {
                 return callback(new Error(err));
             }
 
-            const activitiesList = res.body.TrackResponse.Shipment.Package.Activity;
-
             const results = {
                 events: []
             };
+
+            // if (err) {
+            //     return callback(err);
+            // } else if (res.Error) {
+            //     // Invalid credentials or Invalid Tracking Number
+            //     return callback(new Error(res.Error.Description[0]));
+            // } else if (res.body.TrackResponse.Shipment[0].Error) {
+            //     // No Tracking Information
+            //     return callback(null, results);
+            // }
+
+            const activitiesList = res.body.TrackResponse.Shipment.Package.Activity;
+
+            
 
             activitiesList.reverse().forEach(activity => {
                 activity.address = {

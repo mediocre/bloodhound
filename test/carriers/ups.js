@@ -26,10 +26,22 @@ describe('ups.isTrackingNumberValid', function () {
         '1Z12345E0194845039'
     ];
 
+    const invalidTrackingNumbers = [
+        '2Z88887736535254'
+    ];
+
     it('should detect valid UPS tracking numbers', function () {
         validTrackingNumbers.forEach(trackingNumber => {
             if (!ups.isTrackingNumberValid(trackingNumber)) {
                 assert.fail(`${trackingNumber} is not recognized as a valid UPS tracking number`);
+            }
+        });
+    });
+
+    it('should not detect invalid UPS tracking numbers', function() {
+        invalidTrackingNumbers.forEach(trackingNumber => {
+            if (ups.isTrackingNumberValid(trackingNumber)) {
+                assert.fail(`${trackingNumber} should not be recognized as a valid UPS tracking number`);
             }
         });
     });
@@ -42,6 +54,26 @@ describe('UPS', function(){
             UPS_USERNAME: process.env.UPS_USERNAME
         }
     });
+
+    // describe('Error Handling', function() {
+    //     this.timeout(60000);
+
+    //     it.only('should return an error for invalid base URL', function(done) {
+    //         const bloodhound = new Bloodhound({
+    //             ups: {
+    //                 //baseUrl: 'https://httpbin.org/delay/10#',
+    //                 UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
+    //                 UPS_PASSWORD: process.env.UPS_PASSWORD,
+    //                 UPS_USERNAME: process.env.UPS_USERNAME
+    //             }
+    //         });
+
+    //         bloodhound.track('1Z9756W90308462106', 'ups', function(err) {
+    //             assert(err);
+    //             done();
+    //         });
+    //     });
+    // });
 
     it('should return a track response', function(done){
         bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {

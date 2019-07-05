@@ -75,7 +75,7 @@ function USPS(options) {
                 const results = {
                     events: []
                 };
-
+                 
                 if (err) {
                     return callback(err);
                 } else if (data.Error) {
@@ -93,6 +93,8 @@ function USPS(options) {
                 scanDetailsList.push(summary);
 
                 const trackDetailList = data.TrackResponse.TrackInfo[0].TrackDetail;
+
+                //console.log(data.TrackResponse.TrackInfo[0].TrackDetail);
 
                 // If we have tracking details, push them into statuses
                 // Tracking details only exist if the item has more than one status update
