@@ -56,7 +56,7 @@ function UPS(options) {
             }
         }, function (err, res) {
             if (err) {
-                return callback(new Error(err));
+                return callback(err);
             }
 
             const results = {
@@ -74,8 +74,6 @@ function UPS(options) {
             // }
 
             const activitiesList = res.body.TrackResponse.Shipment.Package.Activity;
-
-            
 
             activitiesList.reverse().forEach(activity => {
                 activity.address = {
