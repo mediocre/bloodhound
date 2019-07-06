@@ -4,7 +4,6 @@ const normalize = require('us-states-normalize');
 const PettyCache = require('petty-cache');
 const tzlookup = require('tz-lookup');
 
-const geocoder = NodeGeocoder({ provider: 'openstreetmap' });
 var pettyCache;
 
 function geocode(location, callback) {
@@ -12,7 +11,7 @@ function geocode(location, callback) {
         geocode: function(callback) {
             // Geocode the location
             async.retry(function(callback) {
-                geocoder.geocode(location, callback);
+                exports.geocoder.geocode(location, callback);
             }, function(err, results) {
                 if (err) {
                     return callback(err);
@@ -31,7 +30,7 @@ function geocode(location, callback) {
 
                 // Reverse geocode to ensure we get a city, state, and zip
                 async.retry(function(callback) {
-                    geocoder.reverse({ lat: firstResult.latitude, lon: firstResult.longitude }, callback);
+                    exports.geocoder.reverse({ lat: firstResult.latitude, lon: firstResult.longitude }, callback);
                 }, function(err, results) {
                     if (err) {
                         return callback(err);
@@ -109,3 +108,5 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
 
     geocode(location, callback);
 });
+
+exports.geocoder = NodeGeocoder({ apiKey: 'x', provider: 'virtualearth' });
