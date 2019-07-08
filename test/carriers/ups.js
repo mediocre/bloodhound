@@ -46,7 +46,7 @@ describe('ups.isTrackingNumberValid', function () {
     });
 });
 
-// describe.skip('Error Handling', function() {
+// describe.only.skip('Error Handling', function() {
 //     this.timeout(60000);
 
 //     it.only('should return an error for invalid base URL', function(done) {
@@ -75,7 +75,43 @@ describe('UPS', function(){
         }
     });
 
+    describe('Invalid UPS credentials', function(){
+        it('should return an error for invalid USERNAME', function(done){
+            const bloodhound = new Bloodhound({
+
+                ups:{
+                    USERNAME: 'invalid'
+                }
+            });
+            bloodhound.track('1Z9756W90304415852', 'ups', function(err){
+                assert(err);
+                done();
+            })
+        })
+    })
+
+
     describe('UPS Track', function(){
+
+        it('should return an empty result if there is no tracking information available ', function(done) {
+            bloodhound.track('H9205817377', 'ups', function(err, actual) {
+                const expected = {
+                    events: []
+                }
+                //console.log(err);
+                assert.ifError(err);
+                assert.deepStrictEqual(actual, expected);
+                done();
+            });
+        });
+
+        it('should return tracking information with no errors', function(done) {
+            bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
+                assert.ifError(err);
+                done();
+            });
+        });
+
         describe('UPS Ground', function() {
             it('Arrival Scan', function(done) {
                 this.timeout(5000);
