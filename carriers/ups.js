@@ -68,7 +68,7 @@ function UPS(options) {
 
                 if (err) {
                     return callback(err);
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.SubErrorCode) ){
+                } else if ((res.body.Fault.detail.Errors.ErrorDetail.Severity) === 'Authentication' ){
                     // Invalid credentials or Invalid Tracking Number
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description));
                 } else if ((res.body.Fault.detail.Errors.ErrorDetail.Severity) === 'Hard')  {
