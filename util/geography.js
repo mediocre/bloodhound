@@ -21,7 +21,12 @@ function geocode(location, callback) {
                     return callback();
                 }
 
-                const firstResult = results[0];
+                var firstResult = results[0];
+
+                // Handle Google results
+                if (!firstResult.state && firstResult.administrativeLevels && firstResult.administrativeLevels.level1short) {
+                    firstResult.state = firstResult.administrativeLevels.level1short;
+                }
 
                 // Check to see if the first result has the data we need
                 if (firstResult.city && firstResult.state && firstResult.zipcode) {
@@ -34,6 +39,13 @@ function geocode(location, callback) {
                 }, function(err, results) {
                     if (err) {
                         return callback(err);
+                    }
+
+                    var firstResult = results[0];
+
+                    // Handle Google results
+                    if (!firstResult.state && firstResult.administrativeLevels && firstResult.administrativeLevels.level1short) {
+                        firstResult.state = firstResult.administrativeLevels.level1short;
                     }
 
                     callback(null, results[0]);
@@ -109,4 +121,4 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
     geocode(location, callback);
 });
 
-exports.geocoder = NodeGeocoder({ apiKey: 'x', provider: 'virtualearth' });
+exports.geocoder = NodeGeocoder({ provider: 'openstreetmap' });
