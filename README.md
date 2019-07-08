@@ -15,43 +15,81 @@ yarn add @mediocre/bloodhound
 ```
 
 ## **Features**
-**Dates and Time Zones** Bloodhound contains a date parser that handles every carrier's individual date format and returns a uniform format.
+**Dates and Time Zones** 
 
-**Statuses** Retrieves every status update of that package and displays it in a uniform format that contains where a particular update occurred (Address), when that update occurred (Date) and a description of said update (Description).
+Bloodhound contains a date parser that handles every carrier's individual date format and returns a uniform format.
 
-**Carrier Guessing** Uses regular expressions to make a guess of which carrier it belongs to.
+**Statuses** 
+
+Bloodhound retrieves each status update and returns a uniform `event` object that contains the `address`, `date`, and `description` of each event. 
+
+**Carrier Guessing** 
+
+Bloodhound guesses the carrier that a tracking number belongs to if a carrier is not specified.
 
 ## **Basic Usage**
 ### **Tracking**
 
-**Track Method** Takes a tracking number and retrieves every status update, then returns a uniform event array with uniform dates and time zones. This method primarily needs two items from you, a tracking number and your carrier credentials.
+`Bloodhound.track()` retrieves every status update, then returns an `event` array with uniform dates and time zones.
 
 ```javascript
 const Bloodhound = require('@mediocre/bloodhound')
 
 const bloodhound = new Bloodhound({
     fedEx: {
-        account_number: '846941258',
+        account_number: FEDEX_ACCOUNT_NUMBER,
         environment: 'live',
-        key: 'aSecretKey',
-        meter_number: '123456789',
-        password: 'aSecretPassword'
+        key: FEDEX_KEY,
+        meter_number: FEDEX_METER_NUMBER,
+        password: FEDEX_PASSWORD
     }
 });
 
 bloodhound.track(trackingNumber, carrier, callback)
-//returns array of events of trackingNumber
-
+...
 ```
+
+```json
+// Example Output
+
+{
+    "events": [
+        {
+            "address": {
+                "city": "CARROLLTON", 
+                "state": "TX", 
+                "zip": "75010"
+            },
+            "date": "2019-06-30T18:03:00.000Z",
+            "description": "Delivered, Front Door/Porch"
+        },
+        {
+            "address": {
+                "city": "CARROLLTON", 
+                "state": "TX", 
+                "zip": "75010"
+            },
+            "date": "2019-05-13T17:32:00.000Z",
+            "description": "Sorting Complete"
+        }
+        ...
+    ],
+    "shippedAt": "2019-05-13T17:32:00.000Z",
+    "deliveredAt": "2019-06-30T18:03:00.000Z"
+}
+```
+
 ### **Carrier Guessing**
-**guessCarrier Method** Takes a tracking number and makes a guess of which carrier it belongs to. This method only needs a tracking number provided.
-```javascript
-bloodhound.guessCarrier('61299998620341515252')
+If no carrier is provided, Bloodhound will intelligently guess the carrier based on the pattern of the tracking number.
 
-//returns FedEx
+```javascript
+const trackingNumber = '61299998620341515252';
+bloodhound.guessCarrier(trackingNumber)
+
+// Returns 'FedEx'
 ```
 
-## **Carriers Currently Supported**
+## **Supported Carriers**
 - FedEx
 
 - Pitney-Bowes (Newgistics)
@@ -61,28 +99,26 @@ bloodhound.guessCarrier('61299998620341515252')
 - USPS
 
 
-
-## **Examples for Running Tests**
-Each field requires you to provide your own credentials.
+## **Tests**
 
 FedEx
 ```
-FEDEX_ACCOUNT_NUMBER=12345678901 FEDEX_ENVIRONMENT=sandbox FEDEX_KEY=aSecretKey FEDEX_METER_NUMBER=123456789 FEDEX_PASSWORD=aSecretPassword npm test
+FEDEX_ACCOUNT_NUMBER=YOUR_FEDEX_ACCOUNT_NUMBNER FEDEX_ENVIRONMENT=sandbox FEDEX_KEY=YOUR_FEDEX_KEY FEDEX_METER_NUMBER=YOUR_FEDEX_METER FEDEX_PASSWORD=YOUR_FEDEX_PASSWORD npm test
 ```
 
 Pitney-Bowes
 ```
-PITNEY_BOWES_API_KEY=developerAPIKey PITNEY_BOWES_API_SECRET=developerAPISecret npm test
+PITNEY_BOWES_API_KEY=YOUR_PITNEY_BOWES_KEY PITNEY_BOWES_API_SECRET=YOUR_PITNEY_BOWES_SECRET npm test
 ```
 
 UPS
 ```
-UPS_USERNAME=jdoe321 UPS_PASSWORD=Trackmaster22 UPS_ACCESS_KEY=SECRETACCESSKEY  npm test
+UPS_USERNAME=YOUR_UPS_USERNAME UPS_PASSWORD=YOUR_UPS_PASSWORD UPS_ACCESS_KEY=YOUR_UPS_KEY  npm test
 ```
 
 USPS
 ```
-USPS_USERID=123DOE123 npm test
+USPS_USERID=YOU_USPS_USERID npm test
 ```
 
 
