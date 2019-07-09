@@ -1,5 +1,7 @@
 const assert = require('assert');
 
+const NodeGeocoder = require('node-geocoder');
+
 const geography = require('../../util/geography');
 
 describe('geography.addressToString', function() {
@@ -110,6 +112,34 @@ describe('petty-cache', function() {
                 city: 'Lake Saint Louis',
                 state: 'MO',
                 timezone: 'America/Chicago'
+            };
+
+            assert.deepStrictEqual(actual, expected);
+            done();
+        });
+    });
+});
+
+describe('Google geocoder', function() {
+    var geocoder;
+
+    after(function() {
+        geography.geocoder = geocoder;
+    });
+
+    before(function() {
+        geocoder = geography.geocoder;
+        geography.geocoder = NodeGeocoder({ apiKey: process.env.GOOGLE_API_KEY, language: 'en', provider: 'google', region: '.us' });
+    });
+
+    it('Los Angeles, CA', function(done) {
+        geography.parseLocation('Los Angeles, CA', function(err, actual) {
+            assert.ifError(err);
+
+            const expected = {
+                city: 'Los Angeles',
+                state: 'CA',
+                timezone: 'America/Los_Angeles'
             };
 
             assert.deepStrictEqual(actual, expected);

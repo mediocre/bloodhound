@@ -6,7 +6,7 @@ const checkDigit = require('../util/checkDigit');
 const geography = require('../util/geography');
 
 // Remove these words from cities to turn cities like `DISTRIBUTION CENTER INDIANAPOLIS` into `INDIANAPOLIS`
-const CITY_BLACKLIST = /DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
+const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
 
 // These tracking status codes indicate the shipment was delivered: https://about.usps.com/publications/pub97/pub97_appi.htm
 const DELIVERED_TRACKING_STATUS_CODES = ['01'];
