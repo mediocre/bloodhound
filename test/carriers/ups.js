@@ -80,15 +80,24 @@ describe('UPS', function(){
             const bloodhound = new Bloodhound({
 
                 ups:{
-                    USERNAME: 'invalid'
+                    UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
+                    UPS_PASSWORD: process.env.UPS_PASSWORD,
+                    UPS_USERNAME: 'mediocre'
                 }
             });
             bloodhound.track('1Z9756W90304415852', 'ups', function(err){
                 assert(err);
                 done();
+            });
+        });
+
+        it('should return an error for a tracking number that contains invalid characters', function(done) {
+            bloodhound.track('1Z9756W9030441!85@', 'ups', function(err) {
+                assert(err);
+                done();
             })
         })
-    })
+    });
 
 
     describe('UPS Track', function(){

@@ -68,10 +68,13 @@ function UPS(options) {
 
                 if (err) {
                     return callback(err);
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.Severity) === 'Authentication' ){
-                    // Invalid credentials or Invalid Tracking Number
+                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '250002' ){
+                    // Invalid credentials
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description));
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.Severity) === 'Hard')  {
+                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '150022' ){
+                    // Invalid Tracking Number
+                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description))                  
+                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151044')  {
                     // No Tracking Information
                     return callback(null, results);
                 }
