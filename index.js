@@ -1,16 +1,38 @@
-const FedEx = require('./carriers/fedEx');
+const NodeGeocoder = require('node-geocoder');
 const PitneyBowes = require('./carriers/pitneyBowes');
+const FedEx = require('./carriers/fedEx');
+const USPS = require('./carriers/usps');
+
+const geography = require('./util/geography');
 
 function Bloodhound(options) {
+    // Optionally specify geocoder options
+    if (options && options.geocoder) {
+        geography.geocoder = NodeGeocoder(options.geocoder);
+    }
+
+    // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.pitneyBowes) {
+        options.pitneyBowes.pettyCache = options.pettyCache;
+    }
+
+    // Allow USPS to cache geocode results in Redis (via petty-cache)
+    if (options && options.pettyCache && options.usps) {
+        options.usps.pettyCache = options.pettyCache;
+    }
+
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
+    const usps = new USPS(options && options.usps);
 
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
+        } else if (usps.isTrackingNumberValid(trackingNumber)) {
+            return 'USPS';
+        } else {
+            return undefined;
         }
-
-        return undefined;
     };
 
     this.track = function(trackingNumber, carrier, callback) {
@@ -40,6 +62,8 @@ function Bloodhound(options) {
             fedEx.track(trackingNumber, callback);
         } else if (carrier === 'newgistics') {
             pitneyBowes.track(trackingNumber, callback);
+        } else if (carrier === 'usps') {
+            usps.track(trackingNumber, callback);
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
         }
