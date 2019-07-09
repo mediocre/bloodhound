@@ -3,20 +3,36 @@
 [![Build Status](https://travis-ci.org/mediocre/bloodhound.svg?branch=master)](https://travis-ci.org/mediocre/bloodhound)
 [![Coverage Status](https://coveralls.io/repos/github/mediocre/bloodhound/badge.svg)](https://coveralls.io/github/mediocre/bloodhound)
 
-Bloodhound is a single-source node module that allows you to retrieve data from shipping carriers such as FedEx and USPS, and displays the data in a common format. If available, Bloodhound will use tracking APIs to generate the data, alternatively it will use web-scraping methods. It goes above and beyond to parse dates by returning all dates in a uniform format, so that the hassle of interpreting multiple carriers' dates and times is removed.
+![Elvis Presley & Bloodhound - Photo - 1964](https://res.cloudinary.com/mediocre/image/upload/v1562632498/rpkudq0xpyysdty9nkzk.jpg)
 
-## **Features**
-**Dates and Time Zones** 
+Bloodhound is a Node.js package that allows you to retrieve data from shipping carriers (DHL, FedEx, UPS, USPS) in a common format.
 
-Bloodhound contains a date parser that handles every carrier's individual date format and returns a uniform format.
+This module was inspired by the excellent `shipit` module. We built Bloodhound to provide better support for parsing of timestamps (read more below).
 
-**Statuses** 
+## Features
 
-Bloodhound retrieves each status update and returns a uniform `event` object that contains the `address`, `date`, and `description` of each event. 
+**Common format** 
 
-**Carrier Guessing** 
+Bloodhound interfaces with several shipping carrier APIs and returns results in a single, unified format.
+Each shipping carrier activity/movement/scan is represented as an event with a description, geographic location (city/state), and timestamp.
 
-Bloodhound guesses the carrier that a tracking number belongs to if a carrier is not specified.
+**Timestamps**
+
+When it comes to timestamps there are two types of shipping carrier APIs: those that include a UTC offset which can be easily parsed as proper dates, and those that provide timestamp strings that need to be interepreted based on the local timezone of the geographic location for the event.
+
+When Bloodhound encounters a timestamp without a UTC offset if looks up the timezone by geocoding the event's geographic location. The returned results contain proper dates in the correct timezone for the event.
+
+**Carrier Guessing**
+
+Bloodhound can guess the shipping carrier given a tracking number explicity through the `bloodhound.guessCarrier(trackingNumber)` method. Bloodhound will also try to guess the shipping carrier when tracking a package without specifying a carrier when using the `bloodhound.track(trackingNumber)` method.
+
+**Shipped/Delivered Timestamps**
+
+Bloodhound also...
+
+## Supported Carriers
+- FedEx
+- USPS
 
 ## **Basic Usage**
 ### **Tracking**
@@ -79,7 +95,3 @@ bloodhound.guessCarrier(trackingNumber)
 
 // Returns 'FedEx'
 ```
-
-## Supported Carriers
-- FedEx
-- USPS
