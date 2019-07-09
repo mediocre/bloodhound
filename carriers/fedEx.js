@@ -83,7 +83,17 @@ function FedEx(options) {
 
         // FedEx Web Services requests occasionally fail. Timeout after 5 seconds and retry.
         async.retry(function(callback) {
-            async.timeout(fedExClient.track, 5000)(trackRequest, callback);
+            async.timeout(fedExClient.track, 5000)(trackRequest, function(err, trackReply) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (trackReply.HighestSeverity === 'ERROR') {
+                    return callback(new Error(trackReply.Notifications[0].Message));
+                }
+
+                callback(null, trackReply);
+            });
         }, function(err, trackReply) {
             if (err) {
                 return callback(err);

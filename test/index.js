@@ -3,7 +3,17 @@ const assert = require('assert');
 const Bloodhound = require('../index.js');
 
 describe('Error handling', function() {
-    const bloodhound = new Bloodhound();
+    this.timeout(20000);
+
+    const bloodhound = new Bloodhound({
+        fedEx: {
+            account_number: process.env.FEDEX_ACCOUNT_NUMBER,
+            environment: process.env.FEDEX_ENVIRONMENT,
+            key: process.env.FEDEX_KEY,
+            meter_number: process.env.FEDEX_METER_NUMBER,
+            password: process.env.FEDEX_PASSWORD
+        }
+    });
 
     it('Should return an error when a tracking number is not specified', function(done) {
         bloodhound.track(null, 'fedex', function(err, data) {
@@ -52,5 +62,9 @@ describe('bloodhound.guessCarrier', function() {
 
     it('Should guess a FedEx tracking number', function() {
         assert.strictEqual(bloodhound.guessCarrier('61299998620341515252'), 'FedEx');
+    });
+
+    it('Should guess a USPS tracking number', function() {
+        assert.strictEqual(bloodhound.guessCarrier('9400111699000271800200'), 'USPS');
     });
 });

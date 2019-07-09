@@ -1,39 +1,70 @@
 const async = require('async');
 const NodeGeocoder = require('node-geocoder');
 const normalize = require('us-states-normalize');
+const PettyCache = require('petty-cache');
 const tzlookup = require('tz-lookup');
 
-const geocoder = NodeGeocoder({ provider: 'openstreetmap' });
+var pettyCache;
 
 function geocode(location, callback) {
-    // Geocode the location
-    async.retry(function(callback) {
-        geocoder.geocode(location, callback);
+    async.auto({
+        geocode: function(callback) {
+            // Geocode the location
+            async.retry(function(callback) {
+                exports.geocoder.geocode(location, callback);
+            }, function(err, results) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (!results.length) {
+                    return callback();
+                }
+
+                var firstResult = results[0];
+
+                // Handle Google results
+                if (!firstResult.state && firstResult.administrativeLevels && firstResult.administrativeLevels.level1short) {
+                    firstResult.state = firstResult.administrativeLevels.level1short;
+                }
+
+                // Check to see if the first result has the data we need
+                if (firstResult.city && firstResult.state && firstResult.zipcode) {
+                    return callback(null, firstResult);
+                }
+
+                // Reverse geocode to ensure we get a city, state, and zip
+                async.retry(function(callback) {
+                    exports.geocoder.reverse({ lat: firstResult.latitude, lon: firstResult.longitude }, callback);
+                }, function(err, results) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    var firstResult = results[0];
+
+                    // Handle Google results
+                    if (!firstResult.state && firstResult.administrativeLevels && firstResult.administrativeLevels.level1short) {
+                        firstResult.state = firstResult.administrativeLevels.level1short;
+                    }
+
+                    callback(null, results[0]);
+                });
+            });
+        }
     }, function(err, results) {
         if (err) {
             return callback(err);
         }
 
-        if (!results.length) {
+        if (!results.geocode) {
             return callback();
         }
 
-        const firstResult = results[0];
-
-        // Check to see if the first result has the data we need
-        if (firstResult.city && firstResult.state && firstResult.zipcode) {
-            return callback(null, firstResult);
-        }
-
-        // Reverse geocode to ensure we get a city, state, and zip
-        async.retry(function(callback) {
-            geocoder.reverse({ lat: firstResult.latitude, lon: firstResult.longitude }, callback);
-        }, function(err, results) {
-            if (err) {
-                return callback(err);
-            }
-
-            callback(null, results[0]);
+        callback(null, {
+            city: results.geocode.city,
+            state: normalize(results.geocode.state),
+            timezone: tzlookup(results.geocode.latitude, results.geocode.longitude)
         });
     });
 }
@@ -68,20 +99,26 @@ exports.addressToString = function(address) {
     return value.trim();
 };
 
-exports.parseLocation = async.memoize(function(location, callback) {
-    geocode(location, function(err, result) {
-        if (err) {
-            return callback(err);
+exports.parseLocation = async.memoize(function(location, options, callback) {
+    // Options are optional
+    if (typeof options === 'function') {
+        callback = options;
+        options = undefined;
+    }
+
+    // Use Redis (via Petty Cache)
+    if (options && options.pettyCache) {
+        if (!pettyCache) {
+            pettyCache = new PettyCache(options.pettyCache.port, options.pettyCache.host, options.pettyCache.options);
         }
 
-        if (!result) {
-            return callback();
-        }
+        // Cache between 1-2 months
+        return pettyCache.fetch(`bloodhound.geocode:${location}`, function(callback) {
+            geocode(location, callback);
+        }, { ttl: { min: 2592000000, max: 5184000000 } }, callback);
+    }
 
-        callback(null, {
-            city: result.city,
-            state: normalize(result.state),
-            timezone: tzlookup(result.latitude, result.longitude)
-        });
-    });
+    geocode(location, callback);
 });
+
+exports.geocoder = NodeGeocoder({ provider: 'openstreetmap' });
