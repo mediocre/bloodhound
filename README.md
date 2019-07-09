@@ -26,9 +26,9 @@ When Bloodhound encounters a timestamp without a UTC offset if looks up the time
 
 Bloodhound can guess the shipping carrier given a tracking number explicity through the `bloodhound.guessCarrier(trackingNumber)` method. Bloodhound will also try to guess the shipping carrier when tracking a package without specifying a carrier when using the `bloodhound.track(trackingNumber)` method.
 
-**Shipped/Delivered Timestamps**
+**Shipped/Delivered Dates**
 
-Bloodhound also...
+Bloodhound also examines each of the activity/movement/scan events for "shipped" and "delievered" event types (beyond simple electronic events like "shipping label created" or "manifest file sent"). When a matching event type is encountered Bloodhound returns a `shippedAt` and `deliveredAt` date.
 
 ## Supported Carriers
 - FedEx
