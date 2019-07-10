@@ -71,13 +71,13 @@ function DHL(options) {
                         description: scanDetail.status
                     };
 
-                    // if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
-                    //     results.deliveredAt = event.date;
-                    // }
+                    if (scanDetail.statusCode === 'transit') {
+                        results.shippedAt = event.date;
+                    }
 
-                    // if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
-                    //     results.shippedAt = event.date;
-                    // }
+                    if (scanDetail.status === 'delivered') {
+                        results.deliveredAt = event.date;
+                    }
 
                     // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
                     if (address) {
@@ -92,9 +92,6 @@ function DHL(options) {
 
                     results.events.push(event);
                 });
-
-                // Add details to the most recent event
-                // results.events[0].details = data.TrackResponse.TrackInfo[0].StatusSummary[0];
 
                 callback(null, JSON.stringify(results, null, 4));
 
