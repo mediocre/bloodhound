@@ -1,6 +1,7 @@
 const async = require('async');
 const request = require('request');
 const geography = require('../util/geography');
+const moment = require('moment-timezone');
 
 function DHL(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
@@ -32,8 +33,8 @@ function DHL(options) {
 
             scanDetails.forEach(scanDetail => {
                 scanDetail.address = {
-                    city: scanDetail.location.address.addressLocality,
-                    zip: scanDetail.location.address.postalCode
+                    city: scanDetail.location != undefined ? scanDetail.location.address.addressLocality : '',
+                    zip: scanDetail.location != undefined ? scanDetail.location.address.postalCode : ''
                 }
                 scanDetail.location = geography.addressToString(scanDetail.address);
             });
@@ -59,15 +60,15 @@ function DHL(options) {
 
                 scanDetails.forEach(scanDetail => {
                     const address = addresses.find(a => a && a.location === scanDetail.location);
-                    // let timezone = 'America/New_York';
+                    let timezone = 'America/New_York';
 
-                    // if (address && address.timezone) {
-                    //     timezone = address.timezone;
-                    // }
+                    if (address && address.timezone) {
+                        timezone = address.timezone;
+                    }
 
                     const event = {
                         address: scanDetail.address,
-                        date: scanDetail.timestamp,
+                        date: new Date(moment.tz(`${scanDetail.timestamp}`, timezone).format('YYYY-MM-DDTHH:mm:ss')),
                         description: scanDetail.status
                     };
 
@@ -75,7 +76,7 @@ function DHL(options) {
                         results.shippedAt = event.date;
                     }
 
-                    if (scanDetail.status === 'delivered') {
+                    if (scanDetail.statusCode === 'delivered') {
                         results.deliveredAt = event.date;
                     }
 
@@ -94,7 +95,6 @@ function DHL(options) {
                 });
 
                 callback(null, JSON.stringify(results, null, 4));
-
             });
         });
     }
