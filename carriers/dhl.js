@@ -10,32 +10,12 @@ function DHL(options) {
         trackingNumber = trackingNumber.replace(/\s/g, '');
         trackingNumber = trackingNumber.toUpperCase();
 
-        /* GLOBAL MAIL: Need Tracking number starting with GM followed by 16 digits */
-        if ([/^GM\d{16}/].some(regex => regex.test(trackingNumber))) {
-            return true;
-        }
-
-        /* USPS/DHL Domestic Tracking: Passes*/
-        if (/^93612\d{17}$/.test(trackingNumber)) {
+        if ([/^93612\d{17}$/, /^92612\d{17}$/, /^94748\d{17}$/, /^93748\d{17}$/, /^92748\d{17}$/].some(regex => regex.test(trackingNumber))) {
             return checkDigit(trackingNumber, [3, 1], 10);
         }
-
-        /* USPS/DHL Domestic Tracking: Passes*/
-        if (/^94748\d{17}$/.test(trackingNumber)) {
-            return checkDigit(trackingNumber, [3, 1], 10);
-        }
-
-        /* USPS/DHL Domestic Tracking: Need Tracking number starting with 93748 (total 32 digits) */
-        if (/^93748\d{17}$/.test(trackingNumber)) {
-            return checkDigit(trackingNumber, [3, 1], 10);
-        }
-
-        /* Need Tracking number with 32 digits */
         if (/^420\d{27}$/.test(trackingNumber)) {
-            return checkDigit(trackingNumber.match(/^420\d{27}$/)[1], [3, 1], 10);
+            return checkDigit(trackingNumber.match(/^420\d{5}(\d{22})$/)[1], [3, 1], 10);
         }
-
-        /* Need Tracking number with 34 digits */
         if (/^420\d{31}$/.test(trackingNumber)) {
             if (checkDigit(trackingNumber.match(/^420\d{9}(\d{22})$/)[1], [3, 1], 10)) {
                 return true;
