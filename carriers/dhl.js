@@ -64,8 +64,9 @@ function DHL(options) {
 
             if (err) {
                 return callback(err);
-            } else if (response.status === 401) {
-                return callback(response.detail);
+                //invalid credentials or invalid tracking number
+            } else if (response.status === 401 || response.status === 404) {
+                return callback(new Error (response.detail));
             }
 
             const results = {
