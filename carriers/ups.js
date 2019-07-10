@@ -11,6 +11,113 @@ const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', '
 // These are all of the status descriptions related to shipping provided by UPS.
 const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DESTINATION SCAN', 'ORIGIN SCAN', 'OUT FOR DELIVERY', 'OUT FOR DELIVERY TODAY', 'PACKAGE DEPARTED UPS MAIL INNOVATIONS FACILITY ENROUTE TO USPS FOR INDUCTION', 'PACKAGE PROCESSED BY UPS MAIL INNOVATIONS ORIGIN FACILITY', 'PACKAGE RECEIVED FOR PROCESSING BY UPS MAIL INNOVATIONS', 'PACKAGE RECEIVED FOR SORT BY DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE TRANSFERRED TO DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE OUT FOR POST OFFICE DELIVERY', 'PACKAGE SORTED BY POST OFFICE', 'RECEIVED BY THE POST OFFICE', 'SHIPMENT ACCEPTANCE AT POST OFFICE', 'YOUR PACKAGE IS IN TRANSIT TO THE UPS FACILITY.', 'LOADED ON DELIVERY VEHICLE'];
 
+function getActivities(package) {
+    var activitiesList = package.Activity;
+
+    if (activitiesList.length != undefined) {
+        activitiesList.reverse().forEach(activity => {
+            if (activity.ActivityLocation != undefined) {
+                activity.address = {
+                    city: activity.ActivityLocation.Address.City,
+                    state: activity.ActivityLocation.Address.StateProvinceCode,
+                    country: activity.ActivityLocation.Address.CountryCode,
+                    zipcode: activity.ActivityLocation.Address.PostalCode ? activity.ActivityLocation.Address.PostalCode : null
+                }
+                activity.location = geography.addressToString(activity.address);
+            } else {
+                activity.address = {
+                    city: null,
+                    state: null,
+                    country: null,
+                    zipcode: null
+                }
+
+                activity.location = null;
+            }
+        })
+    } else {
+        activitiesList.address = {
+            city: activitiesList.ActivityLocation.Address.City,
+            state: activitiesList.ActivityLocation.Address.StateProvinceCode,
+            country: activitiesList.ActivityLocation.Address.CountryCode,
+            zipcode: activitiesList.ActivityLocation.Address.PostalCode ? activitiesList.ActivityLocation.Address.PostalCode : null
+        };
+        activitiesList.location = geography.addressToString(activitiesList.address);
+    }
+
+    return activitiesList;
+}
+
+function filter(res) {
+    const packageInfo = res.body.TrackResponse.Shipment.Package;
+    var activitiesList = [];
+
+    if (packageInfo.length === undefined) {
+        activitiesList.push(getActivities(packageInfo));
+    } else {
+        packageInfo.forEach((package) => {
+            activitiesList.push(getActivities(package));
+        })
+    }
+
+    return activitiesList;
+}
+
+function getResults(locations, callback, results, activitiesList) {
+    async.mapLimit(locations, 10, function(location, callback) {
+        geography.parseLocation(location, function (err, address) {
+            if (err) {
+                return callback(err);
+            }
+            address.location = location;
+
+            callback(null, address);
+        });
+    }, function (err, addresses) {
+        if (err) {
+            return callback(err);
+        }
+
+        activitiesList.forEach(activity => {
+            const address = addresses.find(a => a.location === activity.location);
+            let timezone = 'America/New_York';
+
+            if (address && address.timezone) {
+                timezone = address.timezone;
+            }
+
+            const event = {
+                address: activity.address,
+                date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
+                description: activity.Status.Description
+            };
+
+            if (DELIVERED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+                results.deliveredAt = event.date;
+            }
+            if (SHIPPED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+                results.shippedAt = event.date;
+            }
+
+            // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
+            if (address) {
+                if (address.city) {
+                    event.address.city = address.city;
+                }
+
+                if (address.state) {
+                    event.address.state = address.state;
+                }
+            }
+
+            results.events.push(event);
+        });
+
+        callback(null, results);
+    });
+}
+
+
 function UPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -32,7 +139,7 @@ function UPS(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function (trackingNumber, callback) {
         const baseUrl = options.baseUrl || 'https://onlinetools.ups.com/rest/Track';
 
         request.post(baseUrl, {
@@ -61,7 +168,7 @@ function UPS(options) {
             const results = {
                 events: []
             };
-
+            console.log(res.body);
             const trackDetailsList = res.body.TrackResponse;
 
             if(!trackDetailsList){
@@ -81,72 +188,18 @@ function UPS(options) {
 
             }
 
-            const activitiesList = res.body.TrackResponse.Shipment.Package.Activity;
+            const activitiesList = filter(res);
+            var locations = [];
 
-            activitiesList.reverse().forEach(activity => {
-                activity.address = {
-                    city: activity.ActivityLocation.Address.City,
-                    state: activity.ActivityLocation.Address.StateProvinceCode,
-                    country: activity.ActivityLocation.Address.CountryCode,
-                    zipcode: activity.ActivityLocation.Address.PostalCode ? activity.ActivityLocation.Address.PostalCode : null
-                }
-
-                activity.location = geography.addressToString(activity.address);
-            })
-
-            const locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
-
-            async.mapLimit(locations, 10, function(location, callback) {
-                geography.parseLocation(location, function (err, address) {
-                    if (err) {
-                        return callback(err);
-                    }
-                    address.location = location;
-
-                    callback(null, address);
-                });
-            }, function (err, addresses) {
-                if (err) {
-                    return callback(err);
-                }
-
-                activitiesList.forEach(activity => {
-                    const address = addresses.find(a => a.location === activity.location);
-                    let timezone = 'America/New_York';
-
-                    if (address && address.timezone) {
-                        timezone = address.timezone;
-                    }
-
-                    const event = {
-                        address: activity.address,
-                        date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
-                        description: activity.Status.Description
-                    };
-
-                    if (DELIVERED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
-                        results.deliveredAt = event.date;
-                    }
-                    if (SHIPPED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
-                        results.shippedAt = event.date;
-                    }
-
-                    // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
-                    if (address) {
-                        if (address.city) {
-                            event.address.city = address.city;
-                        }
-
-                        if (address.state) {
-                            event.address.state = address.state;
-                        }
-                    }
-
-                    results.events.push(event);
-                });
-
-                callback(null, results);
-            });
+            if (activitiesList[0].length === undefined){
+                locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
+                getResults(locations, callback, results, activitiesList);
+            } else {
+                activitiesList.forEach((activities) => {
+                    locations = Array.from(new Set(activities.map(activity => activity.location)));
+                    getResults(locations, callback, results, activities);
+                })
+            }
         })
     }
 }
