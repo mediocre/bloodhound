@@ -3,26 +3,47 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe('DHL', function() {
-    describe('dhl.isTrackingNumberValid', function() {
+describe('DHL', function () {
+    describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
 
         const validTrackingNumbers = [
-            '9374869903503911996562',
-            '9374869903503912116716'
+            '9374 8699 0350 3907 0556 62',
+            '9361269903503907020237',
+            '9361269903503907265775',
+            '9374869903503907072188',
+            '9374869903503907009511',
+
+            '9361269903500576940071',
+            '4209 2155 1234 9505 5000 2071 4300 0001 28',
+            '9474812901015476250258'
+
         ];
 
-        it('should detect valid DHL tracking numbers', function() {
+        const invalidTrackingNumbers = [
+            '4206810692612927005269000028978090'
+
+        ];
+
+        it('should detect valid DHL tracking numbers', function () {
             validTrackingNumbers.forEach(trackingNumber => {
                 if (!dhl.isTrackingNumberValid(trackingNumber)) {
                     assert.fail(`${trackingNumber} is not recognized as a valid DHL tracking number`);
                 }
             });
         });
+
+        it('should not detect invalid DHL tracking numbers', function () {
+            invalidTrackingNumbers.forEach(trackingNumber => {
+                if (dhl.isTrackingNumberValid(trackingNumber)) {
+                    assert.fail(`${trackingNumber} should not be recognized as a valid DHL tracking number`);
+                }
+            });
+        });
     });
 
-    describe('Error Handling', function() {
-        describe('Invalid DHL credentials', function() {
+    describe('Error Handling', function () {
+        describe('Invalid DHL credentials', function () {
             const bloodhound = new Bloodhound({
                 dhl: {
                     DHL_API_Key: process.env.DHL_API_Key
@@ -31,21 +52,21 @@ describe('DHL', function() {
 
             this.timeout(15000);
 
-            it.only('should return an error for invalid DHL credentials', function(done) {
+            it.only('should return an error for invalid DHL credentials', function (done) {
                 const bloodhound = new Bloodhound({
                     dhl: {
                         DHL_API_Key: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
                     }
                 });
 
-                bloodhound.track('9374869903503911996586', 'dhl', function(err) {
+                bloodhound.track('9374869903503911996586', 'dhl', function (err) {
                     assert(err);
                     done();
                 })
             });
 
-            it.only('should return an error for a tracking number that contains invalid characters', function(done) {
-                bloodhound.track('asdfkhqowiuy98734587y', 'dhl', function(err) {
+            it.only('should return an error for a tracking number that contains invalid characters', function (done) {
+                bloodhound.track('asdfkhqowiuy98734587y', 'dhl', function (err) {
                     assert(err);
                     done();
                 })
@@ -53,7 +74,7 @@ describe('DHL', function() {
         });
     });
 
-    describe('dhl.track', function() {
+    describe('dhl.track', function () {
         this.timeout(10000);
 
         const bloodhound = new Bloodhound({
@@ -62,8 +83,8 @@ describe('DHL', function() {
             }
         });
 
-        it('Should return a track response', function(done) {
-            bloodhound.track('9374869903503911996586', 'dhl', function(err, actual) {
+        it('Should return a track response', function (done) {
+            bloodhound.track('9374869903503911996586', 'dhl', function (err, actual) {
                 assert.ifError(err);
 
                 const expected = {
