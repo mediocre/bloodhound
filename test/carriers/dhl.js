@@ -21,6 +21,38 @@ describe('DHL', function() {
         });
     });
 
+    describe('Error Handling', function() {
+        describe('Invalid DHL credentials', function() {
+            const bloodhound = new Bloodhound({
+                dhl: {
+                    DHL_API_Key: process.env.DHL_API_Key
+                }
+            });
+
+            this.timeout(15000);
+
+            it.only('should return an error for invalid DHL credentials', function(done) {
+                const bloodhound = new Bloodhound({
+                    dhl: {
+                        DHL_API_Key: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
+                    }
+                });
+
+                bloodhound.track('9374869903503911996586', 'dhl', function(err) {
+                    assert(err);
+                    done();
+                })
+            });
+
+            it.only('should return an error for a tracking number that contains invalid characters', function(done) {
+                bloodhound.track('asdfkhqowiuy98734587y', 'dhl', function(err) {
+                    assert(err);
+                    done();
+                })
+            })
+        });
+    });
+
     describe('dhl.track', function() {
         this.timeout(10000);
 

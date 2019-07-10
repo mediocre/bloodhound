@@ -21,8 +21,12 @@ function DHL(options) {
         async.retry(function(callback) {
             request(req, callback);
         }, function(err, res) {
+            const response = JSON.parse(res.body);
+
             if (err) {
                 return callback(err);
+            } else if (response.status === 401) {
+                return callback(response.detail);
             }
 
             const results = {
