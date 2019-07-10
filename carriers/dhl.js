@@ -94,7 +94,7 @@ function DHL(options) {
                     results.events.push(event);
                 });
 
-                callback(null, JSON.stringify(results, null, 4));
+                callback(null, results);
             });
         });
     }
