@@ -52,7 +52,7 @@ describe('DHL', function () {
 
             this.timeout(15000);
 
-            it.only('should return an error for invalid DHL credentials', function (done) {
+            it('should return an error for invalid DHL credentials', function (done) {
                 const bloodhound = new Bloodhound({
                     dhl: {
                         DHL_API_Key: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
@@ -65,7 +65,7 @@ describe('DHL', function () {
                 })
             });
 
-            it.only('should return an error for a tracking number that contains invalid characters', function (done) {
+            it('should return an error for a tracking number that contains invalid characters', function (done) {
                 bloodhound.track('asdfkhqowiuy98734587y', 'dhl', function (err) {
                     assert(err);
                     done();
