@@ -23,7 +23,10 @@ function DHL(options) {
                 return callback(err);
             }
 
-            // console.log(JSON.stringify(JSON.parse(trackingResponse.body), null, 4));
+            const response = JSON.parse(trackingResponse.body);
+            response.shipments.forEach((shipment) => {
+                console.log(JSON.stringify(shipment.events, null, 4));
+            })
 
             const results = {
                 events: []
