@@ -42,6 +42,9 @@ function DHL(options) {
         }, function(err, res) {
             const response = JSON.parse(res.body);
 
+            //console.log(response)
+
+
             if (err) {
                 return callback(err);
                 //invalid credentials or invalid tracking number

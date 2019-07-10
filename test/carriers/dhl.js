@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe('DHL', function () {
+describe.only('DHL', function () {
     describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
 
@@ -54,7 +54,7 @@ describe('DHL', function () {
         });
     });
 
-    describe('Error Handling', function () {
+    describe.only('Error Handling', function () {
         describe('Invalid DHL credentials', function () {
             const bloodhound = new Bloodhound({
                 dhl: {
@@ -86,7 +86,7 @@ describe('DHL', function () {
         });
     });
 
-    describe('dhl.track', function () {
+    describe.only('dhl.track', function () {
         this.timeout(10000);
 
         const bloodhound = new Bloodhound({
@@ -95,8 +95,60 @@ describe('DHL', function () {
             }
         });
 
+        it('transit', function(done){
+            bloodhound.track('9374869903503927640039', 'dhl', function(err, actual){
+                //console.log(JSON.stringify(actual, null, 4));
+                assert.ifError(err);
+
+                const expected = {
+
+                    events: [
+                        {
+                            address: {
+                                city: 'Avenel',
+                                zip: '07001',
+                                state: 'NJ'
+                            },
+                            date: new Date ('2019-07-10T18:34:41.000Z'),
+                            description: 'Processed'
+                        },
+                        {
+                            address: {
+                                city: 'Avenel',
+                                zip: '07001',
+                                state: 'NJ'
+                            },
+                            date: new Date ('2019-07-10T18:26:35.000Z'),
+                            description: 'ARRIVAL AT DHL ECOMMERCE DISTRIBUTION CENTER'
+                        },
+                        {
+                            address: {
+                                city: '',
+                                zip: ''
+                            },
+                            date: new Date ('2019-07-08T20:16:39.000Z'),
+                            description: 'EN ROUTE TO DHL ECOMMERCE'
+                        },
+                        {
+                            address: {
+                                city: '',
+                                zip: ''
+                            },
+                            date: new Date ('2019-07-08T20:12:33.000Z'),
+                            description: 'Electronic Notification Received: Your order has been processed and tracking will be updated soon'
+                        }
+                    ],
+                    shippedAt: new Date ('2019-07-10T18:26:35.000Z')
+                }
+                assert.deepStrictEqual(actual, expected);
+                done();
+            });
+
+        });
+
         it('Should return a track response', function (done) {
             bloodhound.track('9374869903503911996586', 'dhl', function (err, actual) {
+                //console.log(actual);
                 assert.ifError(err);
 
                 const expected = {
@@ -225,5 +277,129 @@ describe('DHL', function () {
                 done();
             });
         });
+
+        it('Delivered', function(done) {
+            bloodhound.track('9374869903503912434773', 'dhl', function(err, actual) {
+                //console.log(JSON.stringify(actual, null, 4));
+                assert.ifError(err);
+
+                const expected = {
+                    events: [
+                        {
+                            address: {
+                                city: 'Port St. Lucie',
+                                zip: '34983',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-09T19:55:00.000Z'),
+                            description: 'DELIVERED'
+                        },
+                        {
+                            address: {
+                                city: 'Port St. Lucie',
+                                zip: '34983',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-09T14:56:00.000Z'),
+                            description: 'Out for Delivery'
+                        },
+                        {
+                            address: {
+                                city: 'Port St. Lucie',
+                                zip: '34983',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-09T14:46:00.000Z'),
+                            description: 'Sorting Complete'
+                        },
+                        {
+                            address: {
+                                city: 'Fort Pierce, FL, US',
+                                zip: '34981',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-09T08:57:00.000Z'),
+                            description: 'ARRIVAL AT POST OFFICE'
+                        },
+                        {
+                            address: {
+                                city: 'Fort Pierce, FL, US',
+                                zip: '34981',
+                                state: 'FL'
+                            },
+                            date: new Date('2019-07-09T07:42:00.000Z'),
+                            description: 'Arrived USPS Sort Facility'
+                        },
+                        {
+                            address: {
+                                city: 'Orlando',
+                                zip: '32822',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-08T17:09:08.000Z'),
+                            description: 'TENDERED TO DELIVERY SERVICE PROVIDER'
+                        },
+                        {
+                            address: {
+                                city: 'Orlando',
+                                zip: '32822',
+                                state: 'FL'
+                            },
+                            date: new Date ('2019-07-07T16:52:06.000Z'),
+                            description: 'ARRIVAL DESTINATION DHL ECOMMERCE FACILITY'
+                        },
+                        {
+                            address: {
+                                city: 'Compton',
+                                zip: '90220',
+                                state: 'CA'
+                            },
+                            date: new Date ('2019-07-02T21:21:17.000Z'),
+                            description: 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY'
+                        },
+                        {
+                            address: {
+                                city: 'Compton',
+                                zip: '90220',
+                                state: 'CA'
+                            },
+                            date: new Date ('2019-07-02T14:27:26.000Z'),
+                            description: 'Processed'
+                        },
+                        {
+                            address: {
+                                city: 'Compton',
+                                zip: '90220',
+                                state: 'CA'
+                            },
+                            date: new Date ('2019-07-02T00:59:40.000Z'),
+                            description: 'ARRIVAL AT DHL ECOMMERCE DISTRIBUTION CENTER'
+                        },
+                        {
+                            address: {
+                                city: '',
+                                zip: ''
+                            },
+                            date: new Date ('2019-07-01T21:41:38.000Z'),
+                            description: 'EN ROUTE TO DHL ECOMMERCE'
+                        },
+                        {
+                            address: {
+                                city: '',
+                                zip: ''
+                            },
+                            date: new Date ('2019-07-01T21:38:35.000Z'),
+                            description: 'Electronic Notification Received: Your order has been processed and tracking will be updated soon'
+                        }
+                    ],
+                    deliveredAt: new Date ('2019-07-09T19:55:00.000Z'),
+                    shippedAt: new Date ('2019-07-02T00:59:40.000Z')
+                }
+                assert.deepStrictEqual(actual, expected);
+                done();
+
+            });
+        });
+
     })
 });
