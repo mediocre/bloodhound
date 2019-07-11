@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe.only('DHL', function () {
+describe('DHL', function () {
     describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
 
@@ -54,7 +54,7 @@ describe.only('DHL', function () {
         });
     });
 
-    describe.only('Error Handling', function () {
+    describe('Error Handling', function () {
         describe('Invalid DHL credentials', function () {
             const bloodhound = new Bloodhound({
                 dhl: {
@@ -86,7 +86,7 @@ describe.only('DHL', function () {
         });
     });
 
-    describe.only('dhl.track', function () {
+    describe('dhl.track', function () {
         this.timeout(10000);
 
         const bloodhound = new Bloodhound({
@@ -241,7 +241,7 @@ describe.only('DHL', function () {
                                 zip: '07001',
                                 state: 'NJ'
                             },
-                            date: '2019-07-11T11:34:52.000Z',
+                            date: new Date ('2019-07-11T11:34:52.000Z'),
                             'description': 'TENDERED TO DELIVERY SERVICE PROVIDER'
                         },
                         {
@@ -250,7 +250,7 @@ describe.only('DHL', function () {
                                 zip: '07001',
                                 state: 'NJ'
                             },
-                            date: '2019-07-10T18:34:41.000Z',
+                            date: new Date ('2019-07-10T18:34:41.000Z'),
                             description: 'Processed'
                         },
                         {
@@ -259,7 +259,7 @@ describe.only('DHL', function () {
                                 zip: '07001',
                                 state: 'NJ'
                             },
-                            date: '2019-07-10T18:26:35.000Z',
+                            date: new Date ('2019-07-10T18:26:35.000Z'),
                             description: 'ARRIVAL AT DHL ECOMMERCE DISTRIBUTION CENTER'
                         },
                         {
@@ -267,7 +267,7 @@ describe.only('DHL', function () {
                                 city: '',
                                 zip: ''
                             },
-                            date: '2019-07-08T20:16:39.000Z',
+                            date: new Date ('2019-07-08T20:16:39.000Z'),
                             description: 'EN ROUTE TO DHL ECOMMERCE'
                         },
                         {
@@ -275,14 +275,13 @@ describe.only('DHL', function () {
                                 city: '',
                                 zip: ''
                             },
-                            date: '2019-07-08T20:12:33.000Z',
+                            date: new Date ('2019-07-08T20:12:33.000Z'),
                             description: 'Electronic Notification Received: Your order has been processed and tracking will be updated soon'
                         }
                     ],
-                    shippedAt: '2019-07-10T18:26:35.000Z'
-                
+                    shippedAt: new Date ('2019-07-10T18:26:35.000Z')
                 }
-                //assert.deepStrictEqual(actual, expected);
+                assert.deepStrictEqual(actual, expected);
                 done();
             });
 
