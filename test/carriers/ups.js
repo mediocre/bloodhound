@@ -37,7 +37,7 @@ describe('UPS', function(){
             })
         });
 
-        describe.only('Invalid UPS Access', function() {
+        describe('Invalid UPS Access', function() {
             this.timeout(60000);
 
             it('should return an error for trying to access an invalid url', function(done) {
