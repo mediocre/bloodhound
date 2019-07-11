@@ -15,12 +15,12 @@ describe('UPS', function(){
 
     describe('Error Handling', function() {
         describe('Invalid UPS credentials', function(){
-            it('should return an error for invalid USERNAME', function(done){
+            it('should return an error for invalid username', function(done){
                 const bloodhound = new Bloodhound({
                     ups:{
                         UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
                         UPS_PASSWORD: process.env.UPS_PASSWORD,
-                        UPS_USERNAME: 'hello'
+                        UPS_USERNAME: 'ajsalagundi1234567890'
                     }
                 });
                 bloodhound.track('1Z9756W90304415852', 'ups', function(err){
