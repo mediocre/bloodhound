@@ -1,9 +1,17 @@
+const NodeGeocoder = require('node-geocoder');
 const PitneyBowes = require('./carriers/pitneyBowes');
 const UPS = require('./carriers/ups');
 const FedEx = require('./carriers/fedEx');
 const USPS = require('./carriers/usps');
 
+const geography = require('./util/geography');
+
 function Bloodhound(options) {
+    // Optionally specify geocoder options
+    if (options && options.geocoder) {
+        geography.geocoder = NodeGeocoder(options.geocoder);
+    }
+
     // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
     if (options && options.pettyCache && options.pitneyBowes) {
         options.pitneyBowes.pettyCache = options.pettyCache;

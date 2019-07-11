@@ -2,6 +2,9 @@ const async = require('async');
 const moment = require('moment-timezone');
 const PitneyBowesClient = require('pitney-bowes');
 
+// Remove these words from cities to turn cities like `DISTRIBUTION CENTER INDIANAPOLIS` into `INDIANAPOLIS`
+const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
+
 // These tracking status codes indicate the shipment was delivered
 const DELIVERED_TRACKING_STATUS_CODES = ['01'];
 
@@ -29,10 +32,19 @@ function PitneyBowes(options) {
                 return callback(null, results);
             }
 
+            data.scanDetailsList = data.scanDetailsList.filter(scanDetail => {
+                // Remove scan details without cities
+                if (!scanDetail.eventCity) {
+                    return false;
+                }
+
+                return true;
+            });
+
             // Set address and location of each scan detail
             data.scanDetailsList.forEach(scanDetail => {
                 scanDetail.address = {
-                    city: scanDetail.eventCity,
+                    city: scanDetail.eventCity.replace(CITY_BLACKLIST, '').trim(),
                     country: scanDetail.country,
                     state: scanDetail.eventStateOrProvince,
                     zip: scanDetail.postalCode
