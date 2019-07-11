@@ -168,7 +168,7 @@ function UPS(options) {
             const results = {
                 events: []
             };
-            console.log(res.body);
+
             const trackDetailsList = res.body.TrackResponse;
 
             if(!trackDetailsList){
@@ -180,7 +180,7 @@ function UPS(options) {
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description));
                 } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '150022' ){
                     // Invalid Tracking Number
-                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description))                  
+                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.Description));
                 } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151044')  {
                     // No Tracking Information
                     return callback(null, results);

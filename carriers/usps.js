@@ -76,7 +76,6 @@ function USPS(options) {
                     events: []
                 };
 
-                console.log(data);
                 if (err) {
                     return callback(err);
                 } else if (data.Error) {
