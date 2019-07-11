@@ -20,7 +20,7 @@ describe('UPS', function(){
                     ups:{
                         UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
                         UPS_PASSWORD: process.env.UPS_PASSWORD,
-                        UPS_USERNAME: 'mediocre'
+                        UPS_USERNAME: 'hello'
                     }
                 });
                 bloodhound.track('1Z9756W90304415852', 'ups', function(err){
