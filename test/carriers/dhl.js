@@ -3,7 +3,10 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe('DHL', function () {
+describe.only('DHL', function () {
+    // Can only make one request per second. Used 4 seconds as a cushion
+    this.timeout(4000);
+
     describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
 
@@ -62,8 +65,6 @@ describe('DHL', function () {
                 }
             });
 
-            this.timeout(15000);
-
             it('should return an error for invalid DHL credentials', function (done) {
                 const bloodhound = new Bloodhound({
                     dhl: {
@@ -82,22 +83,26 @@ describe('DHL', function () {
                     assert(err);
                     done();
                 })
-            })
+            });
         });
     });
 
     describe('dhl.track', function () {
-        this.timeout(10000);
-
         const bloodhound = new Bloodhound({
             dhl: {
                 DHL_API_Key: process.env.DHL_API_Key
             }
         });
 
+        it('should return a valid response with no errors', function (done) {
+            bloodhound.track('9374869903503927957359', 'dhl', function (err) {
+                assert.ifError(err);
+                done();
+            })
+        });
+
         it('Should return a track response', function (done) {
             bloodhound.track('9374869903503911996586', 'dhl', function (err, actual) {
-                //console.log(actual);
                 assert.ifError(err);
 
                 const expected = {
@@ -227,69 +232,8 @@ describe('DHL', function () {
             });
         });
 
-        it('Transit', function(done){
-            bloodhound.track('9374869903503927640039', 'dhl', function(err, actual){
-                //console.log(JSON.stringify(actual, null, 4));
-                assert.ifError(err);
-
-                const expected = {
-
-                    events: [
-                        {
-                            address: {
-                                city: 'Avenel',
-                                zip: '07001',
-                                state: 'NJ'
-                            },
-                            date: new Date ('2019-07-11T11:34:52.000Z'),
-                            'description': 'TENDERED TO DELIVERY SERVICE PROVIDER'
-                        },
-                        {
-                            address: {
-                                city: 'Avenel',
-                                zip: '07001',
-                                state: 'NJ'
-                            },
-                            date: new Date ('2019-07-10T18:34:41.000Z'),
-                            description: 'Processed'
-                        },
-                        {
-                            address: {
-                                city: 'Avenel',
-                                zip: '07001',
-                                state: 'NJ'
-                            },
-                            date: new Date ('2019-07-10T18:26:35.000Z'),
-                            description: 'ARRIVAL AT DHL ECOMMERCE DISTRIBUTION CENTER'
-                        },
-                        {
-                            address: {
-                                city: '',
-                                zip: ''
-                            },
-                            date: new Date ('2019-07-08T20:16:39.000Z'),
-                            description: 'EN ROUTE TO DHL ECOMMERCE'
-                        },
-                        {
-                            address: {
-                                city: '',
-                                zip: ''
-                            },
-                            date: new Date ('2019-07-08T20:12:33.000Z'),
-                            description: 'Electronic Notification Received: Your order has been processed and tracking will be updated soon'
-                        }
-                    ],
-                    shippedAt: new Date ('2019-07-10T18:26:35.000Z')
-                }
-                assert.deepStrictEqual(actual, expected);
-                done();
-            });
-
-        });
-
         it('Delivered', function(done) {
             bloodhound.track('9374869903503912434773', 'dhl', function(err, actual) {
-                //console.log(JSON.stringify(actual, null, 4));
                 assert.ifError(err);
 
                 const expected = {
