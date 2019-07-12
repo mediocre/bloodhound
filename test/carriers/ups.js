@@ -30,7 +30,7 @@ describe('UPS', function(){
                 });
             });
 
-            it.only('should return an error for a tracking number that contains invalid characters', function(done) {
+            it('should return an error for a tracking number that contains invalid characters', function(done) {
                 bloodhound.track('1Z9756W9030441!85@', 'ups', function(err) {
                     assert(err);
                     done();
@@ -79,7 +79,7 @@ describe('UPS', function(){
         ];
 
         const invalidTrackingNumbers = [
-            '2Z88887736535254'
+            '1Z12345E020527079'
         ];
 
         it('should detect valid UPS tracking numbers', function () {
@@ -99,13 +99,12 @@ describe('UPS', function(){
         });
     });
 
-    describe.only('ups.track', function(){
+    describe('ups.track', function(){
         it('should return an empty result if there is no tracking information available ', function(done) {
-            bloodhound.track('H9205817377', 'ups', function(err, actual) {
+            bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
                 const expected = {
                     events: []
                 }
-                //console.log(err);
                 assert.ifError(err);
                 assert.deepStrictEqual(actual, expected);
                 done();
@@ -124,57 +123,16 @@ describe('UPS', function(){
                 assert.ifError(err);
 
                 const expected = {
-                    deliveredAt: new Date('2019-06-28T16:28:58.000Z'),
-                    events : [
+                    events: [
                         {
                             address: {
-                                city: 'Huez',
-                                state: '',
-                                country: 'US',
-                                zipcode: ''
-                            },
-                            date: new Date('2019-06-24T15:37:18.000Z'),
-                            description: 'Order Processed: Ready for UPS'
-                        },
-                        {
-                            address: {
-                                city: 'Cerritos',
-                                state: 'CA',
-                                country: 'US',
-                                zipcode: ''
-                            },
-                            date: new Date('2019-06-25T02:48:00.000Z'),
-                            description: 'Origin Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Cerritos',
-                                state: 'CA',
-                                country: 'US',
-                                zipcode: ''
-                            },
-                            date: new Date('2019-06-25T05:50:00.000Z'),
-                            description: 'Departure Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Hodgkins',
+                                city: 'Glendale Heights',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: '60139'
                             },
-                            date: new Date('2019-06-27T13:33:00.000Z'),
-                            description: 'Arrival Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Hodgkins',
-                                state: 'IL',
-                                country: 'US',
-                                zipcode: ''
-                            },
-                            date: new Date('2019-06-28T05:02:00.000Z'),
-                            description: 'Departure Scan'
+                            date: new Date ('2019-06-28T16:28:58.000Z'),
+                            description: 'Delivered'
                         },
                         {
                             address: {
@@ -183,8 +141,8 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date('2019-06-28T05:58:00.000Z'),
-                            description: 'Arrival Scan'
+                            date: new Date ('2019-06-28T14:00:49.000Z'),
+                            description: 'Out For Delivery Today'
                         },
                         {
                             address: {
@@ -193,17 +151,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date('2019-06-28T10:11:58.000Z'),
-                            description: 'Destination Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Addison',
-                                state: 'IL',
-                                country: 'US',
-                                zipcode: ''
-                            },
-                            date: new Date('2019-06-28T12:19:33.000Z'),
+                            date: new Date ('2019-06-28T12:19:33.000Z'),
                             description: 'Loaded on Delivery Vehicle'
                         },
                         {
@@ -213,25 +161,281 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date('2019-06-28T14:00:49.000Z'),
-                            description: 'Out For Delivery Today'
+                            date: new Date ('2019-06-28T10:11:58.000Z'),
+                            description: 'Destination Scan'
                         },
                         {
                             address: {
-                                city: 'Glendale Heights',
+                                city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: '60139'
+                                zipcode: ''
                             },
-                            date: new Date('2019-06-28T16:28:58.000Z'),
-                            description: 'Delivered'
+                            date: new Date ('2019-06-28T05:58:00.000Z'),
+                            description: 'Arrival Scan'
+                        },
+                        {
+                            address: {
+                                city: 'Hodgkins',
+                                state: 'IL',
+                                country: 'US',
+                                zipcode: ''
+                            },
+                            date: new Date ('2019-06-28T05:02:00.000Z'),
+                            description: 'Departure Scan'
+                        },
+                        {
+                            address: {
+                                city: 'Hodgkins',
+                                state: 'IL',
+                                country: 'US',
+                                zipcode: ''
+                            },
+                            date: new Date ('2019-06-27T13:33:00.000Z'),
+                            description: 'Arrival Scan'
+                        },
+                        {
+                            address: {
+                                city: 'Cerritos',
+                                state: 'CA',
+                                country: 'US',
+                                zipcode: ''
+                            },
+                            date: new Date ('2019-06-25T05:50:00.000Z'),
+                            description: 'Departure Scan'
+                        },
+                        {
+                            address: {
+                                city: 'Cerritos',
+                                state: 'CA',
+                                country: 'US',
+                                zipcode: ''
+                            },
+                            date: new Date ('2019-06-25T02:48:00.000Z'),
+                            description: 'Origin Scan'
+                        },
+                        {
+                            address: {
+                                city: 'Huez',
+                                state: '',
+                                country: 'US',
+                                zipcode: ''
+                            },
+                            date: new Date ('2019-06-24T15:37:18.000Z'),
+                            description: 'Order Processed: Ready for UPS'
                         }
                     ],
-                    shippedAt: new Date('2019-06-28T16:28:58.000Z')
+                    deliveredAt: new Date ('2019-06-28T16:28:58.000Z'),
+                    shippedAt: new Date ('2019-06-25T02:48:00.000Z')
                 }
                 assert.deepStrictEqual(actual, expected);
                 done();
             });
+        });
+        describe('2nd Day Air', function(){
+            it('Delivered', function(done){
+                bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual){
+                    assert.ifError(err);
+
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: '30340'
+                                },
+                                date: new Date ('1999-06-10T16:00:00.000Z'),
+                                description: 'DELIVERED'
+                            },
+                            {
+                                address: {
+                                    city: '',
+                                    state: '',
+                                    country: '',
+                                    zipcode: ''
+                                },
+                                date: new Date ('1999-06-08T16:00:00.000Z'),
+                                description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
+                            }
+                        ],
+                        deliveredAt: new Date ('1999-06-10T16:00:00.000Z'),
+                        shippedAt: new Date ('1999-06-10T16:00:00.000Z')
+
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+        });
+
+        describe('World Wide Express', function(){
+            it('Delivered', function(done){
+                bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual){
+                    assert.ifError(err);
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: '',
+                                    country: 'IT',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-05-18T14:00:00.000Z'),
+                                description: 'DELIVERED'
+                            }
+                        ],
+                        deliveredAt: new Date ('2010-05-18T14:00:00.000Z'),
+                        shippedAt: new Date ('2010-05-18T14:00:00.000Z')
+
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+        });
+        describe('Ground', function(){
+            it('Delivered', function(done){
+                bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual){
+                    assert.ifError(err);
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: '30304'
+                                },
+                                date: new Date ('2010-04-29T16:00:00.000Z'),
+                                description: 'DELIVERED'
+                            },
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: '30304'
+                                },
+                                date: new Date ('2010-04-29T16:00:00.000Z'),
+                                description: 'DELIVERED'
+                            }
+                        ],
+                        deliveredAt: new Date ('2010-04-29T16:00:00.000Z'),
+                        shippedAt: new Date ('2010-04-29T16:00:00.000Z')
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+
+        });
+
+        describe('Next Day Air', function(){
+            it('Origin Scan', function(done){
+                bloodhound.track('1Z12345E1305277940', 'ups', function(err, actual){
+                    assert.ifError(err);
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'GRAND JUNCTION AIR S',
+                                    state: 'CO',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-05-05T05:00:00.000Z'),
+                                description: 'ORIGIN SCAN'
+                            }
+                        ],
+                        shippedAt: new Date ('2010-05-05T05:00:00.000Z')
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+
+            it('2nd Delivery Attempt', function(done){
+                bloodhound.track('1Z12345E6205277936', 'ups', function(err, actual){
+                    assert.ifError(err);
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'Bonn',
+                                    state: '',
+                                    country: 'DE',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-08-30T08:39:00.000Z'),
+                                description: 'UPS INTERNAL ACTIVITY CODE'
+                            },
+                            {
+                                address: {
+                                    city: 'Bonn',
+                                    state: '',
+                                    country: 'DE',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-08-30T08:32:00.000Z'),
+                                description: 'ADVERSE WEATHER CONDITIONS CAUSED THIS DELAY'
+                            },
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-09-10T22:03:00.000Z'),
+                                description: 'THE RECEIVER\'S LOCATION WAS CLOSED ON THE 2ND DELIVERY ATTEMPT. A 3RD DELIVERY ATTEMPT WILL BE MADE'
+                            },
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: '30340'
+                                },
+                                date: new Date ('2010-09-12T15:57:00.000Z'),
+                                description: 'DELIVERED'
+                            },
+                            {
+                                address: {
+                                    city: 'WEST CHESTER-MALVERN',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-04-04T18:40:00.000Z'),
+                                description: 'PICKUP SCAN'
+                            },
+                            {
+                                address: {
+                                    city: 'Bonn',
+                                    state: '',
+                                    country: 'DE',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-08-30T11:13:00.000Z'),
+                                description: 'UPS INTERNAL ACTIVITY CODE'
+                            }
+                        ],
+                        deliveredAt: new Date ('2010-09-12T15:57:00.000Z'),
+                        shippedAt: new Date ('2010-09-12T15:57:00.000Z')
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+
         });
 
     });

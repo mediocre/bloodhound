@@ -15,7 +15,7 @@ function getActivities(package) {
     var activitiesList = package.Activity;
 
     if (activitiesList.length != undefined) {
-        activitiesList.reverse().forEach(activity => {
+        activitiesList.forEach(activity => {
             if (activity.ActivityLocation != undefined) {
                 activity.address = {
                     city: activity.ActivityLocation.Address === undefined ? activity.ActivityLocation.City : activity.ActivityLocation.Address.City,
@@ -37,10 +37,10 @@ function getActivities(package) {
         })
     } else {
         activitiesList.address = {
-            city: activitiesList.ActivityLocation.Address.City,
-            state: activitiesList.ActivityLocation.Address.StateProvinceCode,
-            country: activitiesList.ActivityLocation.Address.CountryCode,
-            zipcode: activitiesList.ActivityLocation.Address.PostalCode ? activitiesList.ActivityLocation.Address.PostalCode : ''
+            city: activitiesList.ActivityLocation.Address === undefined ? activitiesList.ActivityLocation.City : activitiesList.ActivityLocation.Address.City,
+            state: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.StateProvinceCode === undefined ? '' : activitiesList.ActivityLocation.StateProvinceCode) : (activitiesList.ActivityLocation.Address.StateProvinceCode === undefined ? '' : activitiesList.ActivityLocation.Address.StateProvinceCode),
+            country: activitiesList.ActivityLocation.Address === undefined ? activitiesList.ActivityLocation.CountryCode : activitiesList.ActivityLocation.Address.CountryCode,
+            zipcode: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.PostalCode === undefined ? '' : activitiesList.ActivityLocation.PostalCode) : (activitiesList.ActivityLocation.Address.PostalCode === undefined ? '' : activitiesList.ActivityLocation.Address.PostalCode)
         };
         activitiesList.location = geography.addressToString(activitiesList.address);
     }
