@@ -18,21 +18,21 @@ function getActivities(package) {
         activitiesList.reverse().forEach(activity => {
             if (activity.ActivityLocation != undefined) {
                 activity.address = {
-                    city: activity.ActivityLocation.Address.City,
-                    state: activity.ActivityLocation.Address.StateProvinceCode,
-                    country: activity.ActivityLocation.Address.CountryCode,
-                    zipcode: activity.ActivityLocation.Address.PostalCode ? activity.ActivityLocation.Address.PostalCode : null
+                    city: activity.ActivityLocation.Address === undefined ? activity.ActivityLocation.City : activity.ActivityLocation.Address.City,
+                    state: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.StateProvinceCode === undefined ? '' : activity.ActivityLocation.StateProvinceCode) : (activity.ActivityLocation.Address.StateProvinceCode === undefined ? '' : activity.ActivityLocation.Address.StateProvinceCode),
+                    country: activity.ActivityLocation.Address === undefined ? activity.ActivityLocation.CountryCode : activity.ActivityLocation.Address.CountryCode,
+                    zipcode: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.PostalCode === undefined ? '' : activity.ActivityLocation.PostalCode) : (activity.ActivityLocation.Address.PostalCode === undefined ? '' : activity.ActivityLocation.Address.PostalCode)
                 }
                 activity.location = geography.addressToString(activity.address);
             } else {
                 activity.address = {
-                    city: null,
-                    state: null,
-                    country: null,
-                    zipcode: null
+                    city: '',
+                    state: '',
+                    country: '',
+                    zipcode: ''
                 }
 
-                activity.location = null;
+                activity.location = '';
             }
         })
     } else {
@@ -40,7 +40,7 @@ function getActivities(package) {
             city: activitiesList.ActivityLocation.Address.City,
             state: activitiesList.ActivityLocation.Address.StateProvinceCode,
             country: activitiesList.ActivityLocation.Address.CountryCode,
-            zipcode: activitiesList.ActivityLocation.Address.PostalCode ? activitiesList.ActivityLocation.Address.PostalCode : null
+            zipcode: activitiesList.ActivityLocation.Address.PostalCode ? activitiesList.ActivityLocation.Address.PostalCode : ''
         };
         activitiesList.location = geography.addressToString(activitiesList.address);
     }
@@ -51,23 +51,25 @@ function getActivities(package) {
 function filter(res) {
     const packageInfo = res.body.TrackResponse.Shipment.Package;
     var activitiesList = [];
-
-    if (packageInfo.length === undefined) {
-        activitiesList.push(getActivities(packageInfo));
+    if(packageInfo === undefined){
+        activitiesList.push(getActivities(res.body.TrackResponse.Shipment));
     } else {
-        packageInfo.forEach((package) => {
-            activitiesList.push(getActivities(package));
-        })
+        if (packageInfo.length === undefined) {
+            activitiesList.push(getActivities(packageInfo));
+        } else {
+            packageInfo.forEach((package) => {
+                activitiesList.push(getActivities(package));
+            })
+        }
     }
-
     return activitiesList;
 }
 
 function getResults(locations, callback, results, activitiesList) {
     async.mapLimit(locations, 10, function(location, callback) {
         geography.parseLocation(location, function (err, address) {
-            if (err) {
-                return callback(err);
+            if (err || !address) {
+                return callback(err, '');
             }
             address.location = location;
 
@@ -81,21 +83,28 @@ function getResults(locations, callback, results, activitiesList) {
         activitiesList.forEach(activity => {
             const address = addresses.find(a => a.location === activity.location);
             let timezone = 'America/New_York';
+            let description = '';
 
             if (address && address.timezone) {
                 timezone = address.timezone;
             }
 
+            if (activity.Status === undefined ) {
+                description = activity.Description;
+            } else {
+                description = activity.Status.Description;
+            }
+
             const event = {
                 address: activity.address,
                 date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
-                description: activity.Status.Description
+                description: description
             };
 
-            if (DELIVERED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+            if (DELIVERED_DESCRIPTIONS.includes(description.toUpperCase())){
                 results.deliveredAt = event.date;
             }
-            if (SHIPPED_DESCRIPTIONS.includes(activity.Status.Description.toUpperCase())){
+            if (SHIPPED_DESCRIPTIONS.includes(description.toUpperCase())){
                 results.shippedAt = event.date;
             }
 
@@ -168,25 +177,18 @@ function UPS(options) {
                 events: []
             };
 
-            const trackDetailsList = res.body.TrackResponse;
-
-            if(!trackDetailsList){
-
-                if (err) {
-                    return callback(err);
-                } else if (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '250002' ){
+            if (res.body.TrackResponse === undefined){
+                if (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '250002' ){
                     // Invalid credentials
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '150022' ){
+                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '150022' || (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151018'){
                     // Invalid Tracking Number
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
                 } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151044')  {
                     // No Tracking Information
                     return callback(null, results);
                 }
-
             }
-
             const activitiesList = filter(res);
             var locations = [];
 

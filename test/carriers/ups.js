@@ -9,7 +9,8 @@ describe('UPS', function(){
         ups: {
             UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
             UPS_PASSWORD: process.env.UPS_PASSWORD,
-            UPS_USERNAME: process.env.UPS_USERNAME
+            UPS_USERNAME: process.env.UPS_USERNAME,
+            baseUrl: 'https://wwwcie.ups.com/rest/Track'
         }
     });
 
@@ -29,7 +30,7 @@ describe('UPS', function(){
                 });
             });
 
-            it('should return an error for a tracking number that contains invalid characters', function(done) {
+            it.only('should return an error for a tracking number that contains invalid characters', function(done) {
                 bloodhound.track('1Z9756W9030441!85@', 'ups', function(err) {
                     assert(err);
                     done();
@@ -98,7 +99,7 @@ describe('UPS', function(){
         });
     });
 
-    describe('ups.track', function(){
+    describe.only('ups.track', function(){
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('H9205817377', 'ups', function(err, actual) {
                 const expected = {
@@ -112,7 +113,7 @@ describe('UPS', function(){
         });
 
         it('should return tracking information with no errors', function(done) {
-            bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
+            bloodhound.track('5548789114', 'ups', function(err) {
                 assert.ifError(err);
                 done();
             });
@@ -128,9 +129,9 @@ describe('UPS', function(){
                         {
                             address: {
                                 city: 'Huez',
-                                state: undefined,
+                                state: '',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-24T15:37:18.000Z'),
                             description: 'Order Processed: Ready for UPS'
@@ -140,7 +141,7 @@ describe('UPS', function(){
                                 city: 'Cerritos',
                                 state: 'CA',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-25T02:48:00.000Z'),
                             description: 'Origin Scan'
@@ -150,7 +151,7 @@ describe('UPS', function(){
                                 city: 'Cerritos',
                                 state: 'CA',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-25T05:50:00.000Z'),
                             description: 'Departure Scan'
@@ -160,7 +161,7 @@ describe('UPS', function(){
                                 city: 'Hodgkins',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-27T13:33:00.000Z'),
                             description: 'Arrival Scan'
@@ -170,7 +171,7 @@ describe('UPS', function(){
                                 city: 'Hodgkins',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-28T05:02:00.000Z'),
                             description: 'Departure Scan'
@@ -180,7 +181,7 @@ describe('UPS', function(){
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-28T05:58:00.000Z'),
                             description: 'Arrival Scan'
@@ -190,7 +191,7 @@ describe('UPS', function(){
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-28T10:11:58.000Z'),
                             description: 'Destination Scan'
@@ -200,7 +201,7 @@ describe('UPS', function(){
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-28T12:19:33.000Z'),
                             description: 'Loaded on Delivery Vehicle'
@@ -210,7 +211,7 @@ describe('UPS', function(){
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: null
+                                zipcode: ''
                             },
                             date: new Date('2019-06-28T14:00:49.000Z'),
                             description: 'Out For Delivery Today'
@@ -232,5 +233,20 @@ describe('UPS', function(){
                 done();
             });
         });
+
+        describe('UPS 2nd Day Air', function(){
+            it('Delivered', function(done){
+                bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual){
+                    assert.ifError(err);
+
+                    const expected = {
+
+
+                    }
+                    //assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            })
+        })
     });
 });
