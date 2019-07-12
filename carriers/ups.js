@@ -147,10 +147,9 @@ function UPS(options) {
         return false;
     };
 
-    this.track = function (trackingNumber, callback) {
-        const baseUrl = options.baseUrl || 'https://onlinetools.ups.com/rest/Track';
-
-        request.post(baseUrl, {
+    this.track = function(trackingNumber, callback) {
+        const req = {
+            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
             json: {
                 Security: {
                     UsernameToken: {
@@ -168,16 +167,24 @@ function UPS(options) {
                     },
                     InquiryNumber: trackingNumber
                 }
-            }
+            },
+            method: 'POST',
+            timeout: 5000,
+            url: '/rest/Track'
+        };
+
+        async.retry(function(callback) {
+            request(req, callback);
         }, function (err, res) {
             if (err) {
                 return callback(err);
             }
+
             const results = {
                 events: []
             };
 
-            if (res.body.TrackResponse === undefined){
+            if (res.body.TrackResponse === undefined) {
                 if (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '250002' ){
                     // Invalid credentials
                     return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
@@ -189,6 +196,7 @@ function UPS(options) {
                     return callback(null, results);
                 }
             }
+
             const activitiesList = filter(res);
             var locations = [];
 
