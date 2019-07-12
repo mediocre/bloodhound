@@ -234,19 +234,5 @@ describe('UPS', function(){
             });
         });
 
-        describe('UPS 2nd Day Air', function(){
-            it('Delivered', function(done){
-                bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual){
-                    assert.ifError(err);
-
-                    const expected = {
-
-
-                    }
-                    //assert.deepStrictEqual(actual, expected);
-                    done();
-                })
-            })
-        })
     });
 });
