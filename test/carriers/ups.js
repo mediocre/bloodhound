@@ -3,8 +3,6 @@ const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
 describe('UPS', function(){
-    this.timeout(10000);
-
     const bloodhound = new Bloodhound({
         ups: {
             UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
@@ -232,6 +230,7 @@ describe('UPS', function(){
                 done();
             });
         });
+
         describe('2nd Day Air', function(){
             it('Delivered', function(done){
                 bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual){
@@ -270,34 +269,159 @@ describe('UPS', function(){
                 })
             });
         });
-
-        describe('World Wide Express', function(){
-            it('Delivered', function(done){
-                bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual){
+        describe('Express Freight', function() {
+            it('should return a track response with a status update of Confirmed Arrival', function(done) {
+                bloodhound.track('5548789114', 'ups', function (err, actual) {
                     assert.ifError(err);
+
                     const expected = {
                         events: [
                             {
                                 address: {
-                                    city: 'ANYTOWN',
+                                    city: '',
                                     state: '',
-                                    country: 'IT',
+                                    country: '',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-05-18T14:00:00.000Z'),
-                                description: 'DELIVERED'
+                                date: new Date('2010-11-24T12:16:00.000Z'),
+                                description: 'Bad weather'
+                            },
+                            {
+                                address: {
+                                    city: 'El Paso',
+                                    state: 'TX',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-18T16:00:00.000Z'),
+                                description: 'CONFIRMED ARRIVAL'
+                            },
+                            {
+                                address: {
+                                    city: 'El Paso',
+                                    state: 'TX',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-18T15:16:00.000Z'),
+                                description: 'DOCUMENTS TURNED OVER TO CLIENTS BROKER OR CONSIGNEE'
+                            },
+                            {
+                                address: {
+                                    city: 'El Paso',
+                                    state: 'TX',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-18T14:00:00.000Z'),
+                                description: 'ENTRY FILED'
+                            },
+                            {
+                                address: {
+                                    city: 'El Paso',
+                                    state: 'TX',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-18T08:42:49.000Z'),
+                                description: 'ON-HAND AT DESTINATION'
+                            },
+                            {
+                                address: {
+                                    city: 'Winchester',
+                                    state: 'IL',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-18T01:04:00.000Z'),
+                                description: 'ARRIVED AT DESTINATION COUNTRY'
+                            },
+                            {
+                                address: {
+                                    city: 'Köln',
+                                    state: 'NW',
+                                    country: 'DE',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-15T13:34:00.000Z'),
+                                description: 'CONFIRMED DEPARTURE'
+                            },
+                            {
+                                address: {
+                                    city: 'Amsterdam',
+                                    state: '',
+                                    country: 'NL',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-15T13:31:32.000Z'),
+                                description: 'DOCS RECEIVED FROM SHIPPER'
+                            },
+                            {
+                                address: {
+                                    city: 'Amsterdam',
+                                    state: '',
+                                    country: 'NL',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-15T13:31:32.000Z'),
+                                description: 'DATE AVAILABLE TO SHIP'
+                            },
+                            {
+                                address: {
+                                    city: 'Amsterdam',
+                                    state: '',
+                                    country: 'NL',
+                                    zipcode: ''
+                                },
+                                date: new Date('2010-10-15T12:00:00.000Z'),
+                                description: 'RECEIVED INTO UPS POSSESSION'
                             }
-                        ],
-                        deliveredAt: new Date ('2010-05-18T14:00:00.000Z'),
-                        shippedAt: new Date ('2010-05-18T14:00:00.000Z')
-
+                        ]
                     }
+
+                    // console.log(JSON.stringify(actual, null, 4));
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                });
+            });
+        });
+
+        describe('Freight LTL', function() {
+            it('should return a track response with a status update of In Transit', function(done) {
+                bloodhound.track('990728071', 'ups', function (err, actual) {
+                    assert.ifError(err);
+
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'Dothan',
+                                    state: 'AL',
+                                    country: '',
+                                    zipcode: ''
+                                },
+                                date: new Date('2005-10-06T17:56:00.000Z'),
+                                description: 'SHIPMENT HAS BEEN DELIVERED TO THE CONSIGNEE.'
+                            },
+                            {
+                                address: {
+                                    city: 'Columbia',
+                                    state: 'SC',
+                                    country: '',
+                                    zipcode: ''
+                                },
+                                date: new Date('2005-10-05T22:00:00.000Z'),
+                                description: 'SHIPMENT HAS BEEN PICKED-UP.'
+                            }
+                        ]
+                    };
 
                     assert.deepStrictEqual(actual, expected);
                     done();
-                })
+                });
             });
         });
+
         describe('Ground', function(){
             it('Delivered', function(done){
                 bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual){
@@ -438,5 +562,124 @@ describe('UPS', function(){
 
         });
 
+        describe('No service stated', function() {
+            it('should return a track response with a status update of Deliver Origin CFS', function(done) {
+                bloodhound.track('3251026119', 'ups', function (err, actual) {
+                    assert.ifError(err);
+
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'Atlanta',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2006-05-26T00:06:05.000Z'),
+                                description: 'DOCS RECEIVED FROM SHIPPER'
+                            },
+                            {
+                                address: {
+                                    city: 'Atlanta',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2006-05-26T00:06:05.000Z'),
+                                description: 'DATE AVAILABLE TO SHIP'
+                            },
+                            {
+                                address: {
+                                    city: 'Atlanta',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2006-05-26T00:06:05.000Z'),
+                                description: 'ON HAND AT ORIGIN'
+                            },
+                            {
+                                address: {
+                                    city: 'Atlanta',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2006-05-26T00:06:05.000Z'),
+                                description: 'CONFIRMED DEPARTURE'
+                            },
+                            {
+                                address: {
+                                    city: 'Atlanta',
+                                    state: 'GA',
+                                    country: 'US',
+                                    zipcode: ''
+                                },
+                                date: new Date('2006-05-26T00:06:05.000Z'),
+                                description: 'RECEIVED INTO UPS-SCS POSSESSION'
+                            }
+                        ]
+                    };
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+        });
+
+        describe('World Wide Express', function(){
+            it('Delivered', function(done){
+                bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual){
+                    assert.ifError(err);
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'ANYTOWN',
+                                    state: '',
+                                    country: 'IT',
+                                    zipcode: ''
+                                },
+                                date: new Date ('2010-05-18T14:00:00.000Z'),
+                                description: 'DELIVERED'
+                            }
+                        ],
+                        deliveredAt: new Date ('2010-05-18T14:00:00.000Z'),
+                        shippedAt: new Date ('2010-05-18T14:00:00.000Z')
+
+                    }
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                })
+            });
+        });
+
+        describe('Worldwide Express Freight', function() {
+            it('should return a track response with a status update of Order Processed: Ready for UPS', function(done) {
+                bloodhound.track('1Z648616E192760718', 'ups', function (err, actual) {
+                    assert.ifError(err);
+
+                    const expected = {
+                        events: [
+                            {
+                                address: {
+                                    city: 'Leeuwarden',
+                                    country: 'FR',
+                                    state: '',
+                                    zipcode: ''
+                                },
+                                date: new Date('2012-10-04T11:58:04.000Z'),
+                                description: 'Order Processed: Ready for UPS'
+                            }
+                        ]
+                    };
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                });
+            })
+        });
     });
 });
