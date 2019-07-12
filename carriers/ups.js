@@ -42,6 +42,7 @@ function getActivities(package) {
             country: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.CountryCode === undefined ? '' : activitiesList.ActivityLocation.CountryCode) : (activitiesList.ActivityLocation.Address.CountryCode === undefined ? '' : activitiesList.ActivityLocation.Address.CountryCode),
             zipcode: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.PostalCode === undefined ? '' : activitiesList.ActivityLocation.PostalCode) : (activitiesList.ActivityLocation.Address.PostalCode === undefined ? '' : activitiesList.ActivityLocation.Address.PostalCode)
         }
+
         activitiesList.location = geography.addressToString(activitiesList.address);
     }
 
@@ -101,10 +102,11 @@ function getResults(locations, callback, results, activitiesList) {
                 description: description
             };
 
-            if (DELIVERED_DESCRIPTIONS.includes(description.toUpperCase())){
+            if (DELIVERED_DESCRIPTIONS.includes(description.toUpperCase())) {
                 results.deliveredAt = event.date;
             }
-            if (SHIPPED_DESCRIPTIONS.includes(description.toUpperCase())){
+
+            if (SHIPPED_DESCRIPTIONS.includes(description.toUpperCase())) {
                 results.shippedAt = event.date;
             }
 
@@ -152,20 +154,20 @@ function UPS(options) {
             baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
             json: {
                 Security: {
-                    UsernameToken: {
-                        Username: options.UPS_USERNAME,
-                        Password: options.UPS_PASSWORD
-                    },
                     UPSServiceAccessToken: {
-                        AccessLicenseNumber: options.UPS_ACCESS_KEY
+                        AccessLicenseNumber: options.accessKey
+                    },
+                    UsernameToken: {
+                        Username: options.username,
+                        Password: options.password
                     }
                 },
                 TrackRequest: {
+                    InquiryNumber: trackingNumber,
                     Request: {
                         RequestAction: 'Track',
                         RequestOption: 'activity'
-                    },
-                    InquiryNumber: trackingNumber
+                    }
                 }
             },
             method: 'POST',
@@ -184,27 +186,25 @@ function UPS(options) {
                 events: []
             };
 
-            if (res.body.TrackResponse === undefined) {
-                if (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '250002' ){
-                    // Invalid credentials
-                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '150022' || (res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151018'){
-                    // Invalid Tracking Number
-                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                } else if ((res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code) === '151044')  {
+            if (!res.body.TrackResponse) {
+                if (res && res.body && res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '151044') {
                     // No Tracking Information
                     return callback(null, results);
+                }
+
+                if (res && res.body && res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
+                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
                 }
             }
 
             const activitiesList = filter(res);
             var locations = [];
 
-            if (activitiesList[0].length === undefined){
+            if (activitiesList[0].length === undefined) {
                 locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
                 getResults(locations, callback, results, activitiesList);
             } else {
-                activitiesList.forEach((activities) => {
+                activitiesList.forEach(activities => {
                     locations = Array.from(new Set(activities.map(activity => activity.location)));
                     getResults(locations, callback, results, activities);
                 })

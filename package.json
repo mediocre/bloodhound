@@ -7,7 +7,6 @@
         "petty-cache": "^2.4.1",
         "pitney-bowes": "~0.1.0",
         "shipping-fedex": "0.2.0",
-        "shipping-ups": "^0.5.7",
         "tz-lookup": "~6.1.18",
         "us-states-normalize": "~1.0.0"
     },

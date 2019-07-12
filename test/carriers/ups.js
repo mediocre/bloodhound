@@ -2,27 +2,28 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
-describe('UPS', function(){
+describe('UPS', function() {
     const bloodhound = new Bloodhound({
         ups: {
-            UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
-            UPS_PASSWORD: process.env.UPS_PASSWORD,
-            UPS_USERNAME: process.env.UPS_USERNAME,
-            baseUrl: 'https://wwwcie.ups.com/rest/Track'
+            accessKey: process.env.UPS_ACCESS_KEY,
+            baseUrl: 'https://wwwcie.ups.com',
+            password: process.env.UPS_PASSWORD,
+            username: process.env.UPS_USERNAME
         }
     });
 
     describe('Error Handling', function() {
-        describe('Invalid UPS credentials', function(){
-            it('should return an error for invalid username', function(done){
+        describe('Invalid UPS credentials', function() {
+            it('should return an error for invalid username', function(done) {
                 const bloodhound = new Bloodhound({
-                    ups:{
-                        UPS_ACCESS_KEY: process.env.UPS_ACCESS_KEY,
-                        UPS_PASSWORD: process.env.UPS_PASSWORD,
-                        UPS_USERNAME: 'username'
+                    ups: {
+                        accessKey: process.env.UPS_ACCESS_KEY,
+                        password: process.env.UPS_PASSWORD,
+                        username: 'username'
                     }
                 });
-                bloodhound.track('1Z9756W90304415852', 'ups', function(err){
+
+                bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
                     assert(err);
                     done();
                 });
@@ -42,9 +43,10 @@ describe('UPS', function(){
             it('should return an error for trying to access an invalid url', function(done) {
                 const bloodhound = new Bloodhound({
                     ups: {
-                        baseUrl: 'https://onlintools.ups.com/rest/Track'
+                        baseUrl: 'https://onlintools.ups.com'
                     }
                 });
+
                 bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
                     assert(err);
                     done();
@@ -53,7 +55,7 @@ describe('UPS', function(){
         });
     });
 
-    describe('ups.isTrackingNumberValid', function () {
+    describe('ups.isTrackingNumberValid', function() {
         const ups = new UPS();
 
         const validTrackingNumbers = [
@@ -80,7 +82,7 @@ describe('UPS', function(){
             '1Z12345E020527079'
         ];
 
-        it('should detect valid UPS tracking numbers', function () {
+        it('should detect valid UPS tracking numbers', function() {
             validTrackingNumbers.forEach(trackingNumber => {
                 if (!ups.isTrackingNumberValid(trackingNumber)) {
                     assert.fail(`${trackingNumber} is not recognized as a valid UPS tracking number`);
@@ -97,12 +99,13 @@ describe('UPS', function(){
         });
     });
 
-    describe('ups.track', function(){
+    describe('ups.track', function() {
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
                 const expected = {
                     events: []
                 }
+
                 assert.ifError(err);
                 assert.deepStrictEqual(actual, expected);
                 done();
@@ -116,7 +119,7 @@ describe('UPS', function(){
             });
         });
 
-        it('should return a track response', function(done){
+        it('should return a track response', function(done) {
             bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
                 assert.ifError(err);
 
@@ -129,7 +132,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: '60139'
                             },
-                            date: new Date ('2019-06-28T16:28:58.000Z'),
+                            date: new Date('2019-06-28T16:28:58.000Z'),
                             description: 'Delivered'
                         },
                         {
@@ -139,7 +142,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-28T14:00:49.000Z'),
+                            date: new Date('2019-06-28T14:00:49.000Z'),
                             description: 'Out For Delivery Today'
                         },
                         {
@@ -149,7 +152,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-28T12:19:33.000Z'),
+                            date: new Date('2019-06-28T12:19:33.000Z'),
                             description: 'Loaded on Delivery Vehicle'
                         },
                         {
@@ -159,7 +162,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-28T10:11:58.000Z'),
+                            date: new Date('2019-06-28T10:11:58.000Z'),
                             description: 'Destination Scan'
                         },
                         {
@@ -169,7 +172,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-28T05:58:00.000Z'),
+                            date: new Date('2019-06-28T05:58:00.000Z'),
                             description: 'Arrival Scan'
                         },
                         {
@@ -179,7 +182,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-28T05:02:00.000Z'),
+                            date: new Date('2019-06-28T05:02:00.000Z'),
                             description: 'Departure Scan'
                         },
                         {
@@ -189,7 +192,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-27T13:33:00.000Z'),
+                            date: new Date('2019-06-27T13:33:00.000Z'),
                             description: 'Arrival Scan'
                         },
                         {
@@ -199,7 +202,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-25T05:50:00.000Z'),
+                            date: new Date('2019-06-25T05:50:00.000Z'),
                             description: 'Departure Scan'
                         },
                         {
@@ -209,7 +212,7 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-25T02:48:00.000Z'),
+                            date: new Date('2019-06-25T02:48:00.000Z'),
                             description: 'Origin Scan'
                         },
                         {
@@ -219,21 +222,22 @@ describe('UPS', function(){
                                 country: 'US',
                                 zipcode: ''
                             },
-                            date: new Date ('2019-06-24T15:37:18.000Z'),
+                            date: new Date('2019-06-24T15:37:18.000Z'),
                             description: 'Order Processed: Ready for UPS'
                         }
                     ],
-                    deliveredAt: new Date ('2019-06-28T16:28:58.000Z'),
-                    shippedAt: new Date ('2019-06-25T02:48:00.000Z')
+                    deliveredAt: new Date('2019-06-28T16:28:58.000Z'),
+                    shippedAt: new Date('2019-06-25T02:48:00.000Z')
                 }
+
                 assert.deepStrictEqual(actual, expected);
                 done();
             });
         });
 
-        describe('2nd Day Air', function(){
-            it('Delivered', function(done){
-                bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual){
+        describe('2nd Day Air', function() {
+            it('Delivered', function(done) {
+                bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
@@ -245,7 +249,7 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: '30340'
                                 },
-                                date: new Date ('1999-06-10T16:00:00.000Z'),
+                                date: new Date('1999-06-10T16:00:00.000Z'),
                                 description: 'DELIVERED'
                             },
                             {
@@ -255,12 +259,12 @@ describe('UPS', function(){
                                     country: '',
                                     zipcode: ''
                                 },
-                                date: new Date ('1999-06-08T16:00:00.000Z'),
+                                date: new Date('1999-06-08T16:00:00.000Z'),
                                 description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
                             }
                         ],
-                        deliveredAt: new Date ('1999-06-10T16:00:00.000Z'),
-                        shippedAt: new Date ('1999-06-10T16:00:00.000Z')
+                        deliveredAt: new Date('1999-06-10T16:00:00.000Z'),
+                        shippedAt: new Date('1999-06-10T16:00:00.000Z')
 
                     }
 
@@ -269,9 +273,10 @@ describe('UPS', function(){
                 })
             });
         });
+
         describe('Express Freight', function() {
             it('should return a track response with a status update of Confirmed Arrival', function(done) {
-                bloodhound.track('5548789114', 'ups', function (err, actual) {
+                bloodhound.track('5548789114', 'ups', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
@@ -377,9 +382,8 @@ describe('UPS', function(){
                                 description: 'RECEIVED INTO UPS POSSESSION'
                             }
                         ]
-                    }
+                    };
 
-                    // console.log(JSON.stringify(actual, null, 4));
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
@@ -388,7 +392,7 @@ describe('UPS', function(){
 
         describe('Freight LTL', function() {
             it('should return a track response with a status update of In Transit', function(done) {
-                bloodhound.track('990728071', 'ups', function (err, actual) {
+                bloodhound.track('990728071', 'ups', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
@@ -422,9 +426,9 @@ describe('UPS', function(){
             });
         });
 
-        describe('Ground', function(){
-            it('Delivered', function(done){
-                bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual){
+        describe('Ground', function() {
+            it('Delivered', function(done) {
+                bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
                         events: [
@@ -435,7 +439,7 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: '30304'
                                 },
-                                date: new Date ('2010-04-29T16:00:00.000Z'),
+                                date: new Date('2010-04-29T16:00:00.000Z'),
                                 description: 'DELIVERED'
                             },
                             {
@@ -445,12 +449,12 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: '30304'
                                 },
-                                date: new Date ('2010-04-29T16:00:00.000Z'),
+                                date: new Date('2010-04-29T16:00:00.000Z'),
                                 description: 'DELIVERED'
                             }
                         ],
-                        deliveredAt: new Date ('2010-04-29T16:00:00.000Z'),
-                        shippedAt: new Date ('2010-04-29T16:00:00.000Z')
+                        deliveredAt: new Date('2010-04-29T16:00:00.000Z'),
+                        shippedAt: new Date('2010-04-29T16:00:00.000Z')
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -460,9 +464,9 @@ describe('UPS', function(){
 
         });
 
-        describe('Next Day Air', function(){
-            it('Origin Scan', function(done){
-                bloodhound.track('1Z12345E1305277940', 'ups', function(err, actual){
+        describe('Next Day Air', function() {
+            it('Origin Scan', function(done) {
+                bloodhound.track('1Z12345E1305277940', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
                         events: [
@@ -473,11 +477,11 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-05-05T05:00:00.000Z'),
+                                date: new Date('2010-05-05T05:00:00.000Z'),
                                 description: 'ORIGIN SCAN'
                             }
                         ],
-                        shippedAt: new Date ('2010-05-05T05:00:00.000Z')
+                        shippedAt: new Date('2010-05-05T05:00:00.000Z')
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -485,8 +489,8 @@ describe('UPS', function(){
                 })
             });
 
-            it('2nd Delivery Attempt', function(done){
-                bloodhound.track('1Z12345E6205277936', 'ups', function(err, actual){
+            it('2nd Delivery Attempt', function(done) {
+                bloodhound.track('1Z12345E6205277936', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
                         events: [
@@ -497,7 +501,7 @@ describe('UPS', function(){
                                     country: 'DE',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-08-30T08:39:00.000Z'),
+                                date: new Date('2010-08-30T08:39:00.000Z'),
                                 description: 'UPS INTERNAL ACTIVITY CODE'
                             },
                             {
@@ -507,7 +511,7 @@ describe('UPS', function(){
                                     country: 'DE',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-08-30T08:32:00.000Z'),
+                                date: new Date('2010-08-30T08:32:00.000Z'),
                                 description: 'ADVERSE WEATHER CONDITIONS CAUSED THIS DELAY'
                             },
                             {
@@ -517,7 +521,7 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-09-10T22:03:00.000Z'),
+                                date: new Date('2010-09-10T22:03:00.000Z'),
                                 description: 'THE RECEIVER\'S LOCATION WAS CLOSED ON THE 2ND DELIVERY ATTEMPT. A 3RD DELIVERY ATTEMPT WILL BE MADE'
                             },
                             {
@@ -527,7 +531,7 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: '30340'
                                 },
-                                date: new Date ('2010-09-12T15:57:00.000Z'),
+                                date: new Date('2010-09-12T15:57:00.000Z'),
                                 description: 'DELIVERED'
                             },
                             {
@@ -537,7 +541,7 @@ describe('UPS', function(){
                                     country: 'US',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-04-04T18:40:00.000Z'),
+                                date: new Date('2010-04-04T18:40:00.000Z'),
                                 description: 'PICKUP SCAN'
                             },
                             {
@@ -547,12 +551,12 @@ describe('UPS', function(){
                                     country: 'DE',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-08-30T11:13:00.000Z'),
+                                date: new Date('2010-08-30T11:13:00.000Z'),
                                 description: 'UPS INTERNAL ACTIVITY CODE'
                             }
                         ],
-                        deliveredAt: new Date ('2010-09-12T15:57:00.000Z'),
-                        shippedAt: new Date ('2010-09-12T15:57:00.000Z')
+                        deliveredAt: new Date('2010-09-12T15:57:00.000Z'),
+                        shippedAt: new Date('2010-09-12T15:57:00.000Z')
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -564,7 +568,7 @@ describe('UPS', function(){
 
         describe('No service stated', function() {
             it('should return a track response with a status update of Deliver Origin CFS', function(done) {
-                bloodhound.track('3251026119', 'ups', function (err, actual) {
+                bloodhound.track('3251026119', 'ups', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
@@ -628,9 +632,9 @@ describe('UPS', function(){
             });
         });
 
-        describe('World Wide Express', function(){
-            it('Delivered', function(done){
-                bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual){
+        describe('World Wide Express', function() {
+            it('Delivered', function(done) {
+                bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
                         events: [
@@ -641,12 +645,12 @@ describe('UPS', function(){
                                     country: 'IT',
                                     zipcode: ''
                                 },
-                                date: new Date ('2010-05-18T14:00:00.000Z'),
+                                date: new Date('2010-05-18T14:00:00.000Z'),
                                 description: 'DELIVERED'
                             }
                         ],
-                        deliveredAt: new Date ('2010-05-18T14:00:00.000Z'),
-                        shippedAt: new Date ('2010-05-18T14:00:00.000Z')
+                        deliveredAt: new Date('2010-05-18T14:00:00.000Z'),
+                        shippedAt: new Date('2010-05-18T14:00:00.000Z')
 
                     }
 
@@ -658,7 +662,7 @@ describe('UPS', function(){
 
         describe('Worldwide Express Freight', function() {
             it('should return a track response with a status update of Order Processed: Ready for UPS', function(done) {
-                bloodhound.track('1Z648616E192760718', 'ups', function (err, actual) {
+                bloodhound.track('1Z648616E192760718', 'ups', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
