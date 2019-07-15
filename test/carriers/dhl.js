@@ -4,8 +4,7 @@ const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
 describe.only('DHL', function () {
-    // Can only make one request per second. Used 4 seconds as a cushion
-    this.timeout(4000);
+    this.timeout(20000);
 
     describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
