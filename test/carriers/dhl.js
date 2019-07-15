@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe.only('DHL', function () {
+describe('DHL', function () {
     this.timeout(20000);
 
     describe('dhl.isTrackingNumberValid', function () {
