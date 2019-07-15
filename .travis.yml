@@ -1,4 +1,5 @@
 before_script:
+  - export TZ=America/Dallas
   - npm i -g eslint
   - eslint .
 
