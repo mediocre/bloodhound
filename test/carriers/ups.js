@@ -100,6 +100,8 @@ describe('UPS', function() {
     });
 
     describe('ups.track', function() {
+        this.timeout(30000);
+
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
                 const expected = {
