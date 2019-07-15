@@ -31,6 +31,7 @@ function DHL(options) {
         const req = {
             url: `https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingNumber}`,
             method: 'GET',
+            json: true,
             headers: {
                 'DHL-API-Key': `${options.DHL_API_Key}`
             },
@@ -40,7 +41,7 @@ function DHL(options) {
         async.retry(function(callback) {
             request(req, callback);
         }, function(err, res) {
-            const response = JSON.parse(res.body);
+            const response = res.body;
 
             if (err) {
                 return callback(err);
@@ -53,7 +54,7 @@ function DHL(options) {
                 events: []
             };
 
-            const scanDetails = JSON.parse(res.body).shipments[0].events;
+            var scanDetails = res.body.shipments[0].events;
 
             scanDetails.forEach(scanDetail => {
                 scanDetail.address = {
@@ -67,8 +68,8 @@ function DHL(options) {
             const locations = Array.from(new Set(scanDetails.map(scanDetail => scanDetail.location)));
 
             // Lookup each location
-            async.mapLimit(locations, 10, function (location, callback) {
-                geography.parseLocation(location, options, function (err, address) {
+            async.mapLimit(locations, 10, function(location, callback) {
+                geography.parseLocation(location, options, function(err, address) {
                     if (err || !address) {
                         return callback(err, address);
                     }
@@ -77,7 +78,7 @@ function DHL(options) {
 
                     callback(null, address);
                 });
-            }, function (err, addresses) {
+            }, function(err, addresses) {
                 if (err) {
                     return callback(err);
                 }
