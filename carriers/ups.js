@@ -1,15 +1,42 @@
 const async = require('async');
+const checkDigit = require('../util/checkDigit')
 const geography = require('../util/geography');
 const moment = require('moment-timezone');
 const request = require('request');
-const confirmUpsFreight = require('../util/confirmUpsFreight');
-const confirmUps = require('../util/confirmUps');
 
 // These are all of the status descriptions related to delivery provided by UPS.
 const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', 'DELIVERED TO UPS ACCESS POINT AWAITING CUSTOMER PICKUP'];
 
 // These are all of the status descriptions related to shipping provided by UPS.
 const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DESTINATION SCAN', 'ORIGIN SCAN', 'OUT FOR DELIVERY', 'OUT FOR DELIVERY TODAY', 'PACKAGE DEPARTED UPS MAIL INNOVATIONS FACILITY ENROUTE TO USPS FOR INDUCTION', 'PACKAGE PROCESSED BY UPS MAIL INNOVATIONS ORIGIN FACILITY', 'PACKAGE RECEIVED FOR PROCESSING BY UPS MAIL INNOVATIONS', 'PACKAGE RECEIVED FOR SORT BY DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE TRANSFERRED TO DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE OUT FOR POST OFFICE DELIVERY', 'PACKAGE SORTED BY POST OFFICE', 'RECEIVED BY THE POST OFFICE', 'SHIPMENT ACCEPTANCE AT POST OFFICE', 'YOUR PACKAGE IS IN TRANSIT TO THE UPS FACILITY.', 'LOADED ON DELIVERY VEHICLE'];
+
+function confirmUps(trackingNumber) {
+    let sum = 0;
+    for (let index = 2; index <= 16; index++) {
+        var num;
+        const asciiValue = trackingNumber[index].charCodeAt(0);
+        if ((asciiValue >= 48) && (asciiValue <= 57)) {
+            num = parseInt(trackingNumber[index], 10);
+        } else {
+            num = (asciiValue - 63) % 10;
+        }
+
+        if ((index % 2) !== 0) { num = num * 2; }
+        sum += num;
+    }
+
+    const checkdigit = (sum % 10) > 0 ? 10 - (sum % 10) : 0;
+    if (checkdigit === parseInt(trackingNumber[17], 10)) { return [true, true]; }
+    return [false, false];
+}
+
+function confirmUpsFreight(trackingNumber) {
+    const firstChar = `${(trackingNumber.charCodeAt(0) - 63) % 10}`;
+    const remaining = trackingNumber.slice(1);
+    trackingNumber = `${firstChar}${remaining}`;
+    if (checkDigit(trackingNumber, [3, 1, 7], 10)) { return [true, true]; }
+    return [false, false];
+}
 
 function getActivities(package) {
     var activitiesList = package.Activity;
