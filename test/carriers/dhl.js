@@ -60,14 +60,14 @@ describe('DHL', function() {
         describe('Invalid DHL credentials', function() {
             const bloodhound = new Bloodhound({
                 dhl: {
-                    DHL_API_Key: process.env.DHL_API_Key
+                    apiKey: process.env.DHL_API_Key
                 }
             });
 
             it('should return an error for invalid DHL credentials', function(done) {
                 const bloodhound = new Bloodhound({
                     dhl: {
-                        DHL_API_Key: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
+                        apiKey: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
                     }
                 });
 
@@ -89,7 +89,7 @@ describe('DHL', function() {
     describe('dhl.track', function() {
         const bloodhound = new Bloodhound({
             dhl: {
-                DHL_API_Key: process.env.DHL_API_Key
+                apiKey: process.env.DHL_API_Key
             }
         });
 

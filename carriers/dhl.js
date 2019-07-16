@@ -1,21 +1,22 @@
 const async = require('async');
-const request = require('request');
-const geography = require('../util/geography');
 const moment = require('moment-timezone');
+const request = require('request');
+
 const checkDigit = require('../util/checkDigit');
+const geography = require('../util/geography');
 
 function DHL(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
-        // remove whitespace
-        trackingNumber = trackingNumber.replace(/\s/g, '');
-        trackingNumber = trackingNumber.toUpperCase();
+        trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
 
         if ([/^93612\d{17}$/, /^92612\d{17}$/, /^94748\d{17}$/, /^93748\d{17}$/, /^92748\d{17}$/].some(regex => regex.test(trackingNumber))) {
             return checkDigit(trackingNumber, [3, 1], 10);
         }
+
         if (/^420\d{27}$/.test(trackingNumber)) {
             return checkDigit(trackingNumber.match(/^420\d{5}(\d{22})$/)[1], [3, 1], 10);
         }
+
         if (/^420\d{31}$/.test(trackingNumber)) {
             if (checkDigit(trackingNumber.match(/^420\d{9}(\d{22})$/)[1], [3, 1], 10)) {
                 return true;
@@ -33,7 +34,7 @@ function DHL(options) {
             method: 'GET',
             json: true,
             headers: {
-                'DHL-API-Key': `${options.DHL_API_Key}`
+                'DHL-API-Key': options.apiKey
             },
             timeout: 5000
         };
@@ -45,9 +46,8 @@ function DHL(options) {
 
             if (err) {
                 return callback(err);
-                //invalid credentials or invalid tracking number
             } else if (response.status === 401 || response.status === 404) {
-                return callback(new Error (response.detail));
+                return callback(new Error(response.detail));
             }
 
             const results = {
@@ -61,6 +61,7 @@ function DHL(options) {
                     city: scanDetail.location != undefined ? scanDetail.location.address.addressLocality : '',
                     zip: scanDetail.location != undefined ? scanDetail.location.address.postalCode : ''
                 }
+
                 scanDetail.location = geography.addressToString(scanDetail.address);
             });
 
