@@ -144,7 +144,7 @@ describe('UPS', function() {
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-28T14:00:49.000Z'),
                             description: 'Out For Delivery Today'
@@ -154,7 +154,7 @@ describe('UPS', function() {
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-28T12:19:33.000Z'),
                             description: 'Loaded on Delivery Vehicle'
@@ -164,7 +164,7 @@ describe('UPS', function() {
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-28T10:11:58.000Z'),
                             description: 'Destination Scan'
@@ -174,7 +174,7 @@ describe('UPS', function() {
                                 city: 'Addison',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-28T05:58:00.000Z'),
                             description: 'Arrival Scan'
@@ -184,7 +184,7 @@ describe('UPS', function() {
                                 city: 'Hodgkins',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-28T05:02:00.000Z'),
                             description: 'Departure Scan'
@@ -194,7 +194,7 @@ describe('UPS', function() {
                                 city: 'Hodgkins',
                                 state: 'IL',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-27T13:33:00.000Z'),
                             description: 'Arrival Scan'
@@ -204,7 +204,7 @@ describe('UPS', function() {
                                 city: 'Cerritos',
                                 state: 'CA',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-25T05:50:00.000Z'),
                             description: 'Departure Scan'
@@ -214,7 +214,7 @@ describe('UPS', function() {
                                 city: 'Cerritos',
                                 state: 'CA',
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-25T02:48:00.000Z'),
                             description: 'Origin Scan'
@@ -222,9 +222,9 @@ describe('UPS', function() {
                         {
                             address: {
                                 city: 'Huez',
-                                state: '',
+                                state: undefined,
                                 country: 'US',
-                                zipcode: ''
+                                zipcode: undefined
                             },
                             date: new Date('2019-06-24T15:37:18.000Z'),
                             description: 'Order Processed: Ready for UPS'
@@ -258,10 +258,10 @@ describe('UPS', function() {
                             },
                             {
                                 address: {
-                                    city: '',
-                                    state: '',
-                                    country: '',
-                                    zipcode: ''
+                                    city: undefined,
+                                    state: undefined,
+                                    country: undefined,
+                                    zipcode: undefined
                                 },
                                 date: new Date('1999-06-08T16:00:00.000Z'),
                                 description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
@@ -287,10 +287,10 @@ describe('UPS', function() {
                         events: [
                             {
                                 address: {
-                                    city: '',
-                                    state: '',
-                                    country: '',
-                                    zipcode: ''
+                                    city: undefined,
+                                    state: undefined,
+                                    country: undefined,
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-11-24T12:16:00.000Z'),
                                 description: 'Bad weather'
@@ -300,7 +300,7 @@ describe('UPS', function() {
                                     city: 'El Paso',
                                     state: 'TX',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-18T16:00:00.000Z'),
                                 description: 'CONFIRMED ARRIVAL'
@@ -310,7 +310,7 @@ describe('UPS', function() {
                                     city: 'El Paso',
                                     state: 'TX',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-18T15:16:00.000Z'),
                                 description: 'DOCUMENTS TURNED OVER TO CLIENTS BROKER OR CONSIGNEE'
@@ -320,7 +320,7 @@ describe('UPS', function() {
                                     city: 'El Paso',
                                     state: 'TX',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-18T14:00:00.000Z'),
                                 description: 'ENTRY FILED'
@@ -330,7 +330,7 @@ describe('UPS', function() {
                                     city: 'El Paso',
                                     state: 'TX',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-18T08:42:49.000Z'),
                                 description: 'ON-HAND AT DESTINATION'
@@ -340,7 +340,7 @@ describe('UPS', function() {
                                     city: 'Winchester',
                                     state: 'IL',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-18T01:04:00.000Z'),
                                 description: 'ARRIVED AT DESTINATION COUNTRY'
@@ -350,7 +350,7 @@ describe('UPS', function() {
                                     city: 'Köln',
                                     state: 'NW',
                                     country: 'DE',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-15T13:34:00.000Z'),
                                 description: 'CONFIRMED DEPARTURE'
@@ -358,9 +358,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Amsterdam',
-                                    state: '',
+                                    state: undefined,
                                     country: 'NL',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-15T13:31:32.000Z'),
                                 description: 'DOCS RECEIVED FROM SHIPPER'
@@ -368,9 +368,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Amsterdam',
-                                    state: '',
+                                    state: undefined,
                                     country: 'NL',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-15T13:31:32.000Z'),
                                 description: 'DATE AVAILABLE TO SHIP'
@@ -378,9 +378,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Amsterdam',
-                                    state: '',
+                                    state: undefined,
                                     country: 'NL',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-10-15T12:00:00.000Z'),
                                 description: 'RECEIVED INTO UPS POSSESSION'
@@ -405,8 +405,8 @@ describe('UPS', function() {
                                 address: {
                                     city: 'Dothan',
                                     state: 'AL',
-                                    country: '',
-                                    zipcode: ''
+                                    country: undefined,
+                                    zipcode: undefined
                                 },
                                 date: new Date('2005-10-06T17:56:00.000Z'),
                                 description: 'SHIPMENT HAS BEEN DELIVERED TO THE CONSIGNEE.'
@@ -415,8 +415,8 @@ describe('UPS', function() {
                                 address: {
                                     city: 'Columbia',
                                     state: 'SC',
-                                    country: '',
-                                    zipcode: ''
+                                    country: undefined,
+                                    zipcode: undefined
                                 },
                                 date: new Date('2005-10-05T22:00:00.000Z'),
                                 description: 'SHIPMENT HAS BEEN PICKED-UP.'
@@ -479,7 +479,7 @@ describe('UPS', function() {
                                     city: 'GRAND JUNCTION AIR S',
                                     state: 'CO',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-05-05T05:00:00.000Z'),
                                 description: 'ORIGIN SCAN'
@@ -501,9 +501,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Bonn',
-                                    state: '',
+                                    state: undefined,
                                     country: 'DE',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-08-30T08:39:00.000Z'),
                                 description: 'UPS INTERNAL ACTIVITY CODE'
@@ -511,9 +511,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Bonn',
-                                    state: '',
+                                    state: undefined,
                                     country: 'DE',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-08-30T08:32:00.000Z'),
                                 description: 'ADVERSE WEATHER CONDITIONS CAUSED THIS DELAY'
@@ -523,7 +523,7 @@ describe('UPS', function() {
                                     city: 'ANYTOWN',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-09-10T22:03:00.000Z'),
                                 description: 'THE RECEIVER\'S LOCATION WAS CLOSED ON THE 2ND DELIVERY ATTEMPT. A 3RD DELIVERY ATTEMPT WILL BE MADE'
@@ -543,7 +543,7 @@ describe('UPS', function() {
                                     city: 'WEST CHESTER-MALVERN',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-04-04T18:40:00.000Z'),
                                 description: 'PICKUP SCAN'
@@ -551,9 +551,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'Bonn',
-                                    state: '',
+                                    state: undefined,
                                     country: 'DE',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-08-30T11:13:00.000Z'),
                                 description: 'UPS INTERNAL ACTIVITY CODE'
@@ -562,7 +562,6 @@ describe('UPS', function() {
                         deliveredAt: new Date('2010-09-12T15:57:00.000Z'),
                         shippedAt: new Date('2010-09-12T15:57:00.000Z')
                     }
-
                     assert.deepStrictEqual(actual, expected);
                     done();
                 })
@@ -582,7 +581,7 @@ describe('UPS', function() {
                                     city: 'Atlanta',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'DOCS RECEIVED FROM SHIPPER'
@@ -592,7 +591,7 @@ describe('UPS', function() {
                                     city: 'Atlanta',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'DATE AVAILABLE TO SHIP'
@@ -602,7 +601,7 @@ describe('UPS', function() {
                                     city: 'Atlanta',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'ON HAND AT ORIGIN'
@@ -612,7 +611,7 @@ describe('UPS', function() {
                                     city: 'Atlanta',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'CONFIRMED DEPARTURE'
@@ -622,7 +621,7 @@ describe('UPS', function() {
                                     city: 'Atlanta',
                                     state: 'GA',
                                     country: 'US',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'RECEIVED INTO UPS-SCS POSSESSION'
@@ -645,9 +644,9 @@ describe('UPS', function() {
                             {
                                 address: {
                                     city: 'ANYTOWN',
-                                    state: '',
+                                    state: undefined,
                                     country: 'IT',
-                                    zipcode: ''
+                                    zipcode: undefined
                                 },
                                 date: new Date('2010-05-18T14:00:00.000Z'),
                                 description: 'DELIVERED'
@@ -675,8 +674,8 @@ describe('UPS', function() {
                                 address: {
                                     city: 'Leeuwarden',
                                     country: 'FR',
-                                    state: '',
-                                    zipcode: ''
+                                    state: undefined,
+                                    zipcode: undefined
                                 },
                                 date: new Date('2012-10-04T11:58:04.000Z'),
                                 description: 'Order Processed: Ready for UPS'

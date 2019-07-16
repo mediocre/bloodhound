@@ -17,29 +17,29 @@ function getActivities(package) {
         activitiesList.forEach(activity => {
             if (activity.ActivityLocation != undefined) {
                 activity.address = {
-                    city: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.City === undefined ? '' : activity.ActivityLocation.City) : (activity.ActivityLocation.Address.City === undefined ? '' : activity.ActivityLocation.Address.City),
-                    state: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.StateProvinceCode === undefined ? '' : activity.ActivityLocation.StateProvinceCode) : (activity.ActivityLocation.Address.StateProvinceCode === undefined ? '' : activity.ActivityLocation.Address.StateProvinceCode),
-                    country: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.CountryCode === undefined ? '' : activity.ActivityLocation.CountryCode) : (activity.ActivityLocation.Address.CountryCode === undefined ? '' : activity.ActivityLocation.Address.CountryCode),
-                    zipcode: activity.ActivityLocation.Address === undefined ? (activity.ActivityLocation.PostalCode === undefined ? '' : activity.ActivityLocation.PostalCode) : (activity.ActivityLocation.Address.PostalCode === undefined ? '' : activity.ActivityLocation.Address.PostalCode)
+                    city:  activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
+                    state:  activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
+                    country:  activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
+                    zipcode:  activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
                 }
                 activity.location = geography.addressToString(activity.address);
             } else {
                 activity.address = {
-                    city: '',
-                    state: '',
-                    country: '',
-                    zipcode: ''
+                    city: undefined,
+                    state: undefined,
+                    country: undefined,
+                    zipcode: undefined
                 }
 
-                activity.location = '';
+                activity.location = undefined;
             }
         })
     } else {
         activitiesList.address = {
-            city: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.City === undefined ? '' : activitiesList.ActivityLocation.City) : (activitiesList.ActivityLocation.Address.City === undefined ? '' : activitiesList.ActivityLocation.Address.City),
-            state: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.StateProvinceCode === undefined ? '' : activitiesList.ActivityLocation.StateProvinceCode) : (activitiesList.ActivityLocation.Address.StateProvinceCode === undefined ? '' : activitiesList.ActivityLocation.Address.StateProvinceCode),
-            country: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.CountryCode === undefined ? '' : activitiesList.ActivityLocation.CountryCode) : (activitiesList.ActivityLocation.Address.CountryCode === undefined ? '' : activitiesList.ActivityLocation.Address.CountryCode),
-            zipcode: activitiesList.ActivityLocation.Address === undefined ? (activitiesList.ActivityLocation.PostalCode === undefined ? '' : activitiesList.ActivityLocation.PostalCode) : (activitiesList.ActivityLocation.Address.PostalCode === undefined ? '' : activitiesList.ActivityLocation.Address.PostalCode)
+            city:  activitiesList.ActivityLocation.City || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.City),
+            state:  activitiesList.ActivityLocation.StateProvinceCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.StateProvinceCode),
+            country:  activitiesList.ActivityLocation.CountryCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.CountryCode),
+            zipcode:  activitiesList.ActivityLocation.PostalCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.PostalCode)
         }
 
         activitiesList.location = geography.addressToString(activitiesList.address);
@@ -67,22 +67,30 @@ function filter(res) {
 
 function getResults(locations, callback, results, activitiesList) {
     async.mapLimit(locations, 10, function(location, callback) {
-        geography.parseLocation(location, function (err, address) {
-            if (err || !address) {
-                return callback(err, '');
-            }
+        if (location === null) {
+            callback(null, null);
+        } else {
+            geography.parseLocation(location, function (err, address) {
+                if (err || !address) {
+                    return callback(err, null);
+                }
 
-            address.location = location;
+                address.location = location;
 
-            callback(null, address);
-        });
+                callback(null, address);
+            });
+        }
     }, function(err, addresses) {
         if (err) {
             return callback(err);
         }
 
+        let address = null;
+
         activitiesList.forEach(activity => {
-            const address = addresses.find(a => a.location === activity.location);
+            if (addresses) {
+                address = addresses.find(a => a && a.location === activity.location);
+            }
             let timezone = 'America/New_York';
             let description = '';
 
