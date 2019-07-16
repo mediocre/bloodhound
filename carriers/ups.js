@@ -1,42 +1,14 @@
 const async = require('async');
-const checkDigit = require('../util/checkDigit')
-const geography = require('../util/geography');
 const moment = require('moment-timezone');
 const request = require('request');
+
+const geography = require('../util/geography');
 
 // These are all of the status descriptions related to delivery provided by UPS.
 const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', 'DELIVERED TO UPS ACCESS POINT AWAITING CUSTOMER PICKUP'];
 
 // These are all of the status descriptions related to shipping provided by UPS.
 const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DESTINATION SCAN', 'ORIGIN SCAN', 'OUT FOR DELIVERY', 'OUT FOR DELIVERY TODAY', 'PACKAGE DEPARTED UPS MAIL INNOVATIONS FACILITY ENROUTE TO USPS FOR INDUCTION', 'PACKAGE PROCESSED BY UPS MAIL INNOVATIONS ORIGIN FACILITY', 'PACKAGE RECEIVED FOR PROCESSING BY UPS MAIL INNOVATIONS', 'PACKAGE RECEIVED FOR SORT BY DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE TRANSFERRED TO DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE OUT FOR POST OFFICE DELIVERY', 'PACKAGE SORTED BY POST OFFICE', 'RECEIVED BY THE POST OFFICE', 'SHIPMENT ACCEPTANCE AT POST OFFICE', 'YOUR PACKAGE IS IN TRANSIT TO THE UPS FACILITY.', 'LOADED ON DELIVERY VEHICLE'];
-
-function confirmUps(trackingNumber) {
-    let sum = 0;
-    for (let index = 2; index <= 16; index++) {
-        var num;
-        const asciiValue = trackingNumber[index].charCodeAt(0);
-        if ((asciiValue >= 48) && (asciiValue <= 57)) {
-            num = parseInt(trackingNumber[index], 10);
-        } else {
-            num = (asciiValue - 63) % 10;
-        }
-
-        if ((index % 2) !== 0) { num = num * 2; }
-        sum += num;
-    }
-
-    const checkdigit = (sum % 10) > 0 ? 10 - (sum % 10) : 0;
-    if (checkdigit === parseInt(trackingNumber[17], 10)) { return [true, true]; }
-    return [false, false];
-}
-
-function confirmUpsFreight(trackingNumber) {
-    const firstChar = `${(trackingNumber.charCodeAt(0) - 63) % 10}`;
-    const remaining = trackingNumber.slice(1);
-    trackingNumber = `${firstChar}${remaining}`;
-    if (checkDigit(trackingNumber, [3, 1, 7], 10)) { return [true, true]; }
-    return [false, false];
-}
 
 function getActivities(package) {
     var activitiesList = package.Activity;
@@ -99,11 +71,12 @@ function getResults(locations, callback, results, activitiesList) {
             if (err || !address) {
                 return callback(err, '');
             }
+
             address.location = location;
 
             callback(null, address);
         });
-    }, function (err, addresses) {
+    }, function(err, addresses) {
         if (err) {
             return callback(err);
         }
@@ -161,16 +134,12 @@ function UPS(options) {
         trackingNumber = trackingNumber.replace(/\s/g, '');
 
         // https://www.ups.com/us/en/tracking/help/tracking/tnh.page
-        // https://www.codeproject.com/Articles/21224/Calculating-the-UPS-Tracking-Number-Check-Digit
         if (/^1Z[0-9A-Z]{16}$/.test(trackingNumber)) {
-            if (confirmUps(trackingNumber)){
-                return true;
-            }
+            return true;
         }
+
         if (/^(H|T|J|K|F|W|M|Q|A)\d{10}$/.test(trackingNumber)) {
-            if (confirmUpsFreight(trackingNumber)){
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -203,25 +172,30 @@ function UPS(options) {
         };
 
         async.retry(function(callback) {
-            request(req, callback);
-        }, function (err, res) {
-            if (err) {
-                return callback(err);
-            }
+            request(req, function(err, res) {
+                if (err) {
+                    return callback(err);
+                }
 
+                if (res && res.body && !res.body.TrackResponse) {
+                    if (res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
+                        return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
+                    }
+                }
+
+                callback(null, res);
+            });
+        }, function (err, res) {
             const results = {
                 events: []
             };
 
-            if (!res.body.TrackResponse) {
-                if (res && res.body && res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Code === '151044') {
-                    // No Tracking Information
+            if (err) {
+                if (err.message === 'No tracking information available') {
                     return callback(null, results);
                 }
 
-                if (res && res.body && res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
-                    return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                }
+                return callback(err);
             }
 
             const activitiesList = filter(res);

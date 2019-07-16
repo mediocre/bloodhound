@@ -3,6 +3,8 @@ const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
 describe('UPS', function() {
+    this.timeout(10000);
+
     const bloodhound = new Bloodhound({
         ups: {
             accessKey: process.env.UPS_ACCESS_KEY,
