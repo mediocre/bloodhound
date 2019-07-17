@@ -13,9 +13,9 @@ const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DE
 function getActivities(package) {
     var activitiesList = package.Activity;
 
-    if (activitiesList.length != undefined) {
+    if (activitiesList.length) {
         activitiesList.forEach(activity => {
-            if (activity.ActivityLocation != undefined) {
+            if (activity.ActivityLocation) {
                 activity.address = {
                     city:  activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
                     state:  activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
@@ -48,21 +48,18 @@ function getActivities(package) {
     return activitiesList;
 }
 
-function filter(res) {
-    const packageInfo = res.body.TrackResponse.Shipment.Package;
-    var activitiesList = [];
-    if(packageInfo === undefined){
-        activitiesList.push(getActivities(res.body.TrackResponse.Shipment));
-    } else {
-        if (packageInfo.length === undefined) {
-            activitiesList.push(getActivities(packageInfo));
-        } else {
-            packageInfo.forEach((package) => {
-                activitiesList.push(getActivities(package));
-            })
-        }
+function filter(body) {
+    const packageInfo = body.TrackResponse.Shipment.Package;
+
+    if(!packageInfo){
+        return [getActivities(body.TrackResponse.Shipment)];
     }
-    return activitiesList;
+
+    if(!Array.isArray(packageInfo)) {
+        return [getActivities(packageInfo)];
+    } else {
+        return packageInfo.map(package => getActivities(package));
+    }
 }
 
 function getResults(locations, callback, results, activitiesList) {
@@ -180,20 +177,20 @@ function UPS(options) {
         };
 
         async.retry(function(callback) {
-            request(req, function(err, res) {
+            request(req, function(err, res, body) {
                 if (err) {
                     return callback(err);
                 }
 
-                if (res && res.body && !res.body.TrackResponse) {
-                    if (res.body.Fault && res.body.Fault.detail && res.body.Fault.detail.Errors && res.body.Fault.detail.Errors.ErrorDetail && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
-                        return callback(new Error(res.body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
+                if (body && !body.TrackResponse) {
+                    if (body.Fault && body.Fault.detail && body.Fault.detail.Errors && body.Fault.detail.Errors.ErrorDetail && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
+                        return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
                     }
                 }
 
-                callback(null, res);
+                callback(null, body);
             });
-        }, function (err, res) {
+        }, function(err, body) {
             const results = {
                 events: []
             };
@@ -206,10 +203,10 @@ function UPS(options) {
                 return callback(err);
             }
 
-            const activitiesList = filter(res);
+            const activitiesList = filter(body);
             var locations = [];
 
-            if (activitiesList[0].length === undefined) {
+            if (!Array.isArray(activitiesList[0])) {
                 locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
                 getResults(locations, callback, results, activitiesList);
             } else {
