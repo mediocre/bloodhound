@@ -108,21 +108,25 @@ function USPS(options) {
 
                 // Set address and location of each scan detail
                 scanDetailsList.forEach(scanDetail => {
-                    scanDetail.address = {
-                        city: scanDetail.EventCity[0].replace(CITY_BLACKLIST, '').trim(),
-                        country: scanDetail.EventCountry[0],
-                        state: scanDetail.EventState[0],
-                        zip: scanDetail.EventZIPCode[0]
-                    };
+                    if (scanDetail.EventCity[0]) {
+                        scanDetail.address = {
+                            city: scanDetail.EventCity[0] !== '' ? scanDetail.EventCity[0].replace(CITY_BLACKLIST, '').trim() : undefined,
+                            country: scanDetail.EventCountry[0] !== '' ? scanDetail.EventCountry[0] : undefined,
+                            state: scanDetail.EventState[0] !== '' ? scanDetail.EventState[0] : undefined,
+                            zip: scanDetail.EventZIPCode[0] !== '' ? scanDetail.EventZIPCode[0] : undefined
+                        };
+                    }
 
-                    scanDetail.location = geography.addressToString(scanDetail.address);
+                    if(scanDetail.address !== undefined)
+                        scanDetail.location = geography.addressToString(scanDetail.address);
                 });
 
-                // Get unqiue array of locations
-                const locations = Array.from(new Set(scanDetailsList.map(scanDetail => scanDetail.location)));
+                // Get unqiue array of locations - filtering out nul elements
+                const locations = [... new Set(scanDetailsList.map(scanDetail => scanDetail.location))].filter(el => { return el != null;});
 
                 // Lookup each location
                 async.mapLimit(locations, 10, function(location, callback) {
+
                     geography.parseLocation(location, options, function(err, address) {
                         if (err || !address) {
                             return callback(err, address);
@@ -147,7 +151,7 @@ function USPS(options) {
 
                         const event = {
                             address: scanDetail.address,
-                            date: moment.tz(`${scanDetail.EventDate[0]} ${scanDetail.EventTime[0]}`, 'MMMM D, YYYY h:mm a', timezone).toDate(),
+                            date: scanDetail.EventDate[0] !== '' ? moment.tz(`${scanDetail.EventDate[0]} ${scanDetail.EventTime[0]}`, 'MMMM D, YYYY h:mm a', timezone).toDate() : undefined,
                             description: scanDetail.Event[0]
                         };
 
