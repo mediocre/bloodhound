@@ -121,9 +121,4 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
     geocode(location, callback);
 });
 
-exports.geocoder = NodeGeocoder({
-    apiKey: 'AIzaSyDNcJwFa-Z0aDxNJVb2IigwWw5kUm7g7z4',
-    language: 'en',
-    provider: 'google',
-    region: '.us'
-});
+exports.geocoder = NodeGeocoder({ provider: 'openstreetmap' });
