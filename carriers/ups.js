@@ -115,10 +115,10 @@ function UPS(options) {
             const packageInfo = body.TrackResponse.Shipment.Package || body.TrackResponse.Shipment;
             var activitiesList = [];
 
-            if (!Array.isArray(packageInfo)) {
-                activitiesList = getActivities(packageInfo);
-            } else {
+            if (Array.isArray(packageInfo)) {
                 activitiesList = packageInfo.map(package => getActivities(package)).flat();
+            } else {
+                activitiesList = getActivities(packageInfo);
             }
 
             async.mapLimit(Array.from(new Set(activitiesList.map(activity => activity.location))), 10, function(location, callback) {
