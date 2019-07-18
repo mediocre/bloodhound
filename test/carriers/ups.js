@@ -102,7 +102,7 @@ describe('UPS', function() {
     });
 
     describe('ups.track', function() {
-        this.timeout(30000);
+        this.timeout(60000);
 
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
@@ -257,12 +257,7 @@ describe('UPS', function() {
                                 description: 'DELIVERED'
                             },
                             {
-                                address: {
-                                    city: undefined,
-                                    state: undefined,
-                                    country: undefined,
-                                    zipcode: undefined
-                                },
+                                address: {},
                                 date: new Date('1999-06-08T16:00:00.000Z'),
                                 description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
                             }
@@ -286,12 +281,7 @@ describe('UPS', function() {
                     const expected = {
                         events: [
                             {
-                                address: {
-                                    city: undefined,
-                                    state: undefined,
-                                    country: undefined,
-                                    zipcode: undefined
-                                },
+                                address: {},
                                 date: new Date('2010-11-24T12:16:00.000Z'),
                                 description: 'Bad weather'
                             },

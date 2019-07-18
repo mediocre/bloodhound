@@ -13,6 +13,12 @@ const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DE
 function getActivities(package) {
     var activitiesList = package.Activity;
 
+    if (!Array.isArray(package.Activity)) {
+        activitiesList = [package.Activity];
+    } else {
+        activitiesList = package.Activity;
+    }
+
     if (activitiesList.length) {
         activitiesList.forEach(activity => {
             if (activity.ActivityLocation) {
@@ -24,113 +30,14 @@ function getActivities(package) {
                 }
                 activity.location = geography.addressToString(activity.address);
             } else {
-                activity.address = {
-                    city: undefined,
-                    state: undefined,
-                    country: undefined,
-                    zipcode: undefined
-                }
+                activity.address = {};
 
                 activity.location = undefined;
             }
         })
-    } else {
-        activitiesList.address = {
-            city:  activitiesList.ActivityLocation.City || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.City),
-            state:  activitiesList.ActivityLocation.StateProvinceCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.StateProvinceCode),
-            country:  activitiesList.ActivityLocation.CountryCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.CountryCode),
-            zipcode:  activitiesList.ActivityLocation.PostalCode || (activitiesList.ActivityLocation.Address && activitiesList.ActivityLocation.Address.PostalCode)
-        }
 
-        activitiesList.location = geography.addressToString(activitiesList.address);
+        return activitiesList;
     }
-
-    return activitiesList;
-}
-
-function filter(body) {
-    const packageInfo = body.TrackResponse.Shipment.Package;
-
-    if(!packageInfo){
-        return [getActivities(body.TrackResponse.Shipment)];
-    }
-
-    if(!Array.isArray(packageInfo)) {
-        return [getActivities(packageInfo)];
-    } else {
-        return packageInfo.map(package => getActivities(package));
-    }
-}
-
-function getResults(locations, callback, results, activitiesList) {
-    async.mapLimit(locations, 10, function(location, callback) {
-        if (location === null) {
-            callback(null, null);
-        } else {
-            geography.parseLocation(location, function (err, address) {
-                if (err || !address) {
-                    return callback(err, null);
-                }
-
-                address.location = location;
-
-                callback(null, address);
-            });
-        }
-    }, function(err, addresses) {
-        if (err) {
-            return callback(err);
-        }
-
-        let address = null;
-
-        activitiesList.forEach(activity => {
-            if (addresses) {
-                address = addresses.find(a => a && a.location === activity.location);
-            }
-            let timezone = 'America/New_York';
-            let description = '';
-
-            if (address && address.timezone) {
-                timezone = address.timezone;
-            }
-
-            if (activity.Status === undefined ) {
-                description = activity.Description;
-            } else {
-                description = activity.Status.Description;
-            }
-
-            const event = {
-                address: activity.address,
-                date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
-                description: description
-            };
-
-            if (DELIVERED_DESCRIPTIONS.includes(description.toUpperCase())) {
-                results.deliveredAt = event.date;
-            }
-
-            if (SHIPPED_DESCRIPTIONS.includes(description.toUpperCase())) {
-                results.shippedAt = event.date;
-            }
-
-            // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
-            if (address) {
-                if (address.city) {
-                    event.address.city = address.city;
-                }
-
-                if (address.state) {
-                    event.address.state = address.state;
-                }
-            }
-
-            results.events.push(event);
-        });
-
-        callback(null, results);
-    });
 }
 
 function UPS(options) {
@@ -203,18 +110,79 @@ function UPS(options) {
                 return callback(err);
             }
 
-            const activitiesList = filter(body);
-            var locations = [];
+            const packageInfo = body.TrackResponse.Shipment.Package;
+            var activitiesList = [];
 
-            if (!Array.isArray(activitiesList[0])) {
-                locations = Array.from(new Set(activitiesList.map(activity => activity.location)));
-                getResults(locations, callback, results, activitiesList);
+            if(!packageInfo){
+                activitiesList = getActivities(body.TrackResponse.Shipment);
             } else {
-                activitiesList.forEach(activities => {
-                    locations = Array.from(new Set(activities.map(activity => activity.location)));
-                    getResults(locations, callback, results, activities);
-                })
+                if(!Array.isArray(packageInfo)) {
+                    activitiesList = getActivities(packageInfo);
+                } else {
+                    activitiesList = packageInfo.map(package => getActivities(package)).flat();
+                }
             }
+
+            async.mapLimit(Array.from(new Set(activitiesList.map(activity => activity.location))), 10, function(location, callback) {
+                if (location === null) {
+                    callback(null, null);
+                } else {
+                    geography.parseLocation(location, function (err, address) {
+                        if (err || !address) {
+                            return callback(err, null);
+                        }
+
+                        address.location = location;
+
+                        callback(null, address);
+                    });
+                }
+            }, function(err, addresses) {
+                if (err) {
+                    return callback(err);
+                }
+
+                let address = null;
+
+                activitiesList.forEach(activity => {
+                    if (addresses) {
+                        address = addresses.find(a => a && a.location === activity.location);
+                    }
+                    let timezone = 'America/New_York';
+
+                    if (address && address.timezone) {
+                        timezone = address.timezone;
+                    }
+
+                    const event = {
+                        address: activity.address,
+                        date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
+                        description: activity.Description || (activity.Status && activity.Status.Description)
+                    };
+
+                    if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                        results.deliveredAt = event.date;
+                    }
+
+                    if (SHIPPED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                        results.shippedAt = event.date;
+                    }
+
+                    // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
+                    if (address) {
+                        if (address.city) {
+                            event.address.city = address.city;
+                        }
+
+                        if (address.state) {
+                            event.address.state = address.state;
+                        }
+                    }
+                    results.events.push(event);
+                });
+
+                callback(null, results);
+            });
         })
     }
 }
