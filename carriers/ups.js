@@ -112,17 +112,13 @@ function UPS(options) {
                 return callback(err);
             }
 
-            const packageInfo = body.TrackResponse.Shipment.Package;
+            const packageInfo = body.TrackResponse.Shipment.Package || body.TrackResponse.Shipment;
             var activitiesList = [];
 
-            if (!packageInfo){
-                activitiesList = getActivities(body.TrackResponse.Shipment);
+            if (!Array.isArray(packageInfo)) {
+                activitiesList = getActivities(packageInfo);
             } else {
-                if (!Array.isArray(packageInfo)) {
-                    activitiesList = getActivities(packageInfo);
-                } else {
-                    activitiesList = packageInfo.map(package => getActivities(package)).flat();
-                }
+                activitiesList = packageInfo.map(package => getActivities(package)).flat();
             }
 
             async.mapLimit(Array.from(new Set(activitiesList.map(activity => activity.location))), 10, function(location, callback) {
