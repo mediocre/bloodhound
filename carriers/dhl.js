@@ -1,6 +1,7 @@
 const async = require('async');
 const moment = require('moment-timezone');
 const request = require('request');
+
 const checkDigit = require('../util/checkDigit');
 
 // These tracking descriptions indicate the shipment was delivered
@@ -71,7 +72,7 @@ function DHL() {
             const scanDetails = body.data.mailItems[0].events.reverse();
 
             // Used when there is no location data present
-            var previousLocation = body.data.mailItems[0].pickup;
+            var previousAddress = body.data.mailItems[0].pickup;
 
             scanDetails.forEach((scanDetail) => {
                 // Filter out duplicate events
@@ -81,7 +82,7 @@ function DHL() {
 
                 const splitLocation = scanDetail.location.split(',');
 
-                const loc = {
+                const address = {
                     city: splitLocation[0],
                     country: scanDetail.country,
                     state: splitLocation[1],
@@ -89,14 +90,14 @@ function DHL() {
                 }
 
                 scanDetail.address = {
-                    city: scanDetail.location === '' ? previousLocation.city : loc.city,
-                    country: scanDetail.country === '' ? previousLocation.country : loc.country,
-                    state: scanDetail.location === '' ? previousLocation.state.trim() : loc.state.trim(),
-                    zip: scanDetail.postalCode === '' ? previousLocation.postalCode.toString() : loc.postalCode.toString()
+                    city: address.city || previousAddress.city,
+                    country: address.country || previousAddress.country,
+                    state: (address.state || previousAddress.state).trim(),
+                    zip: (address.postalCode || previousAddress.postalCode).toString()
                 }
 
                 // Update previous location
-                previousLocation = {
+                previousAddress = {
                     city: scanDetail.address.city,
                     country: scanDetail.address.country,
                     postalCode: scanDetail.address.zip,
