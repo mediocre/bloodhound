@@ -65,9 +65,6 @@ By default, when Bloodhound encounters a timestamp without a UTC offset it will 
 const Bloodhound = require('bloodhound');
 
 const bloodhound = new Bloodhound({
-    dhl: {
-
-    },
     fedEx: {
         account_number: '123456789',
         environment: 'live',
@@ -100,7 +97,7 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
 
 **DHL**
 
-DHL does not require any options. It makes a simple request to https://www.logistics.dhl/v1/mailitems/track?number=${trackingNumber}.
+DHL does not require any options.
 
 **fedEx**
 
