@@ -71,7 +71,7 @@ function DHL() {
             // Reverse the array to get events in order Least Recent - Most Recent
             const scanDetails = body.data.mailItems[0].events.reverse();
 
-            // Used when there is no location data present
+            // Used when there is no address data present
             var previousAddress = body.data.mailItems[0].pickup;
 
             scanDetails.forEach((scanDetail) => {
@@ -96,7 +96,7 @@ function DHL() {
                     zip: (address.postalCode || previousAddress.postalCode).toString()
                 }
 
-                // Update previous location
+                // Update previous address
                 previousAddress = {
                     city: scanDetail.address.city,
                     country: scanDetail.address.country,
