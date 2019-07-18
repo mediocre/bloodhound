@@ -86,22 +86,22 @@ function DHL() {
                     city: splitLocation[0],
                     country: scanDetail.country,
                     state: splitLocation[1],
-                    postalCode: scanDetail.postalCode
+                    zip: scanDetail.postalCode
                 }
 
                 scanDetail.address = {
                     city: address.city || previousAddress.city,
                     country: address.country || previousAddress.country,
                     state: (address.state || previousAddress.state).trim(),
-                    zip: (address.postalCode || previousAddress.postalCode).toString()
+                    zip: (address.zip || previousAddress.zip).toString()
                 }
 
                 // Update previous address
                 previousAddress = {
                     city: scanDetail.address.city,
                     country: scanDetail.address.country,
-                    postalCode: scanDetail.address.zip,
-                    state: scanDetail.address.state
+                    state: scanDetail.address.state,
+                    zip: scanDetail.address.zip
                 }
 
                 const event = {
