@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index.js');
 
 describe('Newgistics', function() {
-    this.timeout(10000);
+    this.timeout(20000);
 
     it('should return an error for invalid base URL', function(done) {
         const bloodhound = new Bloodhound({
