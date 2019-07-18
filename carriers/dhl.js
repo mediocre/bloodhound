@@ -1,9 +1,13 @@
 const async = require('async');
 const moment = require('moment-timezone');
 const request = require('request');
-
 const checkDigit = require('../util/checkDigit');
-const geography = require('../util/geography');
+
+// These tracking descriptions indicate the shipment was delivered
+const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
+
+// These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
+const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY'];
 
 function DHL(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
@@ -30,98 +34,85 @@ function DHL(options) {
 
     this.track = function(trackingNumber, callback) {
         const req = {
-            url: `https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingNumber}`,
-            method: 'GET',
+            forever: true,
+            gzip: true,
             json: true,
-            headers: {
-                'DHL-API-Key': options.apiKey
-            },
-            timeout: 5000
+            method: 'GET',
+            timeout: 5000,
+            url: `https://www.logistics.dhl/v1/mailitems/track?number=${trackingNumber}`
         };
 
         async.retry(function(callback) {
             request(req, callback);
-        }, function(err, res) {
-            const response = res.body;
+        }, function(err, res, body) {
 
             if (err) {
                 return callback(err);
-            } else if (response.status === 401 || response.status === 404) {
-                return callback(new Error(response.detail));
+            } else if (body.meta.code === 400) {
+                return callback(new Error(body.meta.error[0].error_message));
             }
 
             const results = {
                 events: []
             };
 
-            var scanDetails = res.body.shipments[0].events;
+            // Reverse the array to get events in order Least Recent - Most Recent
+            var scanDetails = body.data.mailItems[0].events.reverse();
 
-            scanDetails.forEach(scanDetail => {
+            // Used when there is no location data present
+            var previousLocation = body.data.mailItems[0].pickup;
+
+            scanDetails.forEach((scanDetail) => {
+                // Filter out duplicate events
+                if (scanDetail.timeZone === 'LT') {
+                    return;
+                }
+
+                const splitLocation = scanDetail.location.split(',');
+
+                const loc = {
+                    city: splitLocation[0],
+                    country: scanDetail.country,
+                    state: splitLocation[1],
+                    postalCode: scanDetail.postalCode
+                }
+
                 scanDetail.address = {
-                    city: scanDetail.location != undefined ? scanDetail.location.address.addressLocality : '',
-                    zip: scanDetail.location != undefined ? scanDetail.location.address.postalCode : ''
+                    city: scanDetail.location === '' ? previousLocation.city : loc.city,
+                    country: scanDetail.country === '' ? previousLocation.country : loc.country,
+                    state: scanDetail.location === '' ? previousLocation.state.trim() : loc.state.trim(),
+                    zip: scanDetail.postalCode === '' ? previousLocation.postalCode.toString() : loc.postalCode.toString()
                 }
 
-                scanDetail.location = geography.addressToString(scanDetail.address);
-            });
-
-            // Get unqiue array of locations
-            const locations = Array.from(new Set(scanDetails.map(scanDetail => scanDetail.location)));
-
-            // Lookup each location
-            async.mapLimit(locations, 10, function(location, callback) {
-                geography.parseLocation(location, options, function(err, address) {
-                    if (err || !address) {
-                        return callback(err, address);
-                    }
-
-                    address.location = location;
-
-                    callback(null, address);
-                });
-            }, function(err, addresses) {
-                if (err) {
-                    return callback(err);
+                // Update previous location
+                previousLocation = {
+                    city: scanDetail.address.city,
+                    country: scanDetail.address.country,
+                    postalCode: scanDetail.address.zip,
+                    state: scanDetail.address.state
                 }
 
-                scanDetails.forEach(scanDetail => {
-                    const address = addresses.find(a => a && a.location === scanDetail.location);
-                    let timezone = 'America/New_York';
+                const event = {
+                    address: scanDetail.address,
+                    date: new Date(moment.tz(`${scanDetail.date}${scanDetail.time}`, 'YYYY-MM-DDHH:mm:ss', scanDetail.timezone)),
+                    description: scanDetail.description
+                };
 
-                    if (address && address.timezone) {
-                        timezone = address.timezone;
-                    }
+                if (DELIVERED_TRACKING_DESCRIPTIONS.includes(scanDetail.description)) {
+                    results.deliveredAt = event.date;
+                }
 
-                    const event = {
-                        address: scanDetail.address,
-                        date: new Date(moment.tz(`${scanDetail.timestamp}`, timezone).format('YYYY-MM-DDTHH:mm:ss')),
-                        description: scanDetail.status
-                    };
+                if (SHIPPED_TRACKING_DESCRIPTIONS.includes(scanDetail.description)) {
+                    results.shippedAt = event.date;
+                }
 
-                    if (scanDetail.statusCode === 'transit') {
-                        results.shippedAt = event.date;
-                    }
-
-                    if (scanDetail.statusCode === 'delivered') {
-                        results.deliveredAt = event.date;
-                    }
-
-                    // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
-                    if (address) {
-                        if (address.city) {
-                            event.address.city = address.city;
-                        }
-
-                        if (address.state) {
-                            event.address.state = address.state;
-                        }
-                    }
-
-                    results.events.push(event);
-                });
-
-                callback(null, results);
+                results.events.push(event);
             });
+
+            // Reverse results again to get events in order Most Recent - Least Recent
+            results.events.reverse();
+
+            callback(null, results);
         });
     }
 }
