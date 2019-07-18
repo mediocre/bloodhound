@@ -95,10 +95,6 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
 });
 ```
 
-**DHL**
-
-DHL does not require any options.
-
 **fedEx**
 
 FedEx options are passed to the [shipping-fedex](https://www.npmjs.com/package/shipping-fedex) module.
