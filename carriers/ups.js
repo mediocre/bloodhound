@@ -23,18 +23,18 @@ function getActivities(package) {
         activitiesList.forEach(activity => {
             if (activity.ActivityLocation) {
                 activity.address = {
-                    city:  activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
-                    state:  activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
-                    country:  activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
-                    zipcode:  activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
+                    city: activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
+                    country: activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
+                    state: activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
+                    zip: activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
                 }
+
                 activity.location = geography.addressToString(activity.address);
             } else {
                 activity.address = {};
-
                 activity.location = undefined;
             }
-        })
+        });
 
         return activitiesList;
     }
@@ -60,6 +60,8 @@ function UPS(options) {
     this.track = function(trackingNumber, callback) {
         const req = {
             baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
+            forever: true,
+            gzip: true,
             json: {
                 Security: {
                     UPSServiceAccessToken: {
@@ -113,10 +115,10 @@ function UPS(options) {
             const packageInfo = body.TrackResponse.Shipment.Package;
             var activitiesList = [];
 
-            if(!packageInfo){
+            if (!packageInfo){
                 activitiesList = getActivities(body.TrackResponse.Shipment);
             } else {
-                if(!Array.isArray(packageInfo)) {
+                if (!Array.isArray(packageInfo)) {
                     activitiesList = getActivities(packageInfo);
                 } else {
                     activitiesList = packageInfo.map(package => getActivities(package)).flat();
@@ -124,12 +126,12 @@ function UPS(options) {
             }
 
             async.mapLimit(Array.from(new Set(activitiesList.map(activity => activity.location))), 10, function(location, callback) {
-                if (location === null) {
-                    callback(null, null);
+                if (!location) {
+                    callback();
                 } else {
-                    geography.parseLocation(location, function (err, address) {
+                    geography.parseLocation(location, function(err, address) {
                         if (err || !address) {
-                            return callback(err, null);
+                            return callback(err);
                         }
 
                         address.location = location;
@@ -148,6 +150,7 @@ function UPS(options) {
                     if (addresses) {
                         address = addresses.find(a => a && a.location === activity.location);
                     }
+
                     let timezone = 'America/New_York';
 
                     if (address && address.timezone) {
@@ -178,6 +181,7 @@ function UPS(options) {
                             event.address.state = address.state;
                         }
                     }
+
                     results.events.push(event);
                 });
 
