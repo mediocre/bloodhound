@@ -33,6 +33,7 @@ Bloodhound can guess the carrier given a tracking number explicity through the `
 Bloodhound also examines each of the activity/movement/scan events for "shipped" and "delievered" event types (beyond simple electronic events like "shipping label created" or "manifest file sent"). When a matching event type is encountered Bloodhound returns a `shippedAt` and `deliveredAt` date.
 
 ## Supported Carriers
+- DHL
 - FedEx
 - USPS
 
@@ -64,6 +65,9 @@ By default, when Bloodhound encounters a timestamp without a UTC offset it will 
 const Bloodhound = require('bloodhound');
 
 const bloodhound = new Bloodhound({
+    dhl: {
+
+    },
     fedEx: {
         account_number: '123456789',
         environment: 'live',
@@ -93,6 +97,10 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
     console.log(data);
 });
 ```
+
+**DHL**
+
+DHL does not require any options. It makes a simple request to https://www.logistics.dhl/v1/mailitems/track?number=${trackingNumber}.
 
 **fedEx**
 
