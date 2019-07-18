@@ -73,6 +73,7 @@ function DHL() {
 
             // Used when there is no address data present
             var previousAddress = body.data.mailItems[0].pickup;
+            previousAddress.zip = previousAddress.postalCode;
 
             scanDetails.forEach((scanDetail) => {
                 // Filter out duplicate events
