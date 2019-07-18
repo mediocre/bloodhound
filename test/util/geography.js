@@ -89,6 +89,8 @@ describe('geography.parseLocation', function() {
 });
 
 describe('petty-cache', function() {
+    this.timeout(10000);
+
     it('should store results in Redis (via petty-cache)', function(done) {
         geography.parseLocation('Carrollton, TX', { pettyCache: {} }, function(err, actual) {
             assert.ifError(err);
