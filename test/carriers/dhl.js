@@ -58,24 +58,7 @@ describe('DHL', function() {
 
     describe('Error Handling', function() {
         describe('Invalid DHL credentials', function() {
-            const bloodhound = new Bloodhound({
-                dhl: {
-                    apiKey: process.env.DHL_API_Key
-                }
-            });
-
-            it('should return an error for invalid DHL credentials', function(done) {
-                const bloodhound = new Bloodhound({
-                    dhl: {
-                        apiKey: 'asderiutykjbdfgkuyekrtjh834975jkhfgkuyi34uthi84787yijbnfiu7y4ijkb'
-                    }
-                });
-
-                bloodhound.track('9374869903503911996586', 'dhl', function(err) {
-                    assert(err);
-                    done();
-                })
-            });
+            const bloodhound = new Bloodhound();
 
             it('should return an error for a tracking number that contains invalid characters', function(done) {
                 bloodhound.track('asdfkhqowiuy98734587y', 'dhl', function(err) {
@@ -87,11 +70,7 @@ describe('DHL', function() {
     });
 
     describe('dhl.track', function() {
-        const bloodhound = new Bloodhound({
-            dhl: {
-                apiKey: process.env.DHL_API_Key
-            }
-        });
+        const bloodhound = new Bloodhound();
 
         it('should return a valid response with no errors', function(done) {
             bloodhound.track('9374869903503927957359', 'dhl', function(err) {
@@ -347,9 +326,9 @@ describe('DHL', function() {
                     deliveredAt: new Date ('2019-07-09T19:55:00.000Z'),
                     shippedAt: new Date ('2019-07-02T00:59:40.000Z')
                 }
+
                 assert.deepStrictEqual(actual, expected);
                 done();
-
             });
         });
 

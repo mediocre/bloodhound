@@ -9,7 +9,7 @@ const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
 // These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
 const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY'];
 
-function DHL(options) {
+function DHL() {
     this.isTrackingNumberValid = function(trackingNumber) {
         trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
 
@@ -68,7 +68,7 @@ function DHL(options) {
             };
 
             // Reverse the array to get events in order Least Recent - Most Recent
-            var scanDetails = body.data.mailItems[0].events.reverse();
+            const scanDetails = body.data.mailItems[0].events.reverse();
 
             // Used when there is no location data present
             var previousLocation = body.data.mailItems[0].pickup;
