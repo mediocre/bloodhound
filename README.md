@@ -33,6 +33,7 @@ Bloodhound can guess the carrier given a tracking number explicity through the `
 Bloodhound also examines each of the activity/movement/scan events for "shipped" and "delievered" event types (beyond simple electronic events like "shipping label created" or "manifest file sent"). When a matching event type is encountered Bloodhound returns a `shippedAt` and `deliveredAt` date.
 
 ## Supported Carriers
+- DHL
 - FedEx
 - USPS
 
