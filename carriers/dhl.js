@@ -10,6 +10,13 @@ const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
 // These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
 const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY'];
 
+const TIMEZONE_MAP = {
+    CT: 'America/Chicago',
+    ET: 'America/New_York',
+    MT: 'America/Denver',
+    PT: 'America/Los_Angeles'
+};
+
 function DHL() {
     this.isTrackingNumberValid = function(trackingNumber) {
         trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
@@ -105,9 +112,11 @@ function DHL() {
                     zip: scanDetail.address.zip
                 }
 
+                const timezone = TIMEZONE_MAP[scanDetail.timeZone] || 'America/New_York';
+
                 const event = {
                     address: scanDetail.address,
-                    date: new Date(moment.tz(`${scanDetail.date}${scanDetail.time}`, 'YYYY-MM-DDHH:mm:ss', scanDetail.timezone)),
+                    date: new Date(moment.tz(`${scanDetail.date}${scanDetail.time}`, 'YYYY-MM-DDHH:mm:ss', timezone)),
                     description: scanDetail.description
                 };
 

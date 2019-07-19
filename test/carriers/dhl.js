@@ -4,8 +4,6 @@ const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
 describe('DHL', function () {
-    this.timeout(20000);
-
     describe('dhl.isTrackingNumberValid', function () {
         const dhl = new DHL();
 
@@ -58,10 +56,10 @@ describe('DHL', function () {
 });
 
 describe('dhl.track', function () {
-    const bloodhound = new Bloodhound({
-        dhl: {
-        }
-    });
+    this.timeout(10000);
+
+    const bloodhound = new Bloodhound();
+
     it('should return a valid response with no errors', function (done) {
         bloodhound.track('9374869903503911996586', 'dhl', function (err) {
             assert.ifError(err);
@@ -82,7 +80,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '34983'
                         },
-                        date: new Date('2019-07-09T14:55:00.000Z'),
+                        date: new Date('2019-07-09T18:55:00.000Z'),
                         description: 'DELIVERED'
                     },
                     {
@@ -92,7 +90,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '34983'
                         },
-                        date: new Date('2019-07-09T09:56:00.000Z'),
+                        date: new Date('2019-07-09T13:56:00.000Z'),
                         description: 'OUT FOR DELIVERY'
                     },
                     {
@@ -102,7 +100,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '34983'
                         },
-                        date: new Date('2019-07-09T09:46:00.000Z'),
+                        date: new Date('2019-07-09T13:46:00.000Z'),
                         description: 'SORTING COMPLETE'
                     },
                     {
@@ -112,7 +110,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '34981'
                         },
-                        date: new Date('2019-07-09T03:57:00.000Z'),
+                        date: new Date('2019-07-09T07:57:00.000Z'),
                         description: 'ARRIVAL AT POST OFFICE'
                     },
                     {
@@ -122,7 +120,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '34981'
                         },
-                        date: new Date('2019-07-09T02:42:00.000Z'),
+                        date: new Date('2019-07-09T06:42:00.000Z'),
                         description: 'ARRIVED USPS SORT FACILITY'
                     },
                     {
@@ -132,7 +130,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '32822'
                         },
-                        date: new Date('2019-07-08T12:09:08.000Z'),
+                        date: new Date('2019-07-08T16:09:08.000Z'),
                         description: 'TENDERED TO DELIVERY SERVICE PROVIDER'
                     },
                     {
@@ -142,7 +140,7 @@ describe('dhl.track', function () {
                             state: 'FL',
                             zip: '32822'
                         },
-                        date: new Date('2019-07-07T11:52:06.000Z'),
+                        date: new Date('2019-07-07T15:52:06.000Z'),
                         description: 'ARRIVAL DESTINATION DHL ECOMMERCE FACILITY'
                     },
                     {
@@ -152,7 +150,7 @@ describe('dhl.track', function () {
                             state: 'CA',
                             zip: '90220'
                         },
-                        date: new Date('2019-07-02T16:21:17.000Z'),
+                        date: new Date('2019-07-02T23:21:17.000Z'),
                         description: 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY'
                     },
                     {
@@ -162,7 +160,7 @@ describe('dhl.track', function () {
                             state: 'CA',
                             zip: '90220'
                         },
-                        date: new Date('2019-07-02T09:27:26.000Z'),
+                        date: new Date('2019-07-02T16:27:26.000Z'),
                         description: 'PROCESSED'
                     },
                     {
@@ -172,7 +170,7 @@ describe('dhl.track', function () {
                             state: 'CA',
                             zip: '90220'
                         },
-                        date: new Date('2019-07-01T19:59:40.000Z'),
+                        date: new Date('2019-07-02T02:59:40.000Z'),
                         description: 'ARRIVAL AT DHL ECOMMERCE DISTRIBUTION CENTER'
                     },
                     {
@@ -182,7 +180,7 @@ describe('dhl.track', function () {
                             state: 'CA',
                             zip: '90021'
                         },
-                        date: new Date('2019-07-01T16:41:38.000Z'),
+                        date: new Date('2019-07-01T20:41:38.000Z'),
                         description: 'EN ROUTE TO DHL ECOMMERCE'
                     },
                     {
@@ -192,18 +190,16 @@ describe('dhl.track', function () {
                             state: 'CA',
                             zip: '90021'
                         },
-                        date: new Date('2019-07-01T16:38:35.000Z'),
-                        description: 'ELECTRONIC NOTIFICATION RECEIVED: YOUR ORDER HAS ' +
-                            'BEEN PROCESSED AND TRACKING WILL BE UPDATED SOON'
+                        date: new Date('2019-07-01T20:38:35.000Z'),
+                        description: 'ELECTRONIC NOTIFICATION RECEIVED: YOUR ORDER HAS BEEN PROCESSED AND TRACKING WILL BE UPDATED SOON'
                     }
                 ],
-                deliveredAt: new Date('2019-07-09T14:55:00.000Z'),
-                shippedAt: new Date('2019-07-09T09:56:00.000Z')
+                deliveredAt: new Date('2019-07-09T18:55:00.000Z'),
+                shippedAt: new Date('2019-07-09T13:56:00.000Z')
             }
+
             assert.deepStrictEqual(actual, expected);
             done();
-
         });
     });
-
 });
