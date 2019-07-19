@@ -65,7 +65,8 @@ describe('FedEx', function() {
                                     zip: '471307761'
                                 }
                             }
-                        ]
+                        ],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=449044304137821'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -100,7 +101,8 @@ describe('FedEx', function() {
                                     zip: '22841'
                                 }
                             }
-                        ]
+                        ],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=149331877648230'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -124,7 +126,8 @@ describe('FedEx', function() {
                                     zip: '295545594'
                                 }
                             }
-                        ]
+                        ],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=020207021381215'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -211,7 +214,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-03T22:09:00.000Z')
+                        shippedAt: new Date('2014-01-03T22:09:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=920241085725456'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -266,7 +270,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-06T01:23:00.000Z')
+                        shippedAt: new Date('2014-01-06T01:23:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=568838414941'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -311,7 +316,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-07T06:37:00.000Z')
+                        shippedAt: new Date('2014-01-07T06:37:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=039813852990618'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -426,7 +432,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-01T00:08:00.000Z')
+                        shippedAt: new Date('2014-01-01T00:08:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=231300687629630'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -531,7 +538,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-02-04T20:03:00.000Z')
+                        shippedAt: new Date('2014-02-04T20:03:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=797806677146'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -637,7 +645,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2013-12-12T22:26:00.000Z')
+                        shippedAt: new Date('2013-12-12T22:26:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=377101283611590'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -754,7 +763,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2013-12-19T04:05:00.000Z')
+                        shippedAt: new Date('2013-12-19T04:05:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=852426136339213'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -850,7 +860,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-14T02:55:00.000Z')
+                        shippedAt: new Date('2014-01-14T02:55:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=797615467620'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -938,7 +949,8 @@ describe('FedEx', function() {
 
                             }
                         ],
-                        shippedAt: new Date('2014-01-28T02:23:00.000Z')
+                        shippedAt: new Date('2014-01-28T02:23:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=957794015041323'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1084,7 +1096,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-01-11T00:26:00.000Z')
+                        shippedAt: new Date('2014-01-11T00:26:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=076288115212522'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1202,7 +1215,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2014-02-05T02:30:00.000Z')
+                        shippedAt: new Date('2014-02-05T02:30:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=581190049992'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1319,7 +1333,8 @@ describe('FedEx', function() {
                             }
                         ],
                         deliveredAt: new Date('2014-01-09T18:31:00.000Z'),
-                        shippedAt: new Date('2014-01-04T02:33:00.000Z')
+                        shippedAt: new Date('2014-01-04T02:33:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=122816215025810'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1511,7 +1526,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2013-12-27T06:42:00.000Z')
+                        shippedAt: new Date('2013-12-27T06:42:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=843119172384577'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1545,7 +1561,8 @@ describe('FedEx', function() {
                                     zip: '60143'
                                 }
                             }
-                        ]
+                        ],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=070358180009382'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1571,7 +1588,8 @@ describe('FedEx', function() {
                                     zip: '46143'
                                 }
                             }
-                        ]
+                        ],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=02394653001023698293'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1626,7 +1644,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2015-03-03T02:41:54.000Z')
+                        shippedAt: new Date('2015-03-03T02:41:54.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=61292701078443410536'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1704,7 +1723,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2015-03-02T23:19:52.000Z')
+                        shippedAt: new Date('2015-03-02T23:19:52.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=61292700726653585070'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1826,7 +1846,8 @@ describe('FedEx', function() {
                             }
                         ],
                         deliveredAt: new Date('2015-03-06T18:51:00.000Z'),
-                        shippedAt: new Date('2015-03-02T23:14:26.000Z')
+                        shippedAt: new Date('2015-03-02T23:14:26.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=02394653018047202719'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1841,7 +1862,8 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
-                        events: []
+                        events: [],
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=2873008051'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1876,7 +1898,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2015-03-20T14:55:00.000Z')
+                        shippedAt: new Date('2015-03-20T14:55:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=1960003216'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -1943,7 +1966,8 @@ describe('FedEx', function() {
                                 }
                             }
                         ],
-                        shippedAt: new Date('2015-02-27T13:30:00.000Z')
+                        shippedAt: new Date('2015-02-27T13:30:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=1208673524'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -2032,7 +2056,8 @@ describe('FedEx', function() {
                             }
                         ],
                         deliveredAt: new Date('2015-03-02T17:25:25.000Z'),
-                        shippedAt: new Date('2015-02-27T02:07:00.000Z')
+                        shippedAt: new Date('2015-02-27T02:07:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=1636374036'
                     };
 
                     assert.deepStrictEqual(actual, expected);

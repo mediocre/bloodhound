@@ -108,6 +108,9 @@ function PitneyBowes(options) {
                     results.events.push(event);
                 });
 
+                // Add url to carrier tracking page
+                results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
+
                 callback(null, results);
             });
         });
