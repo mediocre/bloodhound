@@ -60,14 +60,14 @@ describe('dhl.track', function () {
 
     const bloodhound = new Bloodhound();
 
-    it('should return a valid response with no errors', function (done) {
+    it.skip('should return a valid response with no errors', function (done) {
         bloodhound.track('9374869903503911996586', 'dhl', function (err) {
             assert.ifError(err);
             done();
         })
     });
 
-    it('Delivered', function (done) {
+    it.skip('Delivered', function (done) {
         bloodhound.track('9374869903503912434773', 'dhl', function (err, actual) {
             assert.ifError(err);
 
