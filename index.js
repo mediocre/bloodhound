@@ -3,6 +3,7 @@ const PitneyBowes = require('./carriers/pitneyBowes');
 const UPS = require('./carriers/ups');
 const FedEx = require('./carriers/fedEx');
 const USPS = require('./carriers/usps');
+const DHL = require('./carriers/dhl');
 
 const geography = require('./util/geography');
 
@@ -26,14 +27,20 @@ function Bloodhound(options) {
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
     const usps = new USPS(options && options.usps);
+    const dhl = new DHL(options && options.dhl);
 
     this.guessCarrier = function(trackingNumber) {
         if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
         } else if (usps.isTrackingNumberValid(trackingNumber)) {
             return 'USPS';
+<<<<<<< HEAD
         } else if (ups.isTrackingNumberValid(trackingNumber)) {
             return 'UPS';
+=======
+        } else if (dhl.isTrackingNumberValid(trackingNumber)) {
+            return 'DHL';
+>>>>>>> master
         } else {
             return undefined;
         }
@@ -70,6 +77,8 @@ function Bloodhound(options) {
             ups.track(trackingNumber, callback);
         } else if (carrier === 'usps') {
             usps.track(trackingNumber, callback);
+        } else if (carrier === 'dhl') {
+            dhl.track(trackingNumber, callback);
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
         }

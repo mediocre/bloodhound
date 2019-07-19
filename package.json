@@ -17,6 +17,7 @@
     },
     "homepage": "https://github.com/mediocre/bloodhound",
     "keywords": [
+        "dhl",
         "fedex",
         "logistics",
         "newgistics",
@@ -36,5 +37,5 @@
         "type": "git",
         "url": "https://github.com/mediocre/bloodhound.git"
     },
-    "version": "0.4.1"
+    "version": "0.5.0"
 }
