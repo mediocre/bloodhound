@@ -24,6 +24,7 @@
         "pitney-bowes",
         "shipping",
         "tracking",
+        "ups",
         "usps"
     ],
     "license": "Apache-2.0",
@@ -37,5 +38,5 @@
         "type": "git",
         "url": "https://github.com/mediocre/bloodhound.git"
     },
-    "version": "0.5.0"
+    "version": "0.6.0"
 }
