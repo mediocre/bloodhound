@@ -87,7 +87,7 @@ const bloodhound = new Bloodhound({
         port: 6379
     },
     ups: {
-        accessKey: 'C98723KLSI770FJD9',
+        accessKey: 'ABCDEFGHIJKLMNOPQ',
         password: 'password',
         username: 'username',
     },
@@ -115,7 +115,7 @@ By default Bloodhound caches geocode results in-memory locally. You can optional
 
 **ups**
 
-The UPS API requires a username, password, and an access key as options. If you are trying to test UPS, access https://wwwcie.ups.com/rest/Track for test tracking information. Otherwise, Bloodhound will default to the production url: https://onlinetools.ups.com/rest/Track.
+The UPS API requires a username, password, and an access key.
 
 **usps**
 
