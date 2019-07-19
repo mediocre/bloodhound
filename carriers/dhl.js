@@ -52,6 +52,8 @@ function DHL() {
 
         async.retry(function(callback) {
             request(req, function(err, res, body) {
+                // eslint-disable-next-line no-console
+                console.log(err, res && res.statusCode);
                 if (err) {
                     return callback(err);
                 } else if (body && body.meta && body.meta.code !== 200) {
@@ -67,6 +69,8 @@ function DHL() {
                 callback(null, body);
             });
         }, function(err, body) {
+            // eslint-disable-next-line no-console
+            console.log(err, body);
             if (err) {
                 return callback(err);
             }
