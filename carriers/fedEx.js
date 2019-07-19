@@ -144,6 +144,9 @@ function FedEx(options) {
                 results.events.push(event);
             });
 
+            // Add url to carrier tracking page
+            results.url = `https://www.fedex.com/apps/fedextrack/?tracknumbers=${encodeURIComponent(trackingNumber)}`;
+
             callback(null, results);
         });
     }

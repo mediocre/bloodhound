@@ -195,7 +195,8 @@ describe('dhl.track', function () {
                     }
                 ],
                 deliveredAt: new Date('2019-07-09T18:55:00.000Z'),
-                shippedAt: new Date('2019-07-09T13:56:00.000Z')
+                shippedAt: new Date('2019-07-09T13:56:00.000Z'),
+                url: 'http://webtrack.dhlglobalmail.com/?trackingnumber=9374869903503912434773'
             }
 
             assert.deepStrictEqual(actual, expected);

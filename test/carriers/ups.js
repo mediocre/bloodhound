@@ -231,7 +231,8 @@ describe('UPS', function() {
                         }
                     ],
                     deliveredAt: new Date('2019-06-28T16:28:58.000Z'),
-                    shippedAt: new Date('2019-06-25T02:48:00.000Z')
+                    shippedAt: new Date('2019-06-25T02:48:00.000Z'),
+                    url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z9756W90308462106'
                 }
 
                 assert.deepStrictEqual(actual, expected);
@@ -263,8 +264,8 @@ describe('UPS', function() {
                             }
                         ],
                         deliveredAt: new Date('1999-06-10T16:00:00.000Z'),
-                        shippedAt: new Date('1999-06-10T16:00:00.000Z')
-
+                        shippedAt: new Date('1999-06-10T16:00:00.000Z'),
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0205271688'
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -375,7 +376,8 @@ describe('UPS', function() {
                                 date: new Date('2010-10-15T12:00:00.000Z'),
                                 description: 'RECEIVED INTO UPS POSSESSION'
                             }
-                        ]
+                        ],
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=5548789114'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -411,7 +413,8 @@ describe('UPS', function() {
                                 date: new Date('2005-10-05T22:00:00.000Z'),
                                 description: 'SHIPMENT HAS BEEN PICKED-UP.'
                             }
-                        ]
+                        ],
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=990728071'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -448,7 +451,8 @@ describe('UPS', function() {
                             }
                         ],
                         deliveredAt: new Date('2010-04-29T16:00:00.000Z'),
-                        shippedAt: new Date('2010-04-29T16:00:00.000Z')
+                        shippedAt: new Date('2010-04-29T16:00:00.000Z'),
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640'
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -475,7 +479,8 @@ describe('UPS', function() {
                                 description: 'ORIGIN SCAN'
                             }
                         ],
-                        shippedAt: new Date('2010-05-05T05:00:00.000Z')
+                        shippedAt: new Date('2010-05-05T05:00:00.000Z'),
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E1305277940'
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -550,7 +555,8 @@ describe('UPS', function() {
                             }
                         ],
                         deliveredAt: new Date('2010-09-12T15:57:00.000Z'),
-                        shippedAt: new Date('2010-09-12T15:57:00.000Z')
+                        shippedAt: new Date('2010-09-12T15:57:00.000Z'),
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6205277936'
                     }
                     assert.deepStrictEqual(actual, expected);
                     done();
@@ -616,7 +622,8 @@ describe('UPS', function() {
                                 date: new Date('2006-05-26T00:06:05.000Z'),
                                 description: 'RECEIVED INTO UPS-SCS POSSESSION'
                             }
-                        ]
+                        ],
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=3251026119'
                     };
 
                     assert.deepStrictEqual(actual, expected);
@@ -643,8 +650,8 @@ describe('UPS', function() {
                             }
                         ],
                         deliveredAt: new Date('2010-05-18T14:00:00.000Z'),
-                        shippedAt: new Date('2010-05-18T14:00:00.000Z')
-
+                        shippedAt: new Date('2010-05-18T14:00:00.000Z'),
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6605272234'
                     }
 
                     assert.deepStrictEqual(actual, expected);
@@ -670,7 +677,8 @@ describe('UPS', function() {
                                 date: new Date('2012-10-04T11:58:04.000Z'),
                                 description: 'Order Processed: Ready for UPS'
                             }
-                        ]
+                        ],
+                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z648616E192760718'
                     };
 
                     assert.deepStrictEqual(actual, expected);

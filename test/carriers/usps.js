@@ -231,7 +231,8 @@ describe('USPS', function() {
                         }
                     ],
                     deliveredAt: new Date('2019-07-01T19:25:00.000Z'),
-                    shippedAt: new Date('2019-06-29T02:26:00.000Z')
+                    shippedAt: new Date('2019-06-29T02:26:00.000Z'),
+                    url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=9400111899223835077162'
                 }
 
                 assert.deepStrictEqual(actual, expected);

@@ -153,7 +153,8 @@ describe('Newgistics', function() {
                         description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
                     }
                 ],
-                shippedAt: new Date('2019-06-18T14:44:00.000Z')
+                shippedAt: new Date('2019-06-18T14:44:00.000Z'),
+                url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=4204540992748927005269000020006828'
             };
             assert.deepStrictEqual(actual, expected);
             done();
