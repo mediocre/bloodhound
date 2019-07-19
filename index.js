@@ -30,17 +30,14 @@ function Bloodhound(options) {
     const dhl = new DHL(options && options.dhl);
 
     this.guessCarrier = function(trackingNumber) {
-        if (fedEx.isTrackingNumberValid(trackingNumber)) {
+        if (dhl.isTrackingNumberValid(trackingNumber)) {
+            return 'DHL';
+        } else if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
-        } else if (usps.isTrackingNumberValid(trackingNumber)) {
-            return 'USPS';
-<<<<<<< HEAD
         } else if (ups.isTrackingNumberValid(trackingNumber)) {
             return 'UPS';
-=======
-        } else if (dhl.isTrackingNumberValid(trackingNumber)) {
-            return 'DHL';
->>>>>>> master
+        } else if (usps.isTrackingNumberValid(trackingNumber)) {
+            return 'USPS';
         } else {
             return undefined;
         }
@@ -69,7 +66,9 @@ function Bloodhound(options) {
 
         carrier = carrier.toLowerCase();
 
-        if (carrier === 'fedex') {
+        if (carrier === 'dhl') {
+            dhl.track(trackingNumber, callback);
+        } else if (carrier === 'fedex') {
             fedEx.track(trackingNumber, callback);
         } else if (carrier === 'newgistics') {
             pitneyBowes.track(trackingNumber, callback);
@@ -77,8 +76,6 @@ function Bloodhound(options) {
             ups.track(trackingNumber, callback);
         } else if (carrier === 'usps') {
             usps.track(trackingNumber, callback);
-        } else if (carrier === 'dhl') {
-            dhl.track(trackingNumber, callback);
         } else {
             return callback(new Error(`Carrier ${carrier} is not supported.`));
         }
