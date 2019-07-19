@@ -54,6 +54,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2013-12-30T18:24:00.000Z'),
@@ -79,6 +80,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-04T00:54:00.000Z'),
@@ -115,6 +117,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-03T22:58:00.000Z'),
@@ -140,7 +143,9 @@ describe('FedEx', function() {
                 bloodhound.track('403934084723025', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {};
+                    const expected = {
+                        carrier: 'FedEx',
+                    };
 
                     assert.deepStrictEqual(actual, expected);
                     done();
@@ -152,6 +157,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-07T11:07:00.000Z'),
@@ -228,6 +234,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-08T02:37:00.000Z'),
@@ -284,6 +291,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-07T10:11:05.000Z'),
@@ -330,6 +338,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-04T11:55:00.000Z'),
@@ -446,6 +455,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-02-06T07:53:00.000Z'),
@@ -552,6 +562,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2013-12-18T19:22:15.000Z'),
@@ -659,6 +670,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2013-12-24T00:29:46.000Z'),
@@ -777,6 +789,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-14T15:45:00.000Z'),
@@ -874,6 +887,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-28T23:43:08.000Z'),
@@ -963,6 +977,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-15T14:32:31.000Z'),
@@ -1110,6 +1125,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-02-06T20:21:00.000Z'),
@@ -1229,6 +1245,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-09T18:31:00.000Z'),
@@ -1347,6 +1364,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-08T23:23:00.000Z'),
@@ -1540,6 +1558,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2014-01-03T00:45:00.000Z'),
@@ -1577,6 +1596,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-02T11:16:40.000Z'),
@@ -1602,6 +1622,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-03T15:57:12.000Z'),
@@ -1658,6 +1679,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-04T15:28:00.000Z'),
@@ -1737,6 +1759,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-06T18:51:00.000Z'),
@@ -1862,6 +1885,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [],
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=2873008051'
                     };
@@ -1876,6 +1900,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-21T02:12:00.000Z'),
@@ -1912,6 +1937,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-01T20:37:39.000Z'),
@@ -1980,6 +2006,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'FedEx',
                         events: [
                             {
                                 date: new Date('2015-03-02T17:25:25.000Z'),

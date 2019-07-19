@@ -25,6 +25,7 @@ function PitneyBowes(options) {
             }
 
             const results = {
+                carrier: 'Newgistics',
                 events: []
             };
 

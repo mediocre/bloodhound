@@ -107,6 +107,7 @@ describe('UPS', function() {
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
                 const expected = {
+                    carrier: 'UPS',
                     events: []
                 }
 
@@ -128,6 +129,7 @@ describe('UPS', function() {
                 assert.ifError(err);
 
                 const expected = {
+                    carrier: 'UPS',
                     events: [
                         {
                             address: {
@@ -246,6 +248,7 @@ describe('UPS', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -280,6 +283,7 @@ describe('UPS', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {},
@@ -392,6 +396,7 @@ describe('UPS', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -428,6 +433,7 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -467,6 +473,7 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E1305277940', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -492,6 +499,7 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E6205277936', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -571,6 +579,7 @@ describe('UPS', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -637,6 +646,7 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual) {
                     assert.ifError(err);
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
@@ -666,6 +676,7 @@ describe('UPS', function() {
                     assert.ifError(err);
 
                     const expected = {
+                        carrier: 'UPS',
                         events: [
                             {
                                 address: {
