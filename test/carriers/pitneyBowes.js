@@ -155,7 +155,6 @@ describe('Newgistics', function() {
                 ],
                 shippedAt: new Date('2019-06-18T14:44:00.000Z')
             };
-
             assert.deepStrictEqual(actual, expected);
             done();
         });

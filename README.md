@@ -35,6 +35,7 @@ Bloodhound also examines each of the activity/movement/scan events for "shipped"
 ## Supported Carriers
 - DHL
 - FedEx
+- UPS
 - USPS
 
 ## Getting Started
@@ -85,6 +86,11 @@ const bloodhound = new Bloodhound({
         },
         port: 6379
     },
+    ups: {
+        accessKey: 'ABCDEFGHIJKLMNOPQ',
+        password: 'password',
+        username: 'username',
+    },
     usps: {
         userId: 'USPS_USER_ID'
     }
@@ -106,6 +112,10 @@ By default Bloodhound uses the OpenStreetMap geocode provider. You can optionall
 **pettyCache**
 
 By default Bloodhound caches geocode results in-memory locally. You can optionally enable caching of geocoder results to a remote Redis server. These options are passed to the [petty-cache](https://www.npmjs.com/package/petty-cache) module.
+
+**ups**
+
+The UPS API requires a username, password, and an access key.
 
 **usps**
 

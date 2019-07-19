@@ -61,7 +61,7 @@ describe('geography.addressToString', function() {
 });
 
 describe('geography.parseLocation', function() {
-    this.timeout(10000);
+    this.timeout(15000);
 
     it('New York NY', function(done) {
         geography.parseLocation('New York NY', function(err, actual) {
@@ -89,7 +89,7 @@ describe('geography.parseLocation', function() {
 });
 
 describe('petty-cache', function() {
-    this.timeout(10000);
+    this.timeout(15000);
 
     it('should store results in Redis (via petty-cache)', function(done) {
         geography.parseLocation('Carrollton, TX', { pettyCache: {} }, function(err, actual) {
