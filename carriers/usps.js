@@ -73,6 +73,7 @@ function USPS(options) {
 
             parser.parseString(res.body, function(err, data) {
                 const results = {
+                    carrier: 'USPS',
                     events: []
                 };
 

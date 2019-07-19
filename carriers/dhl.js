@@ -72,6 +72,7 @@ function DHL() {
             }
 
             const results = {
+                carrier: 'DHL',
                 events: []
             };
 

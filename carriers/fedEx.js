@@ -100,6 +100,7 @@ function FedEx(options) {
             }
 
             const results = {
+                carrier: 'FedEx',
                 events: []
             };
 

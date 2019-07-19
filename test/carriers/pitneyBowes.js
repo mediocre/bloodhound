@@ -31,6 +31,7 @@ describe('Newgistics', function() {
             assert.ifError(err);
 
             const expected = {
+                carrier: 'Newgistics',
                 events: [
                     {
                         address: {

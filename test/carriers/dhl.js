@@ -3,8 +3,8 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
 
-describe('DHL', function () {
-    describe('dhl.isTrackingNumberValid', function () {
+describe('DHL', function() {
+    describe('dhl.isTrackingNumberValid', function() {
         const dhl = new DHL();
 
         const validTrackingNumbers = [
@@ -37,7 +37,7 @@ describe('DHL', function () {
 
         ];
 
-        it('should detect valid DHL tracking numbers', function () {
+        it('should detect valid DHL tracking numbers', function() {
             validTrackingNumbers.forEach(trackingNumber => {
                 if (!dhl.isTrackingNumberValid(trackingNumber)) {
                     assert.fail(`${trackingNumber} is not recognized as a valid DHL tracking number`);
@@ -45,7 +45,7 @@ describe('DHL', function () {
             });
         });
 
-        it('should not detect invalid DHL tracking numbers', function () {
+        it('should not detect invalid DHL tracking numbers', function() {
             invalidTrackingNumbers.forEach(trackingNumber => {
                 if (dhl.isTrackingNumberValid(trackingNumber)) {
                     assert.fail(`${trackingNumber} should not be recognized as a valid DHL tracking number`);
@@ -55,23 +55,24 @@ describe('DHL', function () {
     });
 });
 
-describe('dhl.track', function () {
+describe('dhl.track', function() {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound();
 
-    it.skip('should return a valid response with no errors', function (done) {
-        bloodhound.track('9374869903503911996586', 'dhl', function (err) {
+    it.skip('should return a valid response with no errors', function(done) {
+        bloodhound.track('9374869903503911996586', 'dhl', function(err) {
             assert.ifError(err);
             done();
         })
     });
 
-    it.skip('Delivered', function (done) {
-        bloodhound.track('9374869903503912434773', 'dhl', function (err, actual) {
+    it.skip('Delivered', function(done) {
+        bloodhound.track('9374869903503912434773', 'dhl', function(err, actual) {
             assert.ifError(err);
 
             const expected = {
+                carrier: 'DHL',
                 events: [
                     {
                         address: {

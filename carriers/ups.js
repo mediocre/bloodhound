@@ -101,6 +101,7 @@ function UPS(options) {
             });
         }, function(err, body) {
             const results = {
+                carrier: 'UPS',
                 events: []
             };
 
