@@ -143,9 +143,7 @@ describe('FedEx', function() {
                 bloodhound.track('403934084723025', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'FedEx'
-                    };
+                    const expected = {};
 
                     assert.deepStrictEqual(actual, expected);
                     done();
