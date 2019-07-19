@@ -144,7 +144,7 @@ describe('FedEx', function() {
                     assert.ifError(err);
 
                     const expected = {
-                        carrier: 'FedEx',
+                        carrier: 'FedEx'
                     };
 
                     assert.deepStrictEqual(actual, expected);
