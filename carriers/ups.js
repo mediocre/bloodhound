@@ -44,6 +44,7 @@ function UPS(options) {
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
         trackingNumber = trackingNumber.replace(/\s/g, '');
+        trackingNumber = trackingNumber.toUpperCase();
 
         // https://www.ups.com/us/en/tracking/help/tracking/tnh.page
         if (/^1Z[0-9A-Z]{16}$/.test(trackingNumber)) {
