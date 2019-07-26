@@ -65,6 +65,8 @@ function Bloodhound(options) {
         }
 
         carrier = carrier.toLowerCase();
+        trackingNumber = trackingNumber.replace(/\s/g, '');
+        trackingNumber = trackingNumber.toUpperCase();
 
         if (carrier === 'dhl') {
             dhl.track(trackingNumber, callback);
