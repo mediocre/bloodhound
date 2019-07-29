@@ -2,7 +2,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
-describe.only('UPS', function() {
+describe('UPS', function() {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
@@ -14,9 +14,9 @@ describe.only('UPS', function() {
         }
     });
 
-    describe('Error Handling', function() {
+    describe.skip('Error Handling', function() {
         describe('Invalid UPS credentials', function() {
-            it.skip('should return an error for invalid username', function(done) {
+            it('should return an error for invalid username', function(done) {
                 const bloodhound = new Bloodhound({
                     ups: {
                         accessKey: process.env.UPS_ACCESS_KEY,
