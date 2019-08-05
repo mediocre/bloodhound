@@ -182,6 +182,10 @@ function USPS(options) {
                     // Add url to carrier tracking page
                     results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
 
+                    if (!results.shippedAt) {
+                        results.shippedAt = results.deliveredAt;
+                    }
+
                     callback(null, results);
                 });
             });
