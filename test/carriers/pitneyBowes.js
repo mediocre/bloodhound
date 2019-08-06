@@ -19,6 +19,51 @@ describe('Newgistics', function() {
         });
     });
 
+    it('should return a shippedAt field when results have no shipping status', function(done) {
+        const bloodhound = new Bloodhound({
+            pitneyBowes: {
+                api_key: process.env.PITNEY_BOWES_API_KEY,
+                api_secret: process.env.PITNEY_BOWES_API_SECRET
+            }
+        });
+
+        bloodhound.track('4207866492612927005269000029964826', 'newgistics', function(err, actual) {
+            assert.ifError(err);
+
+            const expected = {
+                carrier: 'Newgistics',
+                events: [
+                    {
+                        address: {
+                            city: 'LA',
+                            country: null,
+                            state: 'CA',
+                            zip: null
+                        },
+                        date: new Date('2019-07-19T20:57:00.000Z'),
+                        description: 'Delivered, Front Door/Porch'
+                    },
+                    {
+                        address: {
+                            city: 'Carrollton',
+                            country: null,
+                            state: 'TX',
+                            zip: null
+                        },
+                        date: new Date('2019-07-10T16:08:00.000Z'),
+                        description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
+                    }
+                ],
+                deliveredAt: new Date('2019-07-19T20:57:00.000Z'),
+                url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=4207866492612927005269000029964826',
+                shippedAt: new Date('2019-07-19T20:57:00.000Z')
+            }
+
+            assert.deepStrictEqual(actual, expected);
+            done();
+        });
+    });
+
     it('4204540992748927005269000020006828', function(done) {
         const bloodhound = new Bloodhound({
             pitneyBowes: {

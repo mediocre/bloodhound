@@ -138,6 +138,10 @@ function DHL() {
             // Reverse results again to get events in order Most Recent - Least Recent
             results.events.reverse();
 
+            if (!results.shippedAt && results.deliveredAt) {
+                results.shippedAt = results.deliveredAt;
+            }
+
             callback(null, results);
         });
     }
