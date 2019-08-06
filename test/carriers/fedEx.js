@@ -36,7 +36,7 @@ describe('FedEx', function() {
 
     // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.track', function() {
-        this.timeout(10000);
+        this.timeout(20000);
 
         const bloodhound = new Bloodhound({
             fedEx: {
