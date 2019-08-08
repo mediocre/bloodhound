@@ -97,6 +97,7 @@ describe('petty-cache', function() {
 
             const expected = {
                 city: 'Carrollton',
+                location: 'Carrollton, TX',
                 state: 'TX',
                 timezone: 'America/Chicago'
             };

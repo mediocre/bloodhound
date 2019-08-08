@@ -40,8 +40,8 @@ describe('Newgistics', function() {
                             state: 'CA',
                             zip: null
                         },
-                        date: new Date('2019-07-19T20:57:00.000Z'),
-                        description: 'Delivered, Front Door/Porch'
+                        date: new Date('2019-07-19T22:57:00.000Z'),
+                        description: 'Delivered'
                     },
                     {
                         address: {
@@ -51,12 +51,12 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-07-10T16:08:00.000Z'),
-                        description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
+                        description: 'Electronic Shipping Info Received'
                     }
                 ],
-                deliveredAt: new Date('2019-07-19T20:57:00.000Z'),
+                deliveredAt: new Date('2019-07-19T22:57:00.000Z'),
                 url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=4207866492612927005269000029964826',
-                shippedAt: new Date('2019-07-19T20:57:00.000Z')
+                shippedAt: new Date('2019-07-19T22:57:00.000Z')
             }
 
             assert.deepStrictEqual(actual, expected);
@@ -85,8 +85,8 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-22T14:59:00.000Z'),
-                        description: 'Moved, Left no Address'
+                        date: new Date('2019-06-22T13:59:00.000Z'),
+                        description: 'Return to Sender because the addressee moved and left no forwarding address'
                     },
                     {
                         address: {
@@ -95,8 +95,8 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-22T14:59:00.000Z'),
-                        description: 'Return to Sender Processed'
+                        date: new Date('2019-06-21T19:47:00.000Z'),
+                        description: 'Return to Sender due to No such Number'
                     },
                     {
                         address: {
@@ -105,8 +105,8 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-21T20:47:00.000Z'),
-                        description: 'No Such Number'
+                        date: new Date('2019-06-21T13:33:00.000Z'),
+                        description: 'Return to Sender because the addressee moved and left no forwarding address'
                     },
                     {
                         address: {
@@ -115,17 +115,7 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-21T14:33:00.000Z'),
-                        description: 'Moved, Left no Address'
-                    },
-                    {
-                        address: {
-                            city: 'Dayton',
-                            country: null,
-                            state: 'OH',
-                            zip: null
-                        },
-                        date: new Date('2019-06-21T12:14:00.000Z'),
+                        date: new Date('2019-06-21T11:14:00.000Z'),
                         description: 'Out for Delivery'
                     },
                     {
@@ -135,7 +125,7 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-21T12:04:00.000Z'),
+                        date: new Date('2019-06-21T11:04:00.000Z'),
                         description: 'Sorting Complete'
                     },
                     {
@@ -145,8 +135,18 @@ describe('Newgistics', function() {
                             state: 'OH',
                             zip: null
                         },
-                        date: new Date('2019-06-20T15:26:00.000Z'),
-                        description: 'Arrived at Post Office'
+                        date: new Date('2019-06-20T14:26:00.000Z'),
+                        description: 'Arrival at Unit'
+                    },
+                    {
+                        address: {
+                            city: 'Dayton',
+                            country: null,
+                            state: 'OH',
+                            zip: null
+                        },
+                        date: new Date('2019-06-20T05:53:00.000Z'),
+                        description: 'Pre-Shipment Info Sent to USPS, USPS Awaiting Item'
                     },
                     {
                         address: {
@@ -156,7 +156,17 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-06-20T05:44:00.000Z'),
-                        description: 'Departed Shipping Partner Facility, USPS Awaiting Item'
+                        description: 'In transit'
+                    },
+                    {
+                        address: {
+                            city: 'Hebron',
+                            country: null,
+                            state: 'KY',
+                            zip: null
+                        },
+                        date: new Date('2019-06-20T05:27:00.000Z'),
+                        description: 'In transit'
                     },
                     {
                         address: {
@@ -166,7 +176,27 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-06-19T18:12:00.000Z'),
-                        description: 'Arrived Shipping Partner Facility, USPS Awaiting Item'
+                        description: 'In transit'
+                    },
+                    {
+                        address: {
+                            city: 'Hebron',
+                            country: null,
+                            state: 'KY',
+                            zip: null
+                        },
+                        date: new Date('2019-06-19T11:47:00.000Z'),
+                        description: 'Estimated Delivery'
+                    },
+                    {
+                        address: {
+                            city: 'Hebron',
+                            country: null,
+                            state: 'KY',
+                            zip: null
+                        },
+                        date: new Date('2019-06-19T09:05:00.000Z'),
+                        description: 'Delivered to Partner Facility'
                     },
                     {
                         address: {
@@ -176,7 +206,27 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-06-18T23:24:00.000Z'),
-                        description: 'Departed Shipping Partner Facility, USPS Awaiting Item'
+                        description: 'In transit'
+                    },
+                    {
+                        address: {
+                            city: 'Grapevine',
+                            country: null,
+                            state: 'TX',
+                            zip: null
+                        },
+                        date: new Date('2019-06-18T17:38:00.000Z'),
+                        description: 'Enroute Processed'
+                    },
+                    {
+                        address: {
+                            city: 'Grapevine',
+                            country: null,
+                            state: 'TX',
+                            zip: null
+                        },
+                        date: new Date('2019-06-18T17:23:00.000Z'),
+                        description: 'Arrived at Pick-up Location'
                     },
                     {
                         address: {
@@ -186,7 +236,7 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-06-18T14:44:00.000Z'),
-                        description: 'Arrived Shipping Partner Facility, USPS Awaiting Item'
+                        description: 'Arrived at Shipping Facility'
                     },
                     {
                         address: {
@@ -196,10 +246,10 @@ describe('Newgistics', function() {
                             zip: null
                         },
                         date: new Date('2019-06-17T12:07:00.000Z'),
-                        description: 'Picked Up by Shipping Partner, USPS Awaiting Item'
+                        description: 'Electronic Shipping Info Received'
                     }
                 ],
-                shippedAt: new Date('2019-06-18T14:44:00.000Z'),
+                shippedAt: new Date('2019-06-21T11:14:00.000Z'),
                 url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=4204540992748927005269000020006828'
             };
             assert.deepStrictEqual(actual, expected);

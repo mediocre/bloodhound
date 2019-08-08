@@ -6,10 +6,10 @@ const PitneyBowesClient = require('pitney-bowes');
 const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
 
 // These tracking status codes indicate the shipment was delivered
-const DELIVERED_TRACKING_STATUS_CODES = ['01'];
+const DELIVERED_TRACKING_STATUS_CODES = ['01', 'DEL'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'OF', 'PC'];
+const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'ACF', 'AD', 'ADU', 'DCF', 'IPS', 'OF', 'OFD', 'PC'];
 
 const geography = require('../util/geography');
 
@@ -18,7 +18,7 @@ function PitneyBowes(options) {
 
     this.track = function(trackingNumber, callback) {
         async.retry(function(callback) {
-            pitneyBowesClient.tracking({ trackingNumber }, callback);
+            pitneyBowesClient.tracking({ carrier: 'FDR', trackingNumber }, callback);
         }, function(err, data) {
             if (err) {
                 return callback(err);
@@ -73,7 +73,7 @@ function PitneyBowes(options) {
                     return callback(err);
                 }
 
-                data.scanDetailsList.forEach(scanDetail => {
+                data.scanDetailsList.reverse().forEach(scanDetail => {
                     const address = addresses.find(a => a && a.location === scanDetail.location);
                     let timezone = 'America/New_York';
 
@@ -92,6 +92,7 @@ function PitneyBowes(options) {
                     }
 
                     if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
+                        // console.log(scanDetail.scanType);
                         results.shippedAt = new Date(event.date);
                     }
 
@@ -115,7 +116,7 @@ function PitneyBowes(options) {
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;
                 }
-
+                results.events = results.events.reverse();
                 callback(null, results);
             });
         });
