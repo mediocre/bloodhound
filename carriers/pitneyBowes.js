@@ -9,7 +9,7 @@ const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NE
 const DELIVERED_TRACKING_STATUS_CODES = ['01', 'DEL'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'OF', 'OFD', 'PC'];
+const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'IPS', 'OF', 'OFD', 'PC', 'SS'];
 
 const geography = require('../util/geography');
 
