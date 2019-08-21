@@ -74,6 +74,8 @@ function Bloodhound(options) {
             fedEx.track(trackingNumber, callback);
         } else if (carrier === 'newgistics') {
             pitneyBowes.track(trackingNumber, callback);
+        } else if (carrier === 'pitney bowes') {
+            pitneyBowes.track(trackingNumber, callback);
         } else if (carrier === 'ups'){
             ups.track(trackingNumber, callback);
         } else if (carrier === 'usps') {
