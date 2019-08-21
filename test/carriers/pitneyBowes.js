@@ -266,8 +266,7 @@ describe('Pitney Bowes', function() {
         const bloodhound = new Bloodhound({
             pitneyBowes: {
                 api_key: process.env.PITNEY_BOWES_API_KEY,
-                api_secret: process.env.PITNEY_BOWES_API_SECRET,
-                baseUrl: process.env.PITNEY_BOWES_API_BASE_URL
+                api_secret: process.env.PITNEY_BOWES_API_SECRET
             }
         });
 
