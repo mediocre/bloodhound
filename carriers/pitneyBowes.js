@@ -9,7 +9,7 @@ const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NE
 const DELIVERED_TRACKING_STATUS_CODES = ['01', 'DEL'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'IPS', 'OF', 'OFD', 'PC', 'SS'];
+const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '336', '401', '403', '81', '82', 'AD', 'IPS', 'OF', 'OFD', 'PC', 'SS'];
 
 const geography = require('../util/geography');
 
@@ -17,7 +17,15 @@ function PitneyBowes(options) {
     const pitneyBowesClient = new PitneyBowesClient(options);
 
     this.track = function(trackingNumber, callback) {
+        // Pitney Bowes Marketing Mail Flats (length 31): 0004290252994200071698133931119
+        const isImb = trackingNumber.length === 31;
+
         async.retry(function(callback) {
+            if (isImb) {
+                return pitneyBowesClient.tracking({ carrier: 'IMB', trackingNumber: trackingNumber.substring(0, 20) }, callback);
+            }
+
+            // Newgistics Ground (length 34): 4201913892748927005269000023298282
             pitneyBowesClient.tracking({ carrier: 'FDR', trackingNumber }, callback);
         }, function(err, data) {
             if (err) {
@@ -28,6 +36,10 @@ function PitneyBowes(options) {
                 carrier: 'Newgistics',
                 events: []
             };
+
+            if (isImb) {
+                results.carrier = 'Pitney Bowes';
+            }
 
             if (!data | !data.scanDetailsList) {
                 return callback(null, results);
@@ -73,7 +85,10 @@ function PitneyBowes(options) {
                     return callback(err);
                 }
 
-                data.scanDetailsList.reverse().forEach(scanDetail => {
+                // Sort list by date/time
+                data.scanDetailsList.sort((a, b) => `${a.eventDate} ${a.eventTime}` - `${b.eventDate} ${b.eventTime}`);
+
+                data.scanDetailsList.forEach(scanDetail => {
                     const address = addresses.find(a => a && a.location === scanDetail.location);
                     let timezone = 'America/New_York';
 
@@ -111,6 +126,10 @@ function PitneyBowes(options) {
 
                 // Add url to carrier tracking page
                 results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
+
+                if (isImb) {
+                    results.url = `https://checkout.org/tracking/${trackingNumber}`;
+                }
 
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;

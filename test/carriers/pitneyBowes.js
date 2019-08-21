@@ -258,3 +258,22 @@ describe('Newgistics', function() {
         });
     });
 });
+
+describe('Pitney Bowes', function() {
+    this.timeout(20000);
+
+    it('should return an error', function(done) {
+        const bloodhound = new Bloodhound({
+            pitneyBowes: {
+                api_key: process.env.PITNEY_BOWES_API_KEY,
+                api_secret: process.env.PITNEY_BOWES_API_SECRET,
+                baseUrl: process.env.PITNEY_BOWES_API_BASE_URL
+            }
+        });
+
+        bloodhound.track('0004290252994200071698133931119', 'Pitney Bowes', function(err) {
+            assert.ifError(err);
+            done();
+        });
+    });
+});
