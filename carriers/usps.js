@@ -12,7 +12,7 @@ const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NE
 const DELIVERED_TRACKING_STATUS_CODES = ['01'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created): https://about.usps.com/publications/pub97/pub97_appi.htm
-const SHIPPED_TRACKING_STATUS_CODES = ['02', '07', '10', '14', '30', '81', '82', 'AD', 'OF', 'PC'];
+const SHIPPED_TRACKING_STATUS_CODES = ['02', '03', '07', '10', '14', '30', '81', '82', 'AD', 'OF', 'PC', 'SF'];
 
 // The events from these tracking status codes are filtered because they do not provide any useful information: https://about.usps.com/publications/pub97/pub97_appi.htm
 const TRACKING_STATUS_CODES_BLACKLIST = ['NT'];
