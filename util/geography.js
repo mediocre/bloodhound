@@ -106,6 +106,10 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
         options = undefined;
     }
 
+    if (!location) {
+        return callback();
+    }
+
     // Use Redis (via Petty Cache)
     if (options && options.pettyCache) {
         if (!pettyCache) {

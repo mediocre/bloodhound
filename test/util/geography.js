@@ -63,6 +63,14 @@ describe('geography.addressToString', function() {
 describe('geography.parseLocation', function() {
     this.timeout(15000);
 
+    it('should not error on empty strings', function(done) {
+        geography.parseLocation('', function(err, actual) {
+            assert.ifError(err);
+            assert.deepStrictEqual(actual, undefined);
+            done();
+        });
+    });
+
     it('New York NY', function(done) {
         geography.parseLocation('New York NY', function(err, actual) {
             assert.ifError(err);

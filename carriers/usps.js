@@ -95,8 +95,6 @@ function USPS(options) {
 
                 const trackDetailList = data.TrackResponse.TrackInfo[0].TrackDetail;
 
-                //console.log(data.TrackResponse.TrackInfo[0].TrackDetail);
-
                 // If we have tracking details, push them into statuses
                 // Tracking details only exist if the item has more than one status update
                 if (trackDetailList) {

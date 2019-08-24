@@ -10,6 +10,7 @@ describe('USPS', function() {
             userId: process.env.USPS_USERID
         }
     });
+
     describe('usps.isTrackingNumberValid', function() {
         const usps = new USPS();
 
