@@ -22,7 +22,7 @@ describe('Newgistics', function() {
 describe('Pitney Bowes', function() {
     this.timeout(20000);
 
-    it('should return an error', function(done) {
+    it('should not return an error', function(done) {
         const bloodhound = new Bloodhound({
             pitneyBowes: {
                 api_key: process.env.PITNEY_BOWES_API_KEY,
@@ -30,7 +30,7 @@ describe('Pitney Bowes', function() {
             }
         });
 
-        bloodhound.track('0004290252994200071698133931119', 'Pitney Bowes', function(err) {
+        bloodhound.track('0027190252994200106903109595630', 'Pitney Bowes', function(err) {
             assert.ifError(err);
             done();
         });

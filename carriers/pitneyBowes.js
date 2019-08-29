@@ -28,10 +28,6 @@ function PitneyBowes(options) {
             // Newgistics Ground (length 34): 4201913892748927005269000023298282
             pitneyBowesClient.tracking({ carrier: 'FDR', trackingNumber }, callback);
         }, function(err, data) {
-            if (err) {
-                return callback(err);
-            }
-
             const results = {
                 carrier: 'Newgistics',
                 events: []
@@ -39,6 +35,14 @@ function PitneyBowes(options) {
 
             if (isImb) {
                 results.carrier = 'Pitney Bowes';
+            }
+
+            if (err) {
+                if (err.message === 'Not Found') {
+                    return callback(null, results);
+                }
+
+                return callback(err);
             }
 
             if (!data | !data.scanDetailsList) {
@@ -134,6 +138,7 @@ function PitneyBowes(options) {
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;
                 }
+
                 results.events = results.events.reverse();
                 callback(null, results);
             });
