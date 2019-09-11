@@ -41,7 +41,7 @@ Bloodhound also examines each of the activity/movement/scan events for "shipped"
 ## Getting Started
 
 ```javascript
-const Bloodhound = require('bloodhound');
+const Bloodhound = require('@mediocre/bloodhound');
 
 const bloodhound = new Bloodhound({
     usps: {
