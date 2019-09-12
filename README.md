@@ -63,7 +63,7 @@ Creates a new Bloodhound client. Each carrier requires a different combination o
 By default, when Bloodhound encounters a timestamp without a UTC offset it will geocode using OpenStreetMap (which does not require an API key). You can optionally use a different geocoder. You can also optionally cache geocode results in Redis.
 
 ```javascript
-const Bloodhound = require('bloodhound');
+const Bloodhound = require('@mediocre/bloodhound');
 
 const bloodhound = new Bloodhound({
     fedEx: {
