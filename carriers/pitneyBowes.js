@@ -9,7 +9,7 @@ const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NE
 const DELIVERED_TRACKING_STATUS_CODES = ['01', '517', 'DEL'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['000', '02', '07', '10', '131', '138', '139', '14', '141', '143', '144', '145', '146', '159', '248', '249', '30', '333', '334', '335', '336', '371', '375', '376', '377', '378', '396', '401', '403', '404', '406', '436', '437', '438', '439', '463', '464', '466', '516', '538', '81', '82', '865', '869', '870', '872', '873', '874', '876', '878', 'AD', 'IPS', 'OF', 'OFD', 'PC', 'SS'];
+const SHIPPED_TRACKING_STATUS_CODES = ['000', '02', '07', '10', '131', '138', '139', '14', '141', '143', '144', '145', '146', '159', '248', '249', '30', '333', '334', '335', '336', '371', '375', '376', '377', '378', '396', '401', '403', '404', '406', '436', '437', '438', '439', '463', '464', '466', '516', '538', '81', '82', '865', '869', '870', '872', '873', '874', '876', '878', 'AD', 'ADU', 'IPS', 'OF', 'OFD', 'PC', 'SS', 'UPROC'];
 
 const geography = require('../util/geography');
 
@@ -100,6 +100,8 @@ function PitneyBowes(options) {
                         date: moment.tz(`${scanDetail.eventDate} ${scanDetail.eventTime}`, 'YYYY-MM-DD HH:mm:ss', timezone).toDate(),
                         description: scanDetail.scanDescription
                     };
+
+                    console.log(scanDetail);
 
                     if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
                         results.deliveredAt = new Date(event.date);
