@@ -49,29 +49,24 @@ function PitneyBowes(options) {
                 return callback(null, results);
             }
 
-            data.scanDetailsList = data.scanDetailsList.filter(scanDetail => {
-                // Remove scan details without cities
-                if (!scanDetail.eventCity) {
-                    return false;
-                }
-
-                return true;
-            });
-
             // Set address and location of each scan detail
             data.scanDetailsList.forEach(scanDetail => {
                 scanDetail.address = {
-                    city: scanDetail.eventCity.replace(CITY_BLACKLIST, '').trim(),
+                    city: scanDetail.eventCity,
                     country: scanDetail.country,
                     state: scanDetail.eventStateOrProvince,
                     zip: scanDetail.postalCode
                 };
 
+                if (scanDetail.address.city) {
+                    scanDetail.address.city = scanDetail.address.city.replace(CITY_BLACKLIST, '').trim();
+                }
+
                 scanDetail.location = geography.addressToString(scanDetail.address);
             });
 
-            // Get unqiue array of locations
-            const locations = Array.from(new Set(data.scanDetailsList.map(scanDetail => scanDetail.location)));
+            // Get unique array of locations (remove falsy values)
+            const locations = Array.from(new Set(data.scanDetailsList.map(scanDetail => scanDetail.location))).filter(l => l);
 
             // Lookup each location
             async.mapLimit(locations, 10, function(location, callback) {
@@ -132,7 +127,7 @@ function PitneyBowes(options) {
                 results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
 
                 if (isImb) {
-                    results.url = `https://checkout.org/tracking/${trackingNumber}`;
+                    results.url = `https://tracking.pb.com/${trackingNumber.substring(0, 20)}`;
                 }
 
                 if (!results.shippedAt && results.deliveredAt) {
