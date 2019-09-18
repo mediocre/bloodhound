@@ -101,8 +101,6 @@ function PitneyBowes(options) {
                         description: scanDetail.scanDescription
                     };
 
-                    console.log(scanDetail);
-
                     if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
                         results.deliveredAt = new Date(event.date);
                     }
