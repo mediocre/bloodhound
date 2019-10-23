@@ -116,10 +116,10 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
             pettyCache = new PettyCache(options.pettyCache.port, options.pettyCache.host, options.pettyCache.options);
         }
 
-        // Cache between 1-2 months
+        // Cache between 11-12 months
         return pettyCache.fetch(`bloodhound.geocode:${location}`, function(callback) {
             geocode(location, callback);
-        }, { ttl: { min: 2592000000, max: 5184000000 } }, callback);
+        }, { ttl: { min: 28512000000, max: 31104000000 } }, callback);
     }
 
     geocode(location, callback);
