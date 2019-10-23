@@ -14,13 +14,21 @@ function Bloodhound(options) {
     }
 
     // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
-    if (options && options.pettyCache && options.pitneyBowes) {
-        options.pitneyBowes.pettyCache = options.pettyCache;
-    }
+    if (options && options.pettyCache) {
+        // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
+        if (options.pitneyBowes) {
+            options.pitneyBowes.pettyCache = options.pettyCache;
+        }
 
-    // Allow USPS to cache geocode results in Redis (via petty-cache)
-    if (options && options.pettyCache && options.usps) {
-        options.usps.pettyCache = options.pettyCache;
+        // Allow UPS to cache geocode results in Redis (via petty-cache)
+        if (options.ups) {
+            options.ups.pettyCache = options.pettyCache;
+        }
+
+        // Allow USPS to cache geocode results in Redis (via petty-cache)
+        if (options.usps) {
+            options.usps.pettyCache = options.pettyCache;
+        }
     }
 
     const fedEx = new FedEx(options && options.fedEx);

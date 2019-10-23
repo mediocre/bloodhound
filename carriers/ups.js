@@ -127,7 +127,7 @@ function UPS(options) {
                 if (!location) {
                     callback();
                 } else {
-                    geography.parseLocation(location, function(err, address) {
+                    geography.parseLocation(location, options, function(err, address) {
                         if (err || !address) {
                             return callback(err);
                         }
