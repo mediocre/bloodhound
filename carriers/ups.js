@@ -3,6 +3,7 @@ const moment = require('moment-timezone');
 const request = require('request');
 
 const geography = require('../util/geography');
+const USPS = require('./usps');
 
 // These are all of the status descriptions related to delivery provided by UPS.
 const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', 'DELIVERED TO UPS ACCESS POINT AWAITING CUSTOMER PICKUP'];
@@ -41,6 +42,8 @@ function getActivities(package) {
 }
 
 function UPS(options) {
+    const usps = new USPS(options && options.usps);
+
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
         trackingNumber = trackingNumber.replace(/\s/g, '');
@@ -107,6 +110,11 @@ function UPS(options) {
             };
 
             if (err) {
+                // Try USPS for UPS Mail Innovations
+                if (usps.isTrackingNumberValid(trackingNumber)) {
+                    return usps.track(trackingNumber, callback);
+                }
+
                 if (err.message === 'No tracking information available') {
                     return callback(null, results);
                 }

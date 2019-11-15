@@ -76,7 +76,7 @@ describe('geography.parseLocation', function() {
             assert.ifError(err);
 
             const expected = {
-                city: 'NYC',
+                city: 'New York',
                 state: 'NY',
                 timezone: 'America/New_York'
             };

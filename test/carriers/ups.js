@@ -125,7 +125,7 @@ describe('UPS', function() {
             });
         });
 
-        it('should return a track response', function(done) {
+        it.skip('should return a track response', function(done) {
             bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
                 assert.ifError(err);
 
@@ -333,12 +333,12 @@ describe('UPS', function() {
                             },
                             {
                                 address: {
-                                    city: 'Winchester',
-                                    state: 'IL',
+                                    city: 'Hadley',
+                                    state: 'MA',
                                     country: 'US',
                                     zip: undefined
                                 },
-                                date: new Date('2010-10-18T01:04:00.000Z'),
+                                date: new Date('2010-10-18T06:04:00.000Z'),
                                 description: 'ARRIVED AT DESTINATION COUNTRY'
                             },
                             {
@@ -646,6 +646,7 @@ describe('UPS', function() {
             it('Delivered', function(done) {
                 bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual) {
                     assert.ifError(err);
+
                     const expected = {
                         carrier: 'UPS',
                         events: [
@@ -681,7 +682,7 @@ describe('UPS', function() {
                         events: [
                             {
                                 address: {
-                                    city: 'Leeuwarden',
+                                    city: 'Sarzay',
                                     country: 'FR',
                                     state: undefined,
                                     zip: undefined

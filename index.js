@@ -31,6 +31,11 @@ function Bloodhound(options) {
         }
     }
 
+    // Allow UPS to use USPS for UPS Mail Innovations tracking numbers
+    if (options && options.ups && options.usps) {
+        options.ups.usps = options.usps;
+    }
+
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);

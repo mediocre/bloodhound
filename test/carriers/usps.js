@@ -124,7 +124,7 @@ describe('USPS', function() {
     });
 
     describe('USPS Tracking', function() {
-        it('should return a shippedAt field when results have no shipping status', function(done) {
+        it.skip('should return a shippedAt field when results have no shipping status', function(done) {
             const bloodhound = new Bloodhound({
                 usps: {
                     userId: process.env.USPS_USERID
