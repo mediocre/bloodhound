@@ -64,7 +64,7 @@ describe('dhl.track', function() {
         bloodhound.track('9374869903503911996586', 'dhl', function(err) {
             assert.ifError(err);
             done();
-        })
+        });
     });
 
     it.skip('Delivered', function(done) {

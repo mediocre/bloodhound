@@ -54,6 +54,8 @@ function DHL() {
             request(req, function(err, res, body) {
                 if (err) {
                     return callback(err);
+                } else if (res.statusCode !== 200) {
+                    return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href}`));
                 } else if (body && body.meta && body.meta.code !== 200) {
                     var message = body.meta.code;
 
