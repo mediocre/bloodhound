@@ -52,14 +52,14 @@ function PitneyBowes(options) {
             // Set address and location of each scan detail
             data.scanDetailsList.forEach(scanDetail => {
                 scanDetail.address = {
-                    city: scanDetail.eventCity.toString(),
+                    city: scanDetail.eventCity,
                     country: scanDetail.country,
                     state: scanDetail.eventStateOrProvince,
                     zip: scanDetail.postalCode
                 };
 
                 if (scanDetail.address.city) {
-                    scanDetail.address.city = scanDetail.address.city.replace(CITY_BLACKLIST, '').trim();
+                    scanDetail.address.city = scanDetail.address.city.toString().replace(CITY_BLACKLIST, '').trim();
                 }
 
                 scanDetail.location = geography.addressToString(scanDetail.address);
