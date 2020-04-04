@@ -52,7 +52,7 @@ function PitneyBowes(options) {
             // Set address and location of each scan detail
             data.scanDetailsList.forEach(scanDetail => {
                 scanDetail.address = {
-                    city: scanDetail.eventCity,
+                    city: scanDetail.eventCity.toString(),
                     country: scanDetail.country,
                     state: scanDetail.eventStateOrProvince,
                     zip: scanDetail.postalCode
