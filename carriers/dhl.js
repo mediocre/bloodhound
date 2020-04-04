@@ -1,5 +1,4 @@
 const async = require('async');
-const moment = require('moment-timezone');
 const request = require('request');
 
 const checkDigit = require('../util/checkDigit');
@@ -8,14 +7,7 @@ const checkDigit = require('../util/checkDigit');
 const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
 
 // These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY'];
-
-const TIMEZONE_MAP = {
-    CT: 'America/Chicago',
-    ET: 'America/New_York',
-    MT: 'America/Denver',
-    PT: 'America/Los_Angeles'
-};
+const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY', 'PROCESSED THROUGH SORT FACILITY'];
 
 function DHL() {
     this.isTrackingNumberValid = function(trackingNumber) {
@@ -41,29 +33,24 @@ function DHL() {
     };
 
     this.track = function(trackingNumber, callback) {
+        // This is the API being used from: https://www.dhl.com/global-en/home/tracking/tracking-ecommerce.html
         const req = {
             forever: true,
             gzip: true,
             json: true,
             method: 'GET',
             timeout: 5000,
-            url: `https://www.logistics.dhl/v1/mailitems/track?number=${trackingNumber}`
+            url: `https://www.dhl.com/utapi?trackingNumber=${trackingNumber}`
         };
 
         async.retry(function(callback) {
             request(req, function(err, res, body) {
                 if (err) {
                     return callback(err);
-                } else if (res.statusCode !== 200) {
-                    return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href}`));
-                } else if (body && body.meta && body.meta.code !== 200) {
-                    var message = body.meta.code;
+                }
 
-                    if (body.meta.error && body.meta.error[0] && body.meta.error[0].error_message) {
-                        message += ` ${body.meta.error[0].error_message}`;
-                    }
-
-                    return callback(new Error(message));
+                if (res.statusCode !== 200) {
+                    return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href} ${body || ''}`.trim()));
                 }
 
                 callback(null, body);
@@ -78,60 +65,61 @@ function DHL() {
                 events: []
             };
 
+            if (!body || !body.shipments || !body.shipments.length) {
+                return callback(null, results);
+            }
+
+            // We only support the first shipment
+            const shipment = body.shipments[0];
+
             // Reverse the array to get events in order Least Recent - Most Recent
-            const scanDetails = body.data.mailItems[0].events.reverse();
+            const events = shipment.events.reverse();
 
             // Used when there is no address data present
-            var previousAddress = body.data.mailItems[0].pickup;
-            previousAddress.zip = previousAddress.postalCode;
+            var previousAddress = shipment.origin && shipment.origin.address;
 
-            scanDetails.forEach((scanDetail) => {
-                // Filter out duplicate events
-                if (scanDetail.timeZone === 'LT') {
-                    return;
+            events.forEach(event => {
+                // If the event doesn't have a location, make one up using the previousAddress
+                if (!event.location) {
+                    event.location = {
+                        address: previousAddress
+                    }
                 }
 
-                const splitLocation = scanDetail.location.split(',');
-
-                const address = {
-                    city: splitLocation[0],
-                    country: scanDetail.country,
-                    state: splitLocation[1],
-                    zip: scanDetail.postalCode
+                // If the event's location contains an address without a comma (UNITED STATES), use the previousAddress instead
+                if (event.location && event.location.address && event.location.address.addressLocality && !event.location.address.addressLocality.includes(',')) {
+                    event.location.address = previousAddress;
                 }
 
-                scanDetail.address = {
-                    city: address.city || previousAddress.city,
-                    country: address.country || previousAddress.country,
-                    state: (address.state || previousAddress.state).trim(),
-                    zip: (address.zip || previousAddress.zip).toString()
-                }
+                // Save the current address as the previousAddress
+                previousAddress = event.location.address;
 
-                // Update previous address
-                previousAddress = {
-                    city: scanDetail.address.city,
-                    country: scanDetail.address.country,
-                    state: scanDetail.address.state,
-                    zip: scanDetail.address.zip
-                }
+                const addressTokens = event.location.address.addressLocality.split(',').map(t => t.trim());
 
-                const timezone = TIMEZONE_MAP[scanDetail.timeZone] || 'America/New_York';
-
-                const event = {
-                    address: scanDetail.address,
-                    date: new Date(moment.tz(`${scanDetail.date}${scanDetail.time}`, 'YYYY-MM-DDHH:mm:ss', timezone)),
-                    description: scanDetail.description
+                const _event = {
+                    address: {
+                        city: addressTokens[0],
+                        country: event.location.address.countryCode,
+                        state: addressTokens[1],
+                        zip: event.location.address.postalCode
+                    },
+                    date: new Date(event.timestamp),
+                    description: event.status
                 };
 
-                if (DELIVERED_TRACKING_DESCRIPTIONS.includes(scanDetail.description)) {
-                    results.deliveredAt = event.date;
+                if (event.description) {
+                    _event.details = event.description;
                 }
 
-                if (SHIPPED_TRACKING_DESCRIPTIONS.includes(scanDetail.description)) {
-                    results.shippedAt = event.date;
+                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                    results.deliveredAt = _event.date;
                 }
 
-                results.events.push(event);
+                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                    results.shippedAt = _event.date;
+                }
+
+                results.events.push(_event);
             });
 
             // Add url to carrier tracking page

@@ -333,12 +333,12 @@ describe('UPS', function() {
                             },
                             {
                                 address: {
-                                    city: 'Hadley',
-                                    state: 'MA',
+                                    city: 'Hampshire',
+                                    state: 'IL',
                                     country: 'US',
                                     zip: undefined
                                 },
-                                date: new Date('2010-10-18T06:04:00.000Z'),
+                                date: new Date('2010-10-18T07:04:00.000Z'),
                                 description: 'ARRIVED AT DESTINATION COUNTRY'
                             },
                             {
