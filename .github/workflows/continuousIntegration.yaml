@@ -1,0 +1,112 @@
+name: build
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.13.0]
+        redis-version: [4]
+    
+    steps:
+    - name: Setup Node ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Checkout from Git
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
+
+    - name: Install ESLint and Mocha
+      run: npm install -g eslint mocha
+
+    - name: Run ESLint
+      run: eslint .
+
+    - name: Run npm install
+      run: npm install
+
+    - name: Setup Redis v${{ matrix.redis-version }}
+      uses: supercharge/redis-github-action@1.1.0
+      with:
+        redis-version: ${{ matrix.redis-version }}
+
+    - name: Run tests
+      run: npm test
+      env:
+        FEDEX_ACCOUNT_NUMBER: ${{ secrets.FEDEX_ACCOUNT_NUMBER }}
+        FEDEX_ENVIRONMENT: ${{ secrets.FEDEX_ENVIRONMENT }}
+        FEDEX_KEY: ${{ secrets.FEDEX_KEY }}
+        FEDEX_METER_NUMBER: ${{ secrets.FEDEX_METER_NUMBER }}
+        FEDEX_PASSWORD: ${{ secrets.FEDEX_PASSWORD }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        PITNEY_BOWES_API_KEY: ${{ secrets.PITNEY_BOWES_API_KEY }}
+        PITNEY_BOWES_API_SECRET: ${{ secrets.PITNEY_BOWES_API_SECRET }}
+        UPS_ACCESS_KEY: ${{ secrets.UPS_ACCESS_KEY }}
+        UPS_PASSWORD: ${{ secrets.UPS_PASSWORD }}
+        UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
+        USPS_USERID: ${{ secrets.USPS_USERID }}
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup Node 12.13.0
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.13.0
+
+    - name: Checkout from Git
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        ssh-key: ${{ secrets.MERCATALYST_DEPLOY_KEY }}
+
+    - name: Run npm install
+      run: npm install
+
+    - name: Setup Redis v${{ matrix.redis-version }}
+      uses: supercharge/redis-github-action@1.1.0
+      with:
+        redis-version: 4
+
+    - name: Run coverage report
+      run: npm run coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        FEDEX_ACCOUNT_NUMBER: ${{ secrets.FEDEX_ACCOUNT_NUMBER }}
+        FEDEX_ENVIRONMENT: ${{ secrets.FEDEX_ENVIRONMENT }}
+        FEDEX_KEY: ${{ secrets.FEDEX_KEY }}
+        FEDEX_METER_NUMBER: ${{ secrets.FEDEX_METER_NUMBER }}
+        FEDEX_PASSWORD: ${{ secrets.FEDEX_PASSWORD }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        PITNEY_BOWES_API_KEY: ${{ secrets.PITNEY_BOWES_API_KEY }}
+        PITNEY_BOWES_API_SECRET: ${{ secrets.PITNEY_BOWES_API_SECRET }}
+        UPS_ACCESS_KEY: ${{ secrets.UPS_ACCESS_KEY }}
+        UPS_PASSWORD: ${{ secrets.UPS_PASSWORD }}
+        UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
+        USPS_USERID: ${{ secrets.USPS_USERID }}
+
+  notify:
+    needs: [test, coverage]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Notify Slack
+      uses: homoluctus/slatify@master
+      with:
+        type: ${{ job.status }}
+        job_name: '${{ github.repository }} - Tests '
+        channel: '#development'
+        url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        commit: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        icon_emoji: ':mediocrebot:'
+        username: 'mediocrebot'
