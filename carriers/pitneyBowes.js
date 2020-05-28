@@ -6,10 +6,10 @@ const PitneyBowesClient = require('pitney-bowes');
 const CITY_BLACKLIST = /DISTRIBUTION CENTER|INTERNATIONAL DISTRIBUTION CENTER|NETWORK DISTRIBUTION CENTER/ig;
 
 // These tracking status codes indicate the shipment was delivered
-const DELIVERED_TRACKING_STATUS_CODES = ['01', '517', 'DEL'];
+const DELIVERED_TRACKING_STATUS_CODES = ['01', '517', 'DEL', 'PTS01'];
 
 // These tracking status codes indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_STATUS_CODES = ['000', '02', '07', '10', '131', '138', '139', '14', '141', '143', '144', '145', '146', '159', '248', '249', '30', '333', '334', '335', '336', '371', '375', '376', '377', '378', '396', '401', '403', '404', '406', '436', '437', '438', '439', '463', '464', '466', '516', '538', '81', '82', '865', '869', '870', '872', '873', '874', '876', '878', 'AD', 'ADU', 'IPS', 'OF', 'OFD', 'PC', 'SS', 'UPROC'];
+const SHIPPED_TRACKING_STATUS_CODES = ['000', '02', '07', '10', '131', '138', '139', '14', '141', '143', '144', '145', '146', '159', '248', '249', '30', '333', '334', '335', '336', '371', '375', '376', '377', '378', '396', '401', '403', '404', '406', '436', '437', '438', '439', '463', '464', '466', '516', '538', '81', '82', '865', '869', '870', '872', '873', '874', '876', '878', 'AD', 'ADU', 'DELU', 'IPS', 'OF', 'OFD', 'PC', 'PTS07', 'PTSAD', 'PTSMA', 'PTSOF', 'SS', 'UPROC'];
 
 const geography = require('../util/geography');
 
