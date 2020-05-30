@@ -12,7 +12,7 @@ module.exports = {
         'brace-style': ['error', '1tbs', { allowSingleLine: true }],
         'comma-dangle': 'error',
         'dot-notation': 'error',
-        'indent': ['error', 4, { "SwitchCase": 1 }],
+        'indent': ['error', 4, { 'SwitchCase': 1 }],
         'linebreak-style': 'error',
         'no-array-constructor': 'error',
         'no-console': 'error',
