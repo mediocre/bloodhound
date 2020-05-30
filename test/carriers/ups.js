@@ -102,7 +102,7 @@ describe('UPS', function() {
         });
     });
 
-    describe('ups.track', function() {
+    describe.skip('ups.track', function() {
         this.timeout(60000);
 
         it('should return an empty result if there is no tracking information available ', function(done) {
