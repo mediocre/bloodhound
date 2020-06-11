@@ -71,32 +71,38 @@ describe('geography.parseLocation', function() {
         });
     });
 
-    it.skip('New York NY', function(done) {
+    it('New York NY', function(done) {
         geography.parseLocation('New York NY', function(err, actual) {
             assert.ifError(err);
 
             const expected = {
-                city: 'Manhattan Community Board 1',
+                city: 'New York',
                 state: 'NY',
                 timezone: 'America/New_York'
             };
 
-            assert.deepStrictEqual(actual, expected);
+            assert.strictEqual(actual.city, 'New York');
+            assert.strictEqual(actual.state, 'NY');
+            assert.strictEqual(actual.timezone, 'America/New_York');
+
             done();
         });
     });
 
-    it.skip('O FALLON, MO', function(done) {
+    it('O FALLON, MO', function(done) {
         geography.parseLocation('O FALLON, MO', function(err, actual) {
             assert.ifError(err);
 
-            assert.strictEqual(actual, undefined);
+            assert.strictEqual(actual.city, 'O\'Fallon');
+            assert.strictEqual(actual.state, 'MO');
+            assert.strictEqual(actual.timezone, 'America/Chicago');
+
             done();
         });
     });
 });
 
-describe.skip('petty-cache', function() {
+describe('petty-cache', function() {
     this.timeout(15000);
 
     it('should store results in Redis (via petty-cache)', function(done) {
