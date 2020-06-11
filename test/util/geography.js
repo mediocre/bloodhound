@@ -75,12 +75,6 @@ describe('geography.parseLocation', function() {
         geography.parseLocation('New York NY', function(err, actual) {
             assert.ifError(err);
 
-            const expected = {
-                city: 'New York',
-                state: 'NY',
-                timezone: 'America/New_York'
-            };
-
             assert.strictEqual(actual.city, 'New York');
             assert.strictEqual(actual.state, 'NY');
             assert.strictEqual(actual.timezone, 'America/New_York');
