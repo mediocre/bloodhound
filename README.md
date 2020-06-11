@@ -1,6 +1,6 @@
 # Bloodhound
 
-[![Build Status](https://github.com/mediocre/bloodhound/workflows/build/badge.svg](https://github.com/mediocre/bloodhound/actions?query=workflow%3Abuild)
+[![Build Status](https://github.com/mediocre/bloodhound/workflows/build/badge.svg)](https://github.com/mediocre/bloodhound/actions?query=workflow%3Abuild)
 [![Coverage Status](https://coveralls.io/repos/github/mediocre/bloodhound/badge.svg)](https://coveralls.io/github/mediocre/bloodhound)
 
 ![Elvis Presley & Bloodhound - Photo - 1964](https://res.cloudinary.com/mediocre/image/upload/v1562632498/rpkudq0xpyysdty9nkzk.jpg)
@@ -11,7 +11,7 @@ This module was inspired by the excellent `shipit` module. We built Bloodhound t
 
 ## Features
 
-**Common format** 
+**Common format**
 
 Bloodhound interfaces with several carrier APIs and returns results in a single, unified format.
 Each carrier activity/movement/scan is represented as an event with a description, geographic location (city/state), and timestamp.
@@ -147,8 +147,8 @@ bloodhound.track('tracking number', 'USPS', function(err, data) {
     "events": [
         {
             "address": {
-                "city": "CARROLLTON", 
-                "state": "TX", 
+                "city": "CARROLLTON",
+                "state": "TX",
                 "zip": "75010"
             },
             "date": "2019-06-30T18:03:00.000Z",
@@ -156,8 +156,8 @@ bloodhound.track('tracking number', 'USPS', function(err, data) {
         },
         {
             "address": {
-                "city": "CARROLLTON", 
-                "state": "TX", 
+                "city": "CARROLLTON",
+                "state": "TX",
                 "zip": "75010"
             },
             "date": "2019-05-13T17:32:00.000Z",
