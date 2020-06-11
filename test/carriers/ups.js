@@ -2,6 +2,16 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
+function areEventsEqual(a, b) {
+    return a.address.city === b.address.city
+        && a.address.country === b.address.country
+        && a.address.state === b.address.state
+        && a.address.zip === b.address.zip
+        && a.carrier === b.carrier
+        && a.deliveredAt === b.deliveredAt
+        && a.shippedAt === b.shippedAt;
+}
+
 describe('UPS', function() {
     this.timeout(10000);
 
@@ -14,7 +24,7 @@ describe('UPS', function() {
         }
     });
 
-    describe.skip('Error Handling', function() {
+    describe('Error Handling', function() {
         describe('Invalid UPS credentials', function() {
             it('should return an error for invalid username', function(done) {
                 const bloodhound = new Bloodhound({
@@ -27,6 +37,7 @@ describe('UPS', function() {
 
                 bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
                     assert(err);
+
                     done();
                 });
             });
@@ -34,6 +45,7 @@ describe('UPS', function() {
             it('should return an error for a tracking number that contains invalid characters', function(done) {
                 bloodhound.track('1Z9756W9030441!85@', 'ups', function(err) {
                     assert(err);
+
                     done();
                 })
             })
@@ -51,6 +63,7 @@ describe('UPS', function() {
 
                 bloodhound.track('1Z9756W90304415852', 'ups', function(err) {
                     assert(err);
+
                     done();
                 })
             });
@@ -102,18 +115,19 @@ describe('UPS', function() {
         });
     });
 
-    describe.skip('ups.track', function() {
+    describe('ups.track', function() {
         this.timeout(60000);
 
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
-                const expected = {
-                    carrier: 'UPS',
-                    events: []
-                }
-
                 assert.ifError(err);
-                assert.deepStrictEqual(actual, expected);
+
+                assert.strictEqual(actual.carrier, 'UPS');
+                assert.strictEqual(actual.deliveredAt, undefined);
+                assert.strictEqual(actual.shippedAt, undefined);
+                assert.strictEqual(actual.url, undefined);
+                assert.strictEqual(actual.events.length, 0);
+
                 done();
             });
         });
@@ -125,120 +139,41 @@ describe('UPS', function() {
             });
         });
 
-        it.skip('should return a track response', function(done) {
-            bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
+        it('should return a track response', function(done) {
+            // bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
+            bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {
                 assert.ifError(err);
 
-                const expected = {
-                    carrier: 'UPS',
-                    events: [
-                        {
-                            address: {
-                                city: 'Glendale Heights',
-                                state: 'IL',
-                                country: 'US',
-                                zip: '60139'
-                            },
-                            date: new Date('2019-06-28T16:28:58.000Z'),
-                            description: 'Delivered'
+                const expectedEvents = [
+                    {
+                        address: {
+                            city: 'Atlanta',
+                            country: 'US',
+                            state: 'GA',
+                            zip: '30304'
                         },
-                        {
-                            address: {
-                                city: 'Addison',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-28T14:00:49.000Z'),
-                            description: 'Out For Delivery Today'
+                        date: '2010-04-29T16:00:00.000Z',
+                        description: 'DELIVERED'
+                    },
+                    {
+                        address: {
+                            city: 'Atlanta',
+                            country: 'US',
+                            state: 'GA',
+                            zip: '30304'
                         },
-                        {
-                            address: {
-                                city: 'Addison',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-28T12:19:33.000Z'),
-                            description: 'Loaded on Delivery Vehicle'
-                        },
-                        {
-                            address: {
-                                city: 'Addison',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-28T10:11:58.000Z'),
-                            description: 'Destination Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Addison',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-28T05:58:00.000Z'),
-                            description: 'Arrival Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Hodgkins',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-28T05:02:00.000Z'),
-                            description: 'Departure Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Hodgkins',
-                                state: 'IL',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-27T13:33:00.000Z'),
-                            description: 'Arrival Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Cerritos',
-                                state: 'CA',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-25T05:50:00.000Z'),
-                            description: 'Departure Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Cerritos',
-                                state: 'CA',
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-25T02:48:00.000Z'),
-                            description: 'Origin Scan'
-                        },
-                        {
-                            address: {
-                                city: 'Huez',
-                                state: undefined,
-                                country: 'US',
-                                zip: undefined
-                            },
-                            date: new Date('2019-06-24T15:37:18.000Z'),
-                            description: 'Order Processed: Ready for UPS'
-                        }
-                    ],
-                    deliveredAt: new Date('2019-06-28T16:28:58.000Z'),
-                    shippedAt: new Date('2019-06-25T02:48:00.000Z'),
-                    url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z9756W90308462106'
-                }
+                        date: '2010-04-29T16:00:00.000Z',
+                        description: 'DELIVERED'
+                    }
+                ];
 
-                assert.deepStrictEqual(actual, expected);
+                assert.strictEqual(actual.carrier, 'UPS');
+                assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
+                assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
+                assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640');
+                assert.strictEqual(actual.events.length, expectedEvents.length);
+                expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                 done();
             });
         });
@@ -248,31 +183,31 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E0205271688', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: '30340'
-                                },
-                                date: new Date('1999-06-10T16:00:00.000Z'),
-                                description: 'DELIVERED'
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: '30340'
                             },
-                            {
-                                address: {},
-                                date: new Date('1999-06-08T16:00:00.000Z'),
-                                description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
-                            }
-                        ],
-                        deliveredAt: new Date('1999-06-10T16:00:00.000Z'),
-                        shippedAt: new Date('1999-06-10T16:00:00.000Z'),
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0205271688'
-                    }
+                            date: new Date('1999-06-10T16:00:00.000Z'),
+                            description: 'DELIVERED'
+                        },
+                        {
+                            address: {},
+                            date: new Date('1999-06-08T16:00:00.000Z'),
+                            description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0205271688');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -283,109 +218,111 @@ describe('UPS', function() {
                 bloodhound.track('5548789114', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {},
-                                date: new Date('2010-11-24T12:16:00.000Z'),
-                                description: 'Bad weather'
+                    const expectedEvents = [
+                        {
+                            address: {},
+                            date: new Date('2010-11-24T12:16:00.000Z'),
+                            description: 'Bad weather'
+                        },
+                        {
+                            address: {
+                                city: 'El Paso',
+                                state: 'TX',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'El Paso',
-                                    state: 'TX',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-18T16:00:00.000Z'),
-                                description: 'CONFIRMED ARRIVAL'
+                            date: new Date('2010-10-18T16:00:00.000Z'),
+                            description: 'CONFIRMED ARRIVAL'
+                        },
+                        {
+                            address: {
+                                city: 'El Paso',
+                                state: 'TX',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'El Paso',
-                                    state: 'TX',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-18T15:16:00.000Z'),
-                                description: 'DOCUMENTS TURNED OVER TO CLIENTS BROKER OR CONSIGNEE'
+                            date: new Date('2010-10-18T15:16:00.000Z'),
+                            description: 'DOCUMENTS TURNED OVER TO CLIENTS BROKER OR CONSIGNEE'
+                        },
+                        {
+                            address: {
+                                city: 'El Paso',
+                                state: 'TX',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'El Paso',
-                                    state: 'TX',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-18T14:00:00.000Z'),
-                                description: 'ENTRY FILED'
+                            date: new Date('2010-10-18T14:00:00.000Z'),
+                            description: 'ENTRY FILED'
+                        },
+                        {
+                            address: {
+                                city: 'El Paso',
+                                state: 'TX',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'El Paso',
-                                    state: 'TX',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-18T08:42:49.000Z'),
-                                description: 'ON-HAND AT DESTINATION'
+                            date: new Date('2010-10-18T08:42:49.000Z'),
+                            description: 'ON-HAND AT DESTINATION'
+                        },
+                        {
+                            address: {
+                                city: 'Hampshire',
+                                state: 'IL',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Hampshire',
-                                    state: 'IL',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-18T07:04:00.000Z'),
-                                description: 'ARRIVED AT DESTINATION COUNTRY'
+                            date: new Date('2010-10-18T07:04:00.000Z'),
+                            description: 'ARRIVED AT DESTINATION COUNTRY'
+                        },
+                        {
+                            address: {
+                                city: 'Köln',
+                                state: 'NW',
+                                country: 'DE',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Köln',
-                                    state: 'NW',
-                                    country: 'DE',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-15T13:34:00.000Z'),
-                                description: 'CONFIRMED DEPARTURE'
+                            date: new Date('2010-10-15T13:34:00.000Z'),
+                            description: 'CONFIRMED DEPARTURE'
+                        },
+                        {
+                            address: {
+                                city: 'Amsterdam',
+                                state: undefined,
+                                country: 'NL',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Amsterdam',
-                                    state: undefined,
-                                    country: 'NL',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-15T13:31:32.000Z'),
-                                description: 'DOCS RECEIVED FROM SHIPPER'
+                            date: new Date('2010-10-15T13:31:32.000Z'),
+                            description: 'DOCS RECEIVED FROM SHIPPER'
+                        },
+                        {
+                            address: {
+                                city: 'Amsterdam',
+                                state: undefined,
+                                country: 'NL',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Amsterdam',
-                                    state: undefined,
-                                    country: 'NL',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-15T13:31:32.000Z'),
-                                description: 'DATE AVAILABLE TO SHIP'
+                            date: new Date('2010-10-15T13:31:32.000Z'),
+                            description: 'DATE AVAILABLE TO SHIP'
+                        },
+                        {
+                            address: {
+                                city: 'Amsterdam',
+                                state: undefined,
+                                country: 'NL',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Amsterdam',
-                                    state: undefined,
-                                    country: 'NL',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-10-15T12:00:00.000Z'),
-                                description: 'RECEIVED INTO UPS POSSESSION'
-                            }
-                        ],
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=5548789114'
-                    };
+                            date: new Date('2010-10-15T12:00:00.000Z'),
+                            description: 'RECEIVED INTO UPS POSSESSION'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt, undefined);
+                    assert.strictEqual(actual.shippedAt, undefined);
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=5548789114');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 });
             });
@@ -396,34 +333,36 @@ describe('UPS', function() {
                 bloodhound.track('990728071', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'Dothan',
-                                    state: 'AL',
-                                    country: undefined,
-                                    zip: undefined
-                                },
-                                date: new Date('2005-10-06T17:56:00.000Z'),
-                                description: 'SHIPMENT HAS BEEN DELIVERED TO THE CONSIGNEE.'
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Dothan',
+                                state: 'AL',
+                                country: undefined,
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Columbia',
-                                    state: 'SC',
-                                    country: undefined,
-                                    zip: undefined
-                                },
-                                date: new Date('2005-10-05T22:00:00.000Z'),
-                                description: 'SHIPMENT HAS BEEN PICKED-UP.'
-                            }
-                        ],
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=990728071'
-                    };
+                            date: new Date('2005-10-06T17:56:00.000Z'),
+                            description: 'SHIPMENT HAS BEEN DELIVERED TO THE CONSIGNEE.'
+                        },
+                        {
+                            address: {
+                                city: 'Columbia',
+                                state: 'SC',
+                                country: undefined,
+                                zip: undefined
+                            },
+                            date: new Date('2005-10-05T22:00:00.000Z'),
+                            description: 'SHIPMENT HAS BEEN PICKED-UP.'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt, undefined);
+                    assert.strictEqual(actual.shippedAt, undefined);
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=990728071');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 });
             });
@@ -433,36 +372,36 @@ describe('UPS', function() {
             it('Delivered', function(done) {
                 bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {
                     assert.ifError(err);
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: '30304'
-                                },
-                                date: new Date('2010-04-29T16:00:00.000Z'),
-                                description: 'DELIVERED'
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: '30304'
                             },
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: '30304'
-                                },
-                                date: new Date('2010-04-29T16:00:00.000Z'),
-                                description: 'DELIVERED'
-                            }
-                        ],
-                        deliveredAt: new Date('2010-04-29T16:00:00.000Z'),
-                        shippedAt: new Date('2010-04-29T16:00:00.000Z'),
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640'
-                    }
+                            date: new Date('2010-04-29T16:00:00.000Z'),
+                            description: 'DELIVERED'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: '30304'
+                            },
+                            date: new Date('2010-04-29T16:00:00.000Z'),
+                            description: 'DELIVERED'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -473,25 +412,27 @@ describe('UPS', function() {
             it('Origin Scan', function(done) {
                 bloodhound.track('1Z12345E1305277940', 'ups', function(err, actual) {
                     assert.ifError(err);
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'GRAND JUNCTION AIR S',
-                                    state: 'CO',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-05-05T05:00:00.000Z'),
-                                description: 'ORIGIN SCAN'
-                            }
-                        ],
-                        shippedAt: new Date('2010-05-05T05:00:00.000Z'),
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E1305277940'
-                    }
 
-                    assert.deepStrictEqual(actual, expected);
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Grand Junction',
+                                state: 'CO',
+                                country: 'US',
+                                zip: undefined
+                            },
+                            date: new Date('2010-05-05T07:00:00.000Z'),
+                            description: 'ORIGIN SCAN'
+                        }
+                    ];
+
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt, undefined);
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-05-05T07:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E1305277940');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -499,75 +440,77 @@ describe('UPS', function() {
             it('2nd Delivery Attempt', function(done) {
                 bloodhound.track('1Z12345E6205277936', 'ups', function(err, actual) {
                     assert.ifError(err);
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'Bonn',
-                                    state: undefined,
-                                    country: 'DE',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-08-30T08:39:00.000Z'),
-                                description: 'UPS INTERNAL ACTIVITY CODE'
+
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Bonn',
+                                state: undefined,
+                                country: 'DE',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Bonn',
-                                    state: undefined,
-                                    country: 'DE',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-08-30T08:32:00.000Z'),
-                                description: 'ADVERSE WEATHER CONDITIONS CAUSED THIS DELAY'
+                            date: new Date('2010-08-30T08:39:00.000Z'),
+                            description: 'UPS INTERNAL ACTIVITY CODE'
+                        },
+                        {
+                            address: {
+                                city: 'Bonn',
+                                state: undefined,
+                                country: 'DE',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-09-10T22:03:00.000Z'),
-                                description: 'THE RECEIVER\'S LOCATION WAS CLOSED ON THE 2ND DELIVERY ATTEMPT. A 3RD DELIVERY ATTEMPT WILL BE MADE'
+                            date: new Date('2010-08-30T08:32:00.000Z'),
+                            description: 'ADVERSE WEATHER CONDITIONS CAUSED THIS DELAY'
+                        },
+                        {
+                            address: {
+                                city: 'ANYTOWN',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: '30340'
-                                },
-                                date: new Date('2010-09-12T15:57:00.000Z'),
-                                description: 'DELIVERED'
+                            date: new Date('2010-09-10T22:03:00.000Z'),
+                            description: 'THE RECEIVER\'S LOCATION WAS CLOSED ON THE 2ND DELIVERY ATTEMPT. A 3RD DELIVERY ATTEMPT WILL BE MADE'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: '30340'
                             },
-                            {
-                                address: {
-                                    city: 'WEST CHESTER-MALVERN',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-04-04T18:40:00.000Z'),
-                                description: 'PICKUP SCAN'
+                            date: new Date('2010-09-12T15:57:00.000Z'),
+                            description: 'DELIVERED'
+                        },
+                        {
+                            address: {
+                                city: 'Malvern',
+                                state: 'GA',
+                                country: 'US',
+                                zip: 30340
                             },
-                            {
-                                address: {
-                                    city: 'Bonn',
-                                    state: undefined,
-                                    country: 'DE',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-08-30T11:13:00.000Z'),
-                                description: 'UPS INTERNAL ACTIVITY CODE'
-                            }
-                        ],
-                        deliveredAt: new Date('2010-09-12T15:57:00.000Z'),
-                        shippedAt: new Date('2010-09-12T15:57:00.000Z'),
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6205277936'
-                    }
-                    assert.deepStrictEqual(actual, expected);
+                            date: new Date('2010-04-04T18:40:00.000Z'),
+                            description: 'PICKUP SCAN'
+                        },
+                        {
+                            address: {
+                                city: 'Bonn',
+                                state: undefined,
+                                country: 'DE',
+                                zip: undefined
+                            },
+                            date: new Date('2010-08-30T11:13:00.000Z'),
+                            description: 'UPS INTERNAL ACTIVITY CODE'
+                        }
+                    ];
+
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-09-12T15:57:00.000Z').valueOf());
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-09-12T15:57:00.000Z').valueOf());
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6205277936');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -579,64 +522,66 @@ describe('UPS', function() {
                 bloodhound.track('3251026119', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'Atlanta',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2006-05-26T00:06:05.000Z'),
-                                description: 'DOCS RECEIVED FROM SHIPPER'
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Atlanta',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2006-05-26T00:06:05.000Z'),
-                                description: 'DATE AVAILABLE TO SHIP'
+                            date: new Date('2006-05-26T00:06:05.000Z'),
+                            description: 'DOCS RECEIVED FROM SHIPPER'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Atlanta',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2006-05-26T00:06:05.000Z'),
-                                description: 'ON HAND AT ORIGIN'
+                            date: new Date('2006-05-26T00:06:05.000Z'),
+                            description: 'DATE AVAILABLE TO SHIP'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Atlanta',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2006-05-26T00:06:05.000Z'),
-                                description: 'CONFIRMED DEPARTURE'
+                            date: new Date('2006-05-26T00:06:05.000Z'),
+                            description: 'ON HAND AT ORIGIN'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
                             },
-                            {
-                                address: {
-                                    city: 'Atlanta',
-                                    state: 'GA',
-                                    country: 'US',
-                                    zip: undefined
-                                },
-                                date: new Date('2006-05-26T00:06:05.000Z'),
-                                description: 'RECEIVED INTO UPS-SCS POSSESSION'
-                            }
-                        ],
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=3251026119'
-                    };
+                            date: new Date('2006-05-26T00:06:05.000Z'),
+                            description: 'CONFIRMED DEPARTURE'
+                        },
+                        {
+                            address: {
+                                city: 'Atlanta',
+                                state: 'GA',
+                                country: 'US',
+                                zip: undefined
+                            },
+                            date: new Date('2006-05-26T00:06:05.000Z'),
+                            description: 'RECEIVED INTO UPS-SCS POSSESSION'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt, undefined);
+                    assert.strictEqual(actual.shippedAt, undefined);
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=3251026119');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -647,26 +592,26 @@ describe('UPS', function() {
                 bloodhound.track('1Z12345E6605272234', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'ANYTOWN',
-                                    state: undefined,
-                                    country: 'IT',
-                                    zip: undefined
-                                },
-                                date: new Date('2010-05-18T14:00:00.000Z'),
-                                description: 'DELIVERED'
-                            }
-                        ],
-                        deliveredAt: new Date('2010-05-18T14:00:00.000Z'),
-                        shippedAt: new Date('2010-05-18T14:00:00.000Z'),
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6605272234'
-                    }
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'ANYTOWN',
+                                state: undefined,
+                                country: 'IT',
+                                zip: undefined
+                            },
+                            date: new Date('2010-05-18T14:00:00.000Z'),
+                            description: 'DELIVERED'
+                        }
+                    ];
 
-                    assert.deepStrictEqual(actual, expected);
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-05-18T14:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-05-18T14:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6605272234');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 })
             });
@@ -677,24 +622,27 @@ describe('UPS', function() {
                 bloodhound.track('1Z648616E192760718', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {
-                        carrier: 'UPS',
-                        events: [
-                            {
-                                address: {
-                                    city: 'Sarzay',
-                                    country: 'FR',
-                                    state: undefined,
-                                    zip: undefined
-                                },
-                                date: new Date('2012-10-04T11:58:04.000Z'),
-                                description: 'Order Processed: Ready for UPS'
-                            }
-                        ],
-                        url: 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z648616E192760718'
-                    };
 
-                    assert.deepStrictEqual(actual, expected);
+                    const expectedEvents = [
+                        {
+                            address: {
+                                city: 'Joplin',
+                                country: 'FR',
+                                state: 'MO',
+                                zip: undefined
+                            },
+                            date: new Date('2012-10-04T18:58:04.000Z'),
+                            description: 'Order Processed: Ready for UPS'
+                        }
+                    ];
+
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.deliveredAt, undefined);
+                    assert.strictEqual(actual.shippedAt, undefined);
+                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z648616E192760718');
+                    assert.strictEqual(actual.events.length, expectedEvents.length);
+                    expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
+
                     done();
                 });
             })
