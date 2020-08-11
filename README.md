@@ -49,7 +49,7 @@ const bloodhound = new Bloodhound({
     }
 });
 
-bloodhound.track('tracking number', 'USPS', function(err, data) {
+bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
     console.log(data);
 });
 ```
@@ -131,12 +131,12 @@ console.log(carrier);
 
 ```
 
-### bloodhound.track(trackingNumber, [carrier,] callback)
+### bloodhound.track(trackingNumber, [options,] callback)
 
 Retrieves tracking data for the specified tracking number.
 
 ```javascript
-bloodhound.track('tracking number', 'USPS', function(err, data) {
+bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
     console.log(data);
 });
 ```

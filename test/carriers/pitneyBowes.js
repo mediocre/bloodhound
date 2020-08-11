@@ -30,7 +30,7 @@ describe('Pitney Bowes', function() {
             }
         });
 
-        bloodhound.track('0027190252994200106903109595630', 'Pitney Bowes', function(err) {
+        bloodhound.track('4203300992612927005269000093974783', { carrier: 'Pitney Bowes', minDate: new Date('2020-08-06T14:10:56.000Z') }, function(err) {
             assert.ifError(err);
             done();
         });

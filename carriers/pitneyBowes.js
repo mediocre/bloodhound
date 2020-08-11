@@ -16,7 +16,17 @@ const geography = require('../util/geography');
 function PitneyBowes(options) {
     const pitneyBowesClient = new PitneyBowesClient(options);
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function(trackingNumber, options, callback) {
+        // Options are optional
+        if (typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
+
+        if (!options.minDate) {
+            options.minDate = new Date(0);
+        }
+
         // Pitney Bowes Marketing Mail Flats (length 31): 0004290252994200071698133931119
         const isImb = trackingNumber.length === 31;
 
@@ -100,6 +110,11 @@ function PitneyBowes(options) {
                         date: moment.tz(`${scanDetail.eventDate} ${scanDetail.eventTime}`, 'YYYY-MM-DD HH:mm:ss', timezone).toDate(),
                         description: scanDetail.scanDescription
                     };
+
+                    // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                    if (event.date < options.minDate) {
+                        return;
+                    }
 
                     if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
                         results.deliveredAt = new Date(event.date);
