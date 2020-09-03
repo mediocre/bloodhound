@@ -16,15 +16,15 @@ const geography = require('../util/geography');
 function PitneyBowes(options) {
     const pitneyBowesClient = new PitneyBowesClient(options);
 
-    this.track = function(trackingNumber, options, callback) {
+    this.track = function(trackingNumber, trackingOptions, callback) {
         // Options are optional
-        if (typeof options === 'function') {
-            callback = options;
-            options = {};
+        if (typeof trackingOptions === 'function') {
+            callback = trackingOptions;
+            trackingOptions = {};
         }
 
-        if (!options.minDate) {
-            options.minDate = new Date(0);
+        if (!trackingOptions.minDate) {
+            trackingOptions.minDate = new Date(0);
         }
 
         // Pitney Bowes Marketing Mail Flats (length 31): 0004290252994200071698133931119
@@ -80,7 +80,11 @@ function PitneyBowes(options) {
 
             // Lookup each location
             async.mapLimit(locations, 10, function(location, callback) {
-                geography.parseLocation(location, options, function(err, address) {
+                if (options.pettyCache) {
+                    trackingOptions.pettyCache = options.pettyCache;
+                }
+
+                geography.parseLocation(location, trackingOptions, function(err, address) {
                     if (err || !address) {
                         return callback(err, address);
                     }
@@ -112,7 +116,7 @@ function PitneyBowes(options) {
                     };
 
                     // Ensure event is after minDate (used to prevent data from reused tracking numbers)
-                    if (event.date < options.minDate) {
+                    if (event.date < trackingOptions.minDate) {
                         return;
                     }
 
