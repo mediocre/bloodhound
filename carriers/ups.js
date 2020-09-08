@@ -191,8 +191,8 @@ function UPS(options) {
                     results.events.push(event);
                 });
 
-                // Add url to carrier tracking page
-                results.url = `http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=${encodeURIComponent(trackingNumber)}`;
+                // Add URL to carrier tracking page
+                results.url = `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`;
 
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;
