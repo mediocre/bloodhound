@@ -139,6 +139,21 @@ describe('UPS', function() {
             });
         });
 
+        // it.only('should return tracking information for Mail Innovations with no errors', function(done) {
+        //     bloodhound.track('9102084383041101186729', 'ups', function(err) {
+        //         assert.ifError(err);
+        //         done();
+        //     });
+        // });
+        it.only('should return tracking information for Mail Innovations with no errors', function(done) {
+            bloodhound.track('92748902711486543475062736', 'ups', function(err, actual) {
+                assert.ifError(err);
+
+                console.dir(actual, { depth: 99 });
+                done();
+            });
+        });
+
         it('should return a track response', function(done) {
             // bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
             bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {

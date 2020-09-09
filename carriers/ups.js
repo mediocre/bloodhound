@@ -184,7 +184,7 @@ function UPS(options) {
                     const event = {
                         address: activity.address,
                         date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
-                        description: activity.Description || (activity.Status && activity.Status.Description)
+                        description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
 
                     if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
