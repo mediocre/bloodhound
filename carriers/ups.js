@@ -42,7 +42,7 @@ function getActivities(package) {
 }
 
 function UPS(options) {
-    const usps = new USPS(options && options.usps);
+    const upsMailInnovations = new upsMailInnovations();
 
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -62,32 +62,47 @@ function UPS(options) {
     };
 
     this.track = function(trackingNumber, callback) {
-        const req = {
-            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-            forever: true,
-            gzip: true,
-            json: {
-                Security: {
-                    UPSServiceAccessToken: {
-                        AccessLicenseNumber: options.accessKey
+        var req;
+
+        if (upsMailInnovations.isTrackingNumberValid(trackingNumber)) {
+            const body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
+            req = {
+                baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
+                body,
+                forever: true,
+                gzip: true,
+                method: 'POST',
+                timeout: 5000,
+                url: '/ups.app/xml/Track'
+            };
+        } else {
+            req = {
+                baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
+                forever: true,
+                gzip: true,
+                json: {
+                    Security: {
+                        UPSServiceAccessToken: {
+                            AccessLicenseNumber: options.accessKey
+                        },
+                        UsernameToken: {
+                            Username: options.username,
+                            Password: options.password
+                        }
                     },
-                    UsernameToken: {
-                        Username: options.username,
-                        Password: options.password
+                    TrackRequest: {
+                        InquiryNumber: trackingNumber,
+                        Request: {
+                            RequestAction: 'Track',
+                            RequestOption: 'activity'
+                        }
                     }
                 },
-                TrackRequest: {
-                    InquiryNumber: trackingNumber,
-                    Request: {
-                        RequestAction: 'Track',
-                        RequestOption: 'activity'
-                    }
-                }
-            },
-            method: 'POST',
-            timeout: 5000,
-            url: '/rest/Track'
-        };
+                method: 'POST',
+                timeout: 5000,
+                url: '/rest/Track'
+            };
+        }
 
         async.retry(function(callback) {
             request(req, function(err, res, body) {
