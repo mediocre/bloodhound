@@ -1,6 +1,7 @@
 const async = require('async');
 const moment = require('moment-timezone');
 const request = require('request');
+const xml2json = require('fast-xml-parser');
 
 const geography = require('../util/geography');
 const USPS = require('./usps');
@@ -42,7 +43,7 @@ function getActivities(package) {
 }
 
 function UPS(options) {
-    const upsMailInnovations = new upsMailInnovations();
+    const usps = new USPS(options && options.usps);
 
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -64,7 +65,7 @@ function UPS(options) {
     this.track = function(trackingNumber, callback) {
         var req;
 
-        if (upsMailInnovations.isTrackingNumberValid(trackingNumber)) {
+        if (usps.isTrackingNumberValid(trackingNumber)) {
             const body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
             req = {
                 baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
@@ -110,6 +111,13 @@ function UPS(options) {
                     return callback(err);
                 }
 
+                // convert XML from the mail innovations tracking endpoint
+                if (body.startsWith('<?xml version="1.0"?>')) {
+                    body = xml2json.parse(body, { parseNodeValue: false });
+                }
+
+                console.dir(body, { depth: 10 });
+
                 if (body && !body.TrackResponse) {
                     if (body.Fault && body.Fault.detail && body.Fault.detail.Errors && body.Fault.detail.Errors.ErrorDetail && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
                         return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
@@ -125,11 +133,6 @@ function UPS(options) {
             };
 
             if (err) {
-                // Try USPS for UPS Mail Innovations
-                if (usps.isTrackingNumberValid(trackingNumber)) {
-                    return usps.track(trackingNumber, callback);
-                }
-
                 if (err.message === 'No tracking information available') {
                     return callback(null, results);
                 }
