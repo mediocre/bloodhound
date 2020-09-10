@@ -59,11 +59,6 @@ function UPS(options) {
             return true;
         }
 
-        // check for valid usps numbers for Mail Innovations
-        if (usps.isTrackingNumberValid(trackingNumber)) {
-            return true;
-        }
-
         return false;
     };
 
