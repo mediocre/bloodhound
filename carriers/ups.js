@@ -1,6 +1,7 @@
 const async = require('async');
 const moment = require('moment-timezone');
 const request = require('request');
+const xml2json = require('fast-xml-parser');
 
 const geography = require('../util/geography');
 const USPS = require('./usps');
@@ -89,10 +90,23 @@ function UPS(options) {
             url: '/rest/Track'
         };
 
+        // The REST API doesn't support UPS Mail Innovations. Use the XML API instead.
+        if (usps.isTrackingNumberValid(trackingNumber)) {
+            delete req.json;
+
+            req.body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
+            req.url = '/ups.app/xml/Track';
+        }
+
         async.retry(function(callback) {
             request(req, function(err, res, body) {
                 if (err) {
                     return callback(err);
+                }
+
+                // Convert XML to JSON if necessary
+                if (body && body.startsWith && body.startsWith('<?xml version="1.0"?>')) {
+                    body = xml2json.parse(body, { parseNodeValue: false });
                 }
 
                 if (body && !body.TrackResponse) {
@@ -110,7 +124,6 @@ function UPS(options) {
             };
 
             if (err) {
-                // Try USPS for UPS Mail Innovations
                 if (usps.isTrackingNumberValid(trackingNumber)) {
                     return usps.track(trackingNumber, callback);
                 }
@@ -166,7 +179,7 @@ function UPS(options) {
                     const event = {
                         address: activity.address,
                         date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
-                        description: activity.Description || (activity.Status && activity.Status.Description)
+                        description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
 
                     if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {

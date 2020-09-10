@@ -170,11 +170,37 @@ describe('UPS', function() {
                 assert.strictEqual(actual.carrier, 'UPS');
                 assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
                 assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
-                assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640');
+                assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E0305271640');
                 assert.strictEqual(actual.events.length, expectedEvents.length);
                 expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                 done();
+            });
+        });
+
+        describe('Mail Innovations', function() {
+            it('should return a tracking response', function(done) {
+                bloodhound.track('9102084383041101186729', 'ups', function(err, actual) {
+                    assert.ifError(err);
+
+                    // their single UPS MI test tracking number has no activity (annoying, but intentional on their part)
+                    const expectedEvent = {
+                        address: {
+                            city: undefined,
+                            state: undefined,
+                            country: undefined,
+                            zip: undefined
+                        },
+                        date: new Date('2006-10-27T18:52:00.000Z'),
+                        description: ''
+                    };
+
+                    assert.strictEqual(actual.carrier, 'UPS');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=9102084383041101186729');
+                    assert(areEventsEqual(actual.events[0], expectedEvent));
+
+                    done();
+                });
             });
         });
 
@@ -204,7 +230,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
                     assert.strictEqual(actual.shippedAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0205271688');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E0205271688');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -319,7 +345,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt, undefined);
                     assert.strictEqual(actual.shippedAt, undefined);
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=5548789114');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=5548789114');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -359,7 +385,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt, undefined);
                     assert.strictEqual(actual.shippedAt, undefined);
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=990728071');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=990728071');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -398,7 +424,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
                     assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-04-29T16:00:00.000Z').valueOf());
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E0305271640');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E0305271640');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -429,7 +455,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt, undefined);
                     assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-05-05T07:00:00.000Z').valueOf());
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E1305277940');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E1305277940');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -507,7 +533,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-09-12T15:57:00.000Z').valueOf());
                     assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-09-12T15:57:00.000Z').valueOf());
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6205277936');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E6205277936');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -578,7 +604,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt, undefined);
                     assert.strictEqual(actual.shippedAt, undefined);
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=3251026119');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=3251026119');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -608,7 +634,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2010-05-18T14:00:00.000Z').valueOf());
                     assert.strictEqual(actual.shippedAt.valueOf(), new Date('2010-05-18T14:00:00.000Z').valueOf());
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z12345E6605272234');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E6605272234');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
@@ -621,7 +647,6 @@ describe('UPS', function() {
             it('should return a track response with a status update of Order Processed: Ready for UPS', function(done) {
                 bloodhound.track('1Z648616E192760718', 'ups', function(err, actual) {
                     assert.ifError(err);
-
 
                     const expectedEvents = [
                         {
@@ -639,7 +664,7 @@ describe('UPS', function() {
                     assert.strictEqual(actual.carrier, 'UPS');
                     assert.strictEqual(actual.deliveredAt, undefined);
                     assert.strictEqual(actual.shippedAt, undefined);
-                    assert.strictEqual(actual.url, 'http://wwwapps.ups.com/WebTracking/track?track=yes&trackNums=1Z648616E192760718');
+                    assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z648616E192760718');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
