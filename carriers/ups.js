@@ -59,6 +59,11 @@ function UPS(options) {
             return true;
         }
 
+        // check for valid usps numbers for Mail Innovations
+        if (usps.isTrackingNumberValid(trackingNumber)) {
+            return true;
+        }
+
         return false;
     };
 
@@ -112,11 +117,9 @@ function UPS(options) {
                 }
 
                 // convert XML from the mail innovations tracking endpoint
-                if (body.startsWith('<?xml version="1.0"?>')) {
+                if (body && body.startsWith && body.startsWith('<?xml version="1.0"?>')) {
                     body = xml2json.parse(body, { parseNodeValue: false });
                 }
-
-                console.dir(body, { depth: 10 });
 
                 if (body && !body.TrackResponse) {
                     if (body.Fault && body.Fault.detail && body.Fault.detail.Errors && body.Fault.detail.Errors.ErrorDetail && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
@@ -133,6 +136,10 @@ function UPS(options) {
             };
 
             if (err) {
+                if (usps.isTrackingNumberValid(trackingNumber)) {
+                    return usps.track(trackingNumber, callback);
+                }
+
                 if (err.message === 'No tracking information available') {
                     return callback(null, results);
                 }
