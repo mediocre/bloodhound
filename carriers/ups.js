@@ -63,46 +63,39 @@ function UPS(options) {
     };
 
     this.track = function(trackingNumber, callback) {
-        var req;
-
-        if (usps.isTrackingNumberValid(trackingNumber)) {
-            const body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
-            req = {
-                baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-                body,
-                forever: true,
-                gzip: true,
-                method: 'POST',
-                timeout: 5000,
-                url: '/ups.app/xml/Track'
-            };
-        } else {
-            req = {
-                baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-                forever: true,
-                gzip: true,
-                json: {
-                    Security: {
-                        UPSServiceAccessToken: {
-                            AccessLicenseNumber: options.accessKey
-                        },
-                        UsernameToken: {
-                            Username: options.username,
-                            Password: options.password
-                        }
+        const req = {
+            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
+            forever: true,
+            gzip: true,
+            json: {
+                Security: {
+                    UPSServiceAccessToken: {
+                        AccessLicenseNumber: options.accessKey
                     },
-                    TrackRequest: {
-                        InquiryNumber: trackingNumber,
-                        Request: {
-                            RequestAction: 'Track',
-                            RequestOption: 'activity'
-                        }
+                    UsernameToken: {
+                        Username: options.username,
+                        Password: options.password
                     }
                 },
-                method: 'POST',
-                timeout: 5000,
-                url: '/rest/Track'
-            };
+                TrackRequest: {
+                    InquiryNumber: trackingNumber,
+                    Request: {
+                        RequestAction: 'Track',
+                        RequestOption: 'activity'
+                    }
+                }
+            },
+            method: 'POST',
+            timeout: 5000,
+            url: '/rest/Track'
+        };
+
+        // The REST API doesn't support UPS Mail Innovations. Use the XML API instead.
+        if (usps.isTrackingNumberValid(trackingNumber)) {
+            delete req.json;
+
+            req.body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
+            req.url = '/ups.app/xml/Track';
         }
 
         async.retry(function(callback) {
@@ -111,7 +104,7 @@ function UPS(options) {
                     return callback(err);
                 }
 
-                // convert XML from the mail innovations tracking endpoint
+                // Convert XML to JSON if necessary
                 if (body && body.startsWith && body.startsWith('<?xml version="1.0"?>')) {
                     body = xml2json.parse(body, { parseNodeValue: false });
                 }

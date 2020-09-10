@@ -648,7 +648,6 @@ describe('UPS', function() {
                 bloodhound.track('1Z648616E192760718', 'ups', function(err, actual) {
                     assert.ifError(err);
 
-
                     const expectedEvents = [
                         {
                             address: {
