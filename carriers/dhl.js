@@ -32,7 +32,17 @@ function DHL() {
         return false;
     };
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function(trackingNumber, _options, callback) {
+        // Options are optional
+        if (typeof _options === 'function') {
+            callback = _options;
+            _options = {};
+        }
+
+        if (!_options.minDate) {
+            _options.minDate = new Date(0);
+        }
+
         // This is the API being used from: https://www.dhl.com/global-en/home/tracking/tracking-ecommerce.html
         const req = {
             forever: true,
@@ -106,6 +116,11 @@ function DHL() {
                     date: new Date(event.timestamp),
                     description: event.status
                 };
+
+                // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                if (_event.date < _options.minDate) {
+                    return;
+                }
 
                 if (event.description) {
                     _event.details = event.description;

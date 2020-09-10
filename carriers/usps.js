@@ -54,7 +54,17 @@ function USPS(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function(trackingNumber, _options, callback) {
+        // Options are optional
+        if (typeof _options === 'function') {
+            callback = _options;
+            _options = {};
+        }
+
+        if (!_options.minDate) {
+            _options.minDate = new Date(0);
+        }
+
         const xml = `<TrackFieldRequest USERID="${options.userId}"><Revision>1</Revision><ClientIp>${options.clientIp || '127.0.0.1'}</ClientIp><SourceId>${options.sourceId || '@mediocre/bloodhound (+https://github.com/mediocre/bloodhound)'}</SourceId><TrackID ID="${trackingNumber}"/></TrackFieldRequest>`;
 
         const req = {
@@ -151,6 +161,11 @@ function USPS(options) {
                             date: moment.tz(`${scanDetail.EventDate[0]} ${scanDetail.EventTime[0]}`, 'MMMM D, YYYY h:mm a', timezone).toDate(),
                             description: scanDetail.Event[0]
                         };
+
+                        // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                        if (event.date < _options.minDate) {
+                            return;
+                        }
 
                         if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.EventCode[0])) {
                             results.deliveredAt = event.date;

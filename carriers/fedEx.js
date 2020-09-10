@@ -69,7 +69,17 @@ function FedEx(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function(trackingNumber, _options, callback) {
+        // Options are optional
+        if (typeof _options === 'function') {
+            callback = _options;
+            _options = {};
+        }
+
+        if (!_options.minDate) {
+            _options.minDate = new Date(0);
+        }
+
         // Create a FedEx track request: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Service_Optionsbc-3&rhtocid=_26_0_2
         const trackRequest = {
             SelectionDetails: {
@@ -132,6 +142,11 @@ function FedEx(options) {
                     date: new Date(e.Timestamp),
                     description: e.EventDescription
                 };
+
+                // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                if (event.date < _options.minDate) {
+                    return;
+                }
 
                 if (e.StatusExceptionDescription) {
                     event.details = e.StatusExceptionDescription;

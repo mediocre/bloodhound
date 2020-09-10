@@ -62,7 +62,17 @@ function UPS(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, callback) {
+    this.track = function(trackingNumber, _options, callback) {
+        // Options are optional
+        if (typeof _options === 'function') {
+            callback = _options;
+            _options = {};
+        }
+
+        if (!_options.minDate) {
+            _options.minDate = new Date(0);
+        }
+
         const req = {
             baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
             forever: true,
@@ -181,6 +191,11 @@ function UPS(options) {
                         date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
                         description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
+
+                    // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                    if (event.date < _options.minDate) {
+                        return;
+                    }
 
                     if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
                         results.deliveredAt = event.date;
