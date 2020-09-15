@@ -4,13 +4,13 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-18.05
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Setup Node 14.10.1
       uses: actions/setup-node@v1
       with:
-        node-version: 12.13.0
+        node-version: 14.10.1
 
     - name: Checkout from Git
       uses: actions/checkout@v2
