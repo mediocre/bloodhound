@@ -4,10 +4,10 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.05
 
     steps:
-    - name: Setup Node 12.13.0
+    - name: Setup Node 14.10.1
       uses: actions/setup-node@v1
       with:
         node-version: 12.13.0
