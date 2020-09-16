@@ -91,7 +91,8 @@ function UPS(options) {
                     InquiryNumber: trackingNumber,
                     Request: {
                         RequestAction: 'Track',
-                        RequestOption: 'activity'
+                        RequestOption: 'activity',
+                        SubVersion: '1907',
                     }
                 }
             },
@@ -162,6 +163,7 @@ function UPS(options) {
                 if (!location) {
                     callback();
                 } else {
+                    /*
                     geography.parseLocation(location, options, function(err, address) {
                         if (err || !address) {
                             return callback(err);
@@ -171,6 +173,8 @@ function UPS(options) {
 
                         callback(null, address);
                     });
+                     */
+                    callback(null, location);
                 }
             }, function(err, addresses) {
                 if (err) {
@@ -184,15 +188,15 @@ function UPS(options) {
                         address = addresses.find(a => a && a.location === activity.location);
                     }
 
-                    let timezone = 'America/New_York';
+                    let timezone = 'UTC';
 
-                    if (address && address.timezone) {
-                        timezone = address.timezone;
-                    }
+                    //if (address && address.timezone) {
+                        //timezone = address.timezone;
+                    //}
 
                     const event = {
                         address: activity.address,
-                        date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
+                        date: moment.tz(`${activity.GMTDate} ${activity.GMTTime}`, 'YYYYMMDD HHmmss', timezone).toDate(),
                         description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
 
