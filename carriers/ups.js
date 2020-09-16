@@ -125,6 +125,10 @@ function UPS(options) {
                     }
                 }
 
+                if (body && body.TrackResponse && body.TrackResponse.Response && body.TrackResponse.Response.Error) {
+                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription))
+                }
+
                 callback(null, body);
             });
         }, function(err, body) {
