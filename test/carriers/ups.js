@@ -651,9 +651,9 @@ describe('UPS', function() {
                     const expectedEvents = [
                         {
                             address: {
-                                city: 'Joplin',
+                                city: 'Courtabœuf Cedex',
                                 country: 'FR',
-                                state: 'MO',
+                                state: undefined,
                                 zip: undefined
                             },
                             date: new Date('2012-10-04T18:58:04.000Z'),
