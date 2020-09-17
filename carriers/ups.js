@@ -159,24 +159,17 @@ function UPS(options) {
                 activitiesList = getActivities(packageInfo);
             }
 
-            async.mapLimit(Array.from(new Set(activitiesList.map(activity => [activity.location, activity.GMTTime]))), 10, function(info, callback) {
-                const location = info[0];
-                const gmt = info[1] != null;
-                if (!location) {
-                    callback();
-                } else if (gmt) {
-                    callback(null, location);
-                } else {
-                    geography.parseLocation(location, options, function(err, address) {
-                        if (err || !address) {
-                            return callback(err);
-                        }
+            // Get the activity locations for all activities that don't have a GMTDate or GMTTime
+            async.mapLimit(Array.from(new Set(activitiesList.filter(activity => (!activity.GMTDate || !activity.GMTTime) && activity.location).map(activity => activity.location))), 10, function(location, callback) {
+                geography.parseLocation(location, options, function(err, address) {
+                    if (err || !address) {
+                        return callback(err);
+                    }
 
-                        address.location = location;
+                    address.location = location;
 
-                        callback(null, address);
-                    });
-                }
+                    callback(null, address);
+                });
             }, function(err, addresses) {
                 if (err) {
                     return callback(err);
@@ -189,22 +182,22 @@ function UPS(options) {
                         address = addresses.find(a => a && a.location === activity.location);
                     }
 
-                    let timezone = activity.GMTTime
-                        ? 'UTC'
-                        : 'America/New_York';
+                    let timezone = 'America/New_York';
 
                     if (address && address.timezone) {
                         timezone = address.timezone;
                     }
 
-                    const ts = activity.GMTTime
-                        ? `${activity.GMTDate} ${activity.GMTTime}`
-                        : `${activity.Date} ${activity.Time}`;
                     const event = {
                         address: activity.address,
-                        date: moment.tz(ts, 'YYYYMMDD HHmmss', timezone).toDate(),
                         description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
+
+                    if (activity.GMTDate && activity.GMTTime) {
+                        event.date = moment.tz(`${activity.GMTDate} ${activity.GMTTime}`, 'YYYY-MM-DD HH.mm.ss', 'UTC').toDate();
+                    } else {
+                        event.date = moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate();
+                    }
 
                     // Ensure event is after minDate (used to prevent data from reused tracking numbers)
                     if (event.date < _options.minDate) {

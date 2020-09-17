@@ -212,24 +212,24 @@ describe('UPS', function() {
                     const expectedEvents = [
                         {
                             address: {
-                                city: 'Atlanta',
+                                city: 'ANYTOWN',
                                 state: 'GA',
                                 country: 'US',
                                 zip: '30340'
                             },
-                            date: new Date('1999-06-10T16:00:00.000Z'),
+                            date: new Date('2019-04-15T15:40:17.000Z'),
                             description: 'DELIVERED'
                         },
                         {
                             address: {},
-                            date: new Date('1999-06-08T16:00:00.000Z'),
+                            date: new Date('2019-04-15T15:40:17.000Z'),
                             description: 'BILLING INFORMATION RECEIVED. SHIPMENT DATE PENDING.'
                         }
                     ];
 
                     assert.strictEqual(actual.carrier, 'UPS');
-                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
-                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('1999-06-10T16:00:00.000Z').valueOf());
+                    assert.strictEqual(actual.deliveredAt.valueOf(), new Date('2019-04-15T15:40:17.000Z').valueOf());
+                    assert.strictEqual(actual.shippedAt.valueOf(), new Date('2019-04-15T15:40:17.000Z').valueOf());
                     assert.strictEqual(actual.url, 'https://www.ups.com/track?tracknum=1Z12345E0205271688');
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
