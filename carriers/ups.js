@@ -189,7 +189,9 @@ function UPS(options) {
                         address = addresses.find(a => a && a.location === activity.location);
                     }
 
-                    let timezone = 'UTC';
+                    let timezone = activity.GMTTime
+                        ? 'UTC'
+                        : 'America/New_York';
 
                     if (address && address.timezone) {
                         timezone = address.timezone;
