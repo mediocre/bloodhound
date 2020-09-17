@@ -91,7 +91,8 @@ function UPS(options) {
                     InquiryNumber: trackingNumber,
                     Request: {
                         RequestAction: 'Track',
-                        RequestOption: 'activity'
+                        RequestOption: 'activity',
+                        SubVersion: '1907',
                     }
                 }
             },
@@ -158,9 +159,13 @@ function UPS(options) {
                 activitiesList = getActivities(packageInfo);
             }
 
-            async.mapLimit(Array.from(new Set(activitiesList.map(activity => activity.location))), 10, function(location, callback) {
+            async.mapLimit(Array.from(new Set(activitiesList.map(activity => [activity.location, activity.GMTTime]))), 10, function(info, callback) {
+                const location = info[0];
+                const gmt = info[1] != null;
                 if (!location) {
                     callback();
+                } else if (gmt) {
+                    callback(null, location);
                 } else {
                     geography.parseLocation(location, options, function(err, address) {
                         if (err || !address) {
@@ -184,15 +189,20 @@ function UPS(options) {
                         address = addresses.find(a => a && a.location === activity.location);
                     }
 
-                    let timezone = 'America/New_York';
+                    let timezone = activity.GMTTime
+                        ? 'UTC'
+                        : 'America/New_York';
 
                     if (address && address.timezone) {
                         timezone = address.timezone;
                     }
 
+                    const ts = activity.GMTTime
+                        ? `${activity.GMTDate} ${activity.GMTTime}`
+                        : `${activity.Date} ${activity.Time}`;
                     const event = {
                         address: activity.address,
-                        date: moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate(),
+                        date: moment.tz(ts, 'YYYYMMDD HHmmss', timezone).toDate(),
                         description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
                     };
 
