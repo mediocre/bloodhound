@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - name: Setup Node 14.10.1
+    - name: Setup Node 14.11.0
       uses: actions/setup-node@v1
       with:
-        node-version: 14.10.1
+        node-version: 14.11.0
 
     - name: Checkout from Git
       uses: actions/checkout@v2
