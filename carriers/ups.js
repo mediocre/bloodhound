@@ -209,14 +209,20 @@ function UPS(options) {
                         if (!results.status) {
                             results.status = activity.Status;
                         }
-                    }
 
-                    if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
-                        results.deliveredAt = event.date;
-                    }
-
-                    if (SHIPPED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
-                        results.shippedAt = event.date;
+                        if (activity.Status.Type == "D") {
+                            results.deliveredAt = event.date;
+                        }
+                        if (activity.Status.Type == "I") {
+                            results.shippedAt = event.date;
+                        }
+                    } else {
+                        if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                            results.deliveredAt = event.date;
+                        }
+                        if (SHIPPED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                            results.shippedAt = event.date;
+                        }
                     }
 
                     // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
