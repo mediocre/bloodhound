@@ -97,7 +97,7 @@ function Bloodhound(options) {
         } else if (options.carrier === 'pitney bowes') {
             pitneyBowes.track(trackingNumber, options, callback);
         } else if (options.carrier === 'ups'){
-            ups.track(trackingNumber, callback);
+            ups.track(trackingNumber, options, callback);
         } else if (options.carrier === 'usps') {
             usps.track(trackingNumber, callback);
         } else {

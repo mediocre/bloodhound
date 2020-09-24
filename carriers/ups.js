@@ -204,6 +204,13 @@ function UPS(options) {
                         return;
                     }
 
+                    if (_options.status === true) {
+                        event.status = activity.Status;
+                        if (!results.status) {
+                            results.status = activity.Status;
+                        }
+                    }
+
                     if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
                         results.deliveredAt = event.date;
                     }
