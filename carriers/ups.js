@@ -198,13 +198,6 @@ function UPS(options) {
                         return;
                     }
 
-                    if (_options.status === true) {
-                        event.status = activity.Status;
-                        if (!results.status) {
-                            results.status = activity.Status;
-                        }
-                    }
-
                     if (activity.Status.Type == "D") {
                         results.deliveredAt = event.date;
                     }
@@ -228,6 +221,10 @@ function UPS(options) {
 
                 // Add URL to carrier tracking page
                 results.url = `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`;
+
+                if (_options.raw === true) {
+                    results.raw = body;
+                }
 
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;

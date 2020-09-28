@@ -145,6 +145,10 @@ function PitneyBowes(options) {
                     results.url = `https://tracking.pb.com/${trackingNumber.substring(0, 20)}`;
                 }
 
+                if (_options.raw === true) {
+                    results.raw = data;
+                }
+
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;
                 }
