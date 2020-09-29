@@ -140,7 +140,6 @@ describe('UPS', function() {
         });
 
         it('should return a track response', function(done) {
-            // bloodhound.track('1Z9756W90308462106', 'ups', function(err, actual) {
             bloodhound.track('1Z12345E0305271640', 'ups', function(err, actual) {
                 assert.ifError(err);
 
@@ -470,7 +469,7 @@ describe('UPS', function() {
                     const expectedEvents = [
                         {
                             address: {
-                                city: 'Bonn',
+                                city: 'BONN',
                                 state: undefined,
                                 country: 'DE',
                                 zip: undefined
@@ -480,7 +479,7 @@ describe('UPS', function() {
                         },
                         {
                             address: {
-                                city: 'Bonn',
+                                city: 'BONN',
                                 state: undefined,
                                 country: 'DE',
                                 zip: undefined
@@ -520,7 +519,7 @@ describe('UPS', function() {
                         },
                         {
                             address: {
-                                city: 'Bonn',
+                                city: 'BONN',
                                 state: undefined,
                                 country: 'DE',
                                 zip: undefined

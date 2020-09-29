@@ -171,12 +171,15 @@ describe('USPS', function() {
 
         it('should return an empty result if there is no tracking information available ', function(done) {
             bloodhound.track('0987654321234567890', 'usps', function(err, actual) {
+                assert.ifError(err);
+
                 const expected = {
                     carrier: 'USPS',
                     events: []
-                }
+                };
 
-                assert.ifError(err);
+                delete actual.raw;
+
                 assert.deepStrictEqual(actual, expected);
                 done();
             });

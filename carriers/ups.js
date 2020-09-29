@@ -25,7 +25,9 @@ function getActivities(package) {
                     zip: activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
                 }
 
-                activity.location = geography.addressToString(activity.address);
+                if ((activity.address.city && activity.address.state) || activity.address.zip) {
+                    activity.location = geography.addressToString(activity.address);
+                }
             } else {
                 activity.address = {};
                 activity.location = undefined;
