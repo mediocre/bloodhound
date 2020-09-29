@@ -111,7 +111,8 @@ function FedEx(options) {
 
             const results = {
                 carrier: 'FedEx',
-                events: []
+                events: [],
+                raw: trackReply
             };
 
             // Ensure track reply has events
@@ -162,10 +163,6 @@ function FedEx(options) {
 
             // Add url to carrier tracking page
             results.url = `https://www.fedex.com/apps/fedextrack/?tracknumbers=${encodeURIComponent(trackingNumber)}`;
-
-            if (_options.raw === true) {
-                results.raw = trackReply;
-            }
 
             if (!results.shippedAt && results.deliveredAt) {
                 results.shippedAt = results.deliveredAt;

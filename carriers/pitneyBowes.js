@@ -40,7 +40,8 @@ function PitneyBowes(options) {
         }, function(err, data) {
             const results = {
                 carrier: 'Newgistics',
-                events: []
+                events: [],
+                raw: data
             };
 
             if (isImb) {
@@ -143,10 +144,6 @@ function PitneyBowes(options) {
 
                 if (isImb) {
                     results.url = `https://tracking.pb.com/${trackingNumber.substring(0, 20)}`;
-                }
-
-                if (_options.raw === true) {
-                    results.raw = data;
                 }
 
                 if (!results.shippedAt && results.deliveredAt) {

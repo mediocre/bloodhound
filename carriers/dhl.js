@@ -72,7 +72,8 @@ function DHL() {
 
             const results = {
                 carrier: 'DHL',
-                events: []
+                events: [],
+                raw: body
             };
 
             if (!body || !body.shipments || !body.shipments.length) {
@@ -142,10 +143,6 @@ function DHL() {
 
             // Reverse results again to get events in order Most Recent - Least Recent
             results.events.reverse();
-
-            if (_options.raw === true) {
-                results.raw = body;
-            }
 
             if (!results.shippedAt && results.deliveredAt) {
                 results.shippedAt = results.deliveredAt;

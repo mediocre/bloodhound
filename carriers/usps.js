@@ -84,7 +84,8 @@ function USPS(options) {
             parser.parseString(res.body, function(err, data) {
                 const results = {
                     carrier: 'USPS',
-                    events: []
+                    events: [],
+                    raw: data
                 };
 
                 if (err) {
@@ -194,10 +195,6 @@ function USPS(options) {
 
                     // Add url to carrier tracking page
                     results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
-
-                    if (_options.raw === true) {
-                        results.raw = data;
-                    }
 
                     if (!results.shippedAt && results.deliveredAt) {
                         results.shippedAt = results.deliveredAt;
