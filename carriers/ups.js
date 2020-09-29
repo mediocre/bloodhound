@@ -6,12 +6,6 @@ const xml2json = require('fast-xml-parser');
 const geography = require('../util/geography');
 const USPS = require('./usps');
 
-// These are all of the status descriptions related to delivery provided by UPS.
-const DELIVERED_DESCRIPTIONS = ['DELIVERED', 'DELIVERED BY LOCAL POST OFFICE', 'DELIVERED TO UPS ACCESS POINT AWAITING CUSTOMER PICKUP'];
-
-// These are all of the status descriptions related to shipping provided by UPS.
-const SHIPPED_DESCRIPTIONS = ['ARRIVAL SCAN', 'DELIVERED', 'DEPARTURE SCAN', 'DESTINATION SCAN', 'ORIGIN SCAN', 'OUT FOR DELIVERY', 'OUT FOR DELIVERY TODAY', 'PACKAGE DEPARTED UPS MAIL INNOVATIONS FACILITY ENROUTE TO USPS FOR INDUCTION', 'PACKAGE PROCESSED BY UPS MAIL INNOVATIONS ORIGIN FACILITY', 'PACKAGE RECEIVED FOR PROCESSING BY UPS MAIL INNOVATIONS', 'PACKAGE RECEIVED FOR SORT BY DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE TRANSFERRED TO DESTINATION UPS MAIL INNOVATIONS FACILITY', 'PACKAGE OUT FOR POST OFFICE DELIVERY', 'PACKAGE SORTED BY POST OFFICE', 'RECEIVED BY THE POST OFFICE', 'SHIPMENT ACCEPTANCE AT POST OFFICE', 'YOUR PACKAGE IS IN TRANSIT TO THE UPS FACILITY.', 'LOADED ON DELIVERY VEHICLE'];
-
 function getActivities(package) {
     var activitiesList = package.Activity;
 
@@ -204,11 +198,10 @@ function UPS(options) {
                         return;
                     }
 
-                    if (DELIVERED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                    if (activity.Status.Type == "D") {
                         results.deliveredAt = event.date;
                     }
-
-                    if (SHIPPED_DESCRIPTIONS.includes(event.description.toUpperCase())) {
+                    if (activity.Status.Type == "I") {
                         results.shippedAt = event.date;
                     }
 
@@ -228,6 +221,10 @@ function UPS(options) {
 
                 // Add URL to carrier tracking page
                 results.url = `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`;
+
+                if (_options.raw === true) {
+                    results.raw = body;
+                }
 
                 if (!results.shippedAt && results.deliveredAt) {
                     results.shippedAt = results.deliveredAt;

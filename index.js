@@ -89,17 +89,17 @@ function Bloodhound(options) {
         trackingNumber = trackingNumber.toUpperCase();
 
         if (options.carrier === 'dhl') {
-            dhl.track(trackingNumber, callback);
+            dhl.track(trackingNumber, options, callback);
         } else if (options.carrier === 'fedex') {
-            fedEx.track(trackingNumber, callback);
+            fedEx.track(trackingNumber, options, callback);
         } else if (options.carrier === 'newgistics') {
             pitneyBowes.track(trackingNumber, options, callback);
         } else if (options.carrier === 'pitney bowes') {
             pitneyBowes.track(trackingNumber, options, callback);
         } else if (options.carrier === 'ups'){
-            ups.track(trackingNumber, callback);
+            ups.track(trackingNumber, options, callback);
         } else if (options.carrier === 'usps') {
-            usps.track(trackingNumber, callback);
+            usps.track(trackingNumber, options, callback);
         } else {
             return callback(new Error(`Carrier ${options.carrier} is not supported.`));
         }

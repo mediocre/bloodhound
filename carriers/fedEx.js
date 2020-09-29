@@ -163,6 +163,10 @@ function FedEx(options) {
             // Add url to carrier tracking page
             results.url = `https://www.fedex.com/apps/fedextrack/?tracknumbers=${encodeURIComponent(trackingNumber)}`;
 
+            if (_options.raw === true) {
+                results.raw = trackReply;
+            }
+
             if (!results.shippedAt && results.deliveredAt) {
                 results.shippedAt = results.deliveredAt;
             }
