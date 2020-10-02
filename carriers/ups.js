@@ -88,7 +88,7 @@ function UPS(options) {
                     Request: {
                         RequestAction: 'Track',
                         RequestOption: 'activity',
-                        SubVersion: '1907',
+                        SubVersion: '1907'
                     }
                 }
             },
@@ -201,9 +201,9 @@ function UPS(options) {
                         return;
                     }
 
-                    if (activity.Status && activity.Status.Type === 'D') {
+                    if (activity.Status && activity.Status.Type === 'D' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'D' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'D') {
                         results.deliveredAt = event.date;
-                    } else if (activity.Status && activity.Status.Type === 'I') {
+                    } else if (activity.Status && activity.Status.Type === 'I' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'I' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'I') {
                         results.shippedAt = event.date;
                     }
 
