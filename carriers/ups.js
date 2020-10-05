@@ -156,7 +156,7 @@ function UPS(options) {
                 activitiesList = getActivities(packageInfo);
             }
 
-            // UPS Mail Innovations doesn't injest USPS data reliably. Fallback to USPS when UPS doesn't give us enough data.
+            // UPS Mail Innovations doesn't import USPS data reliably. Fallback to USPS when UPS doesn't provide enough data.
             if (options.usps && activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
                 return usps.track(trackingNumber, callback);
             }
