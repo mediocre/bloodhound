@@ -156,6 +156,11 @@ function UPS(options) {
                 activitiesList = getActivities(packageInfo);
             }
 
+            // UPS Mail Innovations doesn't injest USPS data reliably. Fallback to USPS when UPS doesn't give us enough data.
+            if (activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
+                return usps.track(trackingNumber, callback);
+            }
+
             // Get the activity locations for all activities that don't have a GMTDate or GMTTime
             async.mapLimit(Array.from(new Set(activitiesList.filter(activity => (!activity.GMTDate || !activity.GMTTime) && activity.location).map(activity => activity.location))), 10, function(location, callback) {
                 geography.parseLocation(location, options, function(err, address) {

@@ -21,6 +21,9 @@ describe('UPS', function() {
             baseUrl: 'https://wwwcie.ups.com',
             password: process.env.UPS_PASSWORD,
             username: process.env.UPS_USERNAME
+        },
+        usps: {
+            userId: process.env.USPS_USERID
         }
     });
 
