@@ -47,6 +47,9 @@ function DHL() {
         const req = {
             forever: true,
             gzip: true,
+            headers: {
+                referer: `https://www.dhl.com/global-en/home/tracking/tracking-ecommerce.html?tracking-id=${trackingNumber}`
+            },
             json: true,
             method: 'GET',
             timeout: 5000,
