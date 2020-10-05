@@ -136,7 +136,7 @@ function UPS(options) {
             };
 
             if (err) {
-                if (usps.isTrackingNumberValid(trackingNumber)) {
+                if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
                     return usps.track(trackingNumber, callback);
                 }
 
@@ -157,7 +157,7 @@ function UPS(options) {
             }
 
             // UPS Mail Innovations doesn't injest USPS data reliably. Fallback to USPS when UPS doesn't give us enough data.
-            if (activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
+            if (options.usps && activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
                 return usps.track(trackingNumber, callback);
             }
 
