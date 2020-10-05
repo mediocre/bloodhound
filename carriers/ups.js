@@ -136,7 +136,7 @@ function UPS(options) {
             };
 
             if (err) {
-                if (usps.isTrackingNumberValid(trackingNumber)) {
+                if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
                     return usps.track(trackingNumber, callback);
                 }
 
@@ -154,6 +154,11 @@ function UPS(options) {
                 activitiesList = packageInfo.map(package => getActivities(package)).flat();
             } else {
                 activitiesList = getActivities(packageInfo);
+            }
+
+            // UPS Mail Innovations doesn't injest USPS data reliably. Fallback to USPS when UPS doesn't give us enough data.
+            if (options.usps && activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
+                return usps.track(trackingNumber, callback);
             }
 
             // Get the activity locations for all activities that don't have a GMTDate or GMTTime
