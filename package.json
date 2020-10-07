@@ -7,7 +7,7 @@
         "node-geocoder": "~3.27.0",
         "petty-cache": "~3.0.1",
         "pitney-bowes": "~0.2.0",
-        "shipping-fedex": "0.2.0",
+        "shipping-fedex": "1.0.0",
         "tz-lookup": "~6.1.25",
         "us-states-normalize": "~1.0.0"
     },
