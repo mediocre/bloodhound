@@ -10,7 +10,7 @@ jobs:
     - name: Setup Node 14.11.0
       uses: actions/setup-node@v1
       with:
-        node-version: 14.13.0
+        node-version: 14.15.0
 
     - name: Checkout from Git
       uses: actions/checkout@v2
