@@ -31,9 +31,8 @@ jobs:
       with:
         redis-version: ${{ matrix.redis-version }}
 
-   - name: test failure
-     run: |-
-        set -x
+    - name: test failure
+      run: |-
         [ ${{ matrix.node-version }} == 14.15.0 ]
 
     - name: Run coverage report
