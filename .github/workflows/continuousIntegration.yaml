@@ -6,11 +6,16 @@ jobs:
   test:
     runs-on: ubuntu-18.04
 
+    strategy:
+      matrix:
+        node-version: [14.15.0, 12.19.0]
+        redis-version: [4.0.14]
+
     steps:
-    - name: Setup Node 14.11.0
+    - name: Setup Node ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
-        node-version: 14.15.0
+        node-version: ${{ matrix.node-version }}
 
     - name: Checkout from Git
       uses: actions/checkout@v2
@@ -24,7 +29,7 @@ jobs:
     - name: Setup Redis v${{ matrix.redis-version }}
       uses: supercharge/redis-github-action@1.1.0
       with:
-        redis-version: 4
+        redis-version: ${{ matrix.redis-version }}
 
     - name: Run coverage report
       run: npm run coveralls
@@ -43,10 +48,16 @@ jobs:
         UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
         USPS_USERID: ${{ secrets.USPS_USERID }}
 
+
+  notify_slack:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
     - name: Notify Slack
       uses: homoluctus/slatify@master
       with:
-        type: ${{ job.status }}
+        type: ${{ needs.test.result }}
         job_name: '${{ github.repository }} - Tests '
         channel: '#development'
         url: ${{ secrets.SLACK_WEBHOOK_URL }}
