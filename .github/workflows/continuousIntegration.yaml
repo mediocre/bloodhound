@@ -26,14 +26,15 @@ jobs:
     - name: Run npm install
       run: npm install
 
-    - name: Setup Redis v${{ matrix.redis-version }}
+    - name: Setup Redis ${{ matrix.redis-version }}
       uses: supercharge/redis-github-action@1.1.0
       with:
         redis-version: ${{ matrix.redis-version }}
 
    - name: test failure
      run: |-
-       [ ${{ matrix.node-version }} == 14.15.0 ]
+        set -x
+        [ ${{ matrix.node-version }} == 14.15.0 ]
 
     - name: Run coverage report
       run: npm run coveralls
