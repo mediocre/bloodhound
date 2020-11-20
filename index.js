@@ -8,13 +8,18 @@ const DHL = require('./carriers/dhl');
 const geography = require('./util/geography');
 
 function Bloodhound(options) {
+    // Options are optional
+    if (!options) {
+        options = {};
+    }
+
     // Optionally specify geocoder options
-    if (options && options.geocoder) {
+    if (options.geocoder) {
         geography.geocoder = NodeGeocoder(options.geocoder);
     }
 
     // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
-    if (options && options.pettyCache) {
+    if (options.pettyCache) {
         // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
         if (options.pitneyBowes) {
             options.pitneyBowes.pettyCache = options.pettyCache;
@@ -31,16 +36,26 @@ function Bloodhound(options) {
         }
     }
 
+    // Ensure DHL options exist
+    if (!options.dhl) {
+        options.dhl = {};
+    }
+
+    // Allow DHL to use USPS
+    if (options.usps) {
+        options.dhl.usps = options.usps;
+    }
+
     // Allow UPS to use USPS for UPS Mail Innovations tracking numbers
-    if (options && options.ups && options.usps) {
+    if (options.ups && options.usps) {
         options.ups.usps = options.usps;
     }
 
+    const dhl = new DHL(options && options.dhl);
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
     const usps = new USPS(options && options.usps);
-    const dhl = new DHL(options && options.dhl);
 
     this.guessCarrier = function(trackingNumber) {
         if (dhl.isTrackingNumberValid(trackingNumber)) {

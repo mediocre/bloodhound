@@ -2,6 +2,7 @@ const async = require('async');
 const request = require('request');
 
 const checkDigit = require('../util/checkDigit');
+const USPS = require('./usps');
 
 // These tracking descriptions indicate the shipment was delivered
 const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
@@ -9,7 +10,9 @@ const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
 // These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
 const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY', 'PROCESSED THROUGH SORT FACILITY'];
 
-function DHL() {
+function DHL(options) {
+    const usps = new USPS(options && options.usps);
+
     this.isTrackingNumberValid = function(trackingNumber) {
         trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
 
@@ -63,6 +66,11 @@ function DHL() {
                 }
 
                 if (res.statusCode !== 200) {
+                    // If DHL fails, try USPS
+                    if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                        return usps.track(trackingNumber, callback);
+                    }
+
                     return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href} ${body || ''}`.trim()));
                 }
 
