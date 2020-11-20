@@ -66,11 +66,6 @@ function DHL(options) {
                 }
 
                 if (res.statusCode !== 200) {
-                    // If DHL fails, try USPS
-                    if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                        return usps.track(trackingNumber, callback);
-                    }
-
                     return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href} ${body || ''}`.trim()));
                 }
 
@@ -78,6 +73,11 @@ function DHL(options) {
             });
         }, function(err, body) {
             if (err) {
+                // If DHL fails, try USPS
+                if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                    return usps.track(trackingNumber, callback);
+                }
+
                 return callback(err);
             }
 
