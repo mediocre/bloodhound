@@ -191,7 +191,9 @@ function USPS(options) {
                     });
 
                     // Add details to the most recent event
-                    results.events[0].details = data.TrackResponse.TrackInfo[0].StatusSummary[0];
+                    if (results.events[0] && data.TrackResponse && data.TrackResponse.TrackInfo && data.TrackResponse.TrackInfo[0] && data.TrackResponse.TrackInfo[0].StatusSummary && data.TrackResponse.TrackInfo[0].StatusSummary[0]) {
+                        results.events[0].details = data.TrackResponse.TrackInfo[0].StatusSummary[0];
+                    }
 
                     // Add url to carrier tracking page
                     results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
