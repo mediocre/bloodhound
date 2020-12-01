@@ -11,9 +11,10 @@ function getActivities(package) {
 
     if (!Array.isArray(package.Activity)) {
         activitiesList = [package.Activity];
-    } else {
-        activitiesList = package.Activity;
     }
+
+    // Filter undefined activities
+    activitiesList = activitiesList.filter(a => a);
 
     if (activitiesList.length) {
         activitiesList.forEach(activity => {
