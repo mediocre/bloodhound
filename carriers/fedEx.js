@@ -125,14 +125,6 @@ function FedEx(options) {
                     return;
                 }
 
-                if (DELIVERED_TRACKING_STATUS_CODES.includes(e.EventType)) {
-                    results.deliveredAt = new Date(e.Timestamp);
-                }
-
-                if (SHIPPED_TRACKING_STATUS_CODES.includes(e.EventType)) {
-                    results.shippedAt = new Date(e.Timestamp);
-                }
-
                 const event = {
                     address: {
                         city: e.Address.City,
@@ -156,6 +148,14 @@ function FedEx(options) {
                 // Remove blacklisted words
                 if (event.address.city) {
                     event.address.city = event.address.city.replace(CITY_BLACKLIST, '').trim();
+                }
+
+                if (DELIVERED_TRACKING_STATUS_CODES.includes(e.EventType)) {
+                    results.deliveredAt = new Date(e.Timestamp);
+                }
+
+                if (SHIPPED_TRACKING_STATUS_CODES.includes(e.EventType)) {
+                    results.shippedAt = new Date(e.Timestamp);
                 }
 
                 results.events.push(event);
