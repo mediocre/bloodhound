@@ -11,6 +11,9 @@ jobs:
         node-version: [12.19.0, 14.15.0]
         redis-version: [4.0.14]
 
+    env:
+      DO_COVERALLS: 14.15.0/4.0.14
+
     steps:
     - name: Setup Node ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -32,7 +35,36 @@ jobs:
         redis-version: ${{ matrix.redis-version }}
 
     - name: Run coverage report
-      run: npm run coveralls
+      run: |-
+        if [ "${{ matrix.node-version }}/${{ matrix.redis-version }}"x == "${DO_COVERALLS}"x ]
+        then
+          npm run coveralls
+        else
+          true
+        fi
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        FEDEX_ACCOUNT_NUMBER: ${{ secrets.FEDEX_ACCOUNT_NUMBER }}
+        FEDEX_ENVIRONMENT: ${{ secrets.FEDEX_ENVIRONMENT }}
+        FEDEX_KEY: ${{ secrets.FEDEX_KEY }}
+        FEDEX_METER_NUMBER: ${{ secrets.FEDEX_METER_NUMBER }}
+        FEDEX_PASSWORD: ${{ secrets.FEDEX_PASSWORD }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        PITNEY_BOWES_API_KEY: ${{ secrets.PITNEY_BOWES_API_KEY }}
+        PITNEY_BOWES_API_SECRET: ${{ secrets.PITNEY_BOWES_API_SECRET }}
+        UPS_ACCESS_KEY: ${{ secrets.UPS_ACCESS_KEY }}
+        UPS_PASSWORD: ${{ secrets.UPS_PASSWORD }}
+        UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
+        USPS_USERID: ${{ secrets.USPS_USERID }}
+
+    - name: Run without coverage report
+      run: |-
+        if [ ! "${{ matrix.node-version }}/${{ matrix.redis-version }}"x == "${DO_COVERALLS}"x ]
+        then
+          npm test
+        else
+          true
+        fi
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         FEDEX_ACCOUNT_NUMBER: ${{ secrets.FEDEX_ACCOUNT_NUMBER }}
@@ -59,7 +91,7 @@ jobs:
       with:
         type: ${{ needs.test.result }}
         job_name: '${{ github.repository }} - Tests '
-        channel: '#development'
+        channel: '#bloodhound'
         url: ${{ secrets.SLACK_WEBHOOK_URL }}
         commit: true
         token: ${{ secrets.GITHUB_TOKEN }}
