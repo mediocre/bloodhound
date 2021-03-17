@@ -68,7 +68,7 @@ function USPS(options) {
         const xml = `<TrackFieldRequest USERID="${options.userId}"><Revision>1</Revision><ClientIp>${options.clientIp || '127.0.0.1'}</ClientIp><SourceId>${options.sourceId || '@mediocre/bloodhound (+https://github.com/mediocre/bloodhound)'}</SourceId><TrackID ID="${trackingNumber}"/></TrackFieldRequest>`;
 
         const req = {
-            baseUrl: options.baseUrl || 'http://production.shippingapis.com',
+            baseUrl: options.baseUrl || 'https://production.shippingapis.com',
             method: 'GET',
             timeout: 5000,
             url: `/ShippingAPI.dll?API=TrackV2&XML=${encodeURIComponent(xml)}`
