@@ -1,7 +1,4 @@
 .eslint*
 .github
 .travis.yml
-LICENSE
-CHANGELOG.md
-README.md
 test
