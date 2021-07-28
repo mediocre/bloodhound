@@ -35,17 +35,17 @@ function PitneyBowes(options) {
                 return pitneyBowesClient.tracking({ carrier: 'IMB', trackingNumber: trackingNumber.substring(0, 20) }, callback);
             }
 
-            // Newgistics Ground (length 34): 4201913892748927005269000023298282
+            // Pitney Bowes Standard (length 34): 4201913892748927005269000023298282
             pitneyBowesClient.tracking({ carrier: 'FDR', trackingNumber }, callback);
         }, function(err, data) {
             const results = {
-                carrier: 'Newgistics',
+                carrier: 'Pitney Bowes',
                 events: [],
                 raw: data
             };
 
-            if (isImb) {
-                results.carrier = 'Pitney Bowes';
+            if (_options && _options.carrier && _options.carrier.toLowerCase() === 'newgistics') {
+                results.carrier = 'Newgistics';
             }
 
             if (err) {
@@ -139,8 +139,8 @@ function PitneyBowes(options) {
                     results.events.push(event);
                 });
 
-                // Add url to carrier tracking page
-                results.url = `https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=${encodeURIComponent(trackingNumber)}`;
+                // Add URL to carrier tracking page
+                results.url = `https://pitneybowes.shipment.co/track/${trackingNumber}`;
 
                 if (isImb) {
                     results.url = `https://tracking.pb.com/${trackingNumber.substring(0, 20)}`;
