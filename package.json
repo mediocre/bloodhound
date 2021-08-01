@@ -6,7 +6,7 @@
         "moment-timezone": "~0.5.28",
         "node-geocoder": "~3.27.0",
         "petty-cache": "~3.2.0",
-        "pitney-bowes": "~0.2.0",
+        "pitney-bowes": "~0.3.0",
         "shipping-fedex": "0.2.0",
         "tz-lookup": "~6.1.25",
         "us-states-normalize": "~1.0.0"
@@ -39,5 +39,5 @@
         "type": "git",
         "url": "https://github.com/mediocre/bloodhound.git"
     },
-    "version": "1.8.0"
+    "version": "1.8.1"
 }

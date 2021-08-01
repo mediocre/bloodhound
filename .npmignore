@@ -1,4 +1,5 @@
-.eslint*
+.eslintignore
+.islintrc.js
 .github
 .travis.yml
 test
