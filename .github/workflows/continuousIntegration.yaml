@@ -1,6 +1,10 @@
 name: build
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches-ignore:
+    - 'dependabot**'
+  workflow_dispatch:
 
 jobs:
   test:
