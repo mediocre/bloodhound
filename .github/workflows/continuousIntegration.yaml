@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: macos-latest
 
     strategy:
       matrix:
@@ -87,7 +87,7 @@ jobs:
 
   notify_slack:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: test
     steps:
     - name: Notify Slack
