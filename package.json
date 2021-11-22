@@ -4,7 +4,7 @@
         "async": "~3.2.0",
         "fast-xml-parser": "~3.21.0",
         "moment-timezone": "~0.5.28",
-        "node-geocoder": "~3.27.0",
+        "node-geocoder": "~3.28.0",
         "petty-cache": "~3.2.0",
         "pitney-bowes": "~0.3.1",
         "shipping-fedex": "0.2.0",
