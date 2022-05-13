@@ -117,11 +117,11 @@ function PitneyBowes(options) {
                         return;
                     }
 
-                    if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
+                    if (DELIVERED_TRACKING_STATUS_CODES.includes(scanDetail?.scanType?.toString())) {
                         results.deliveredAt = new Date(event.date);
                     }
 
-                    if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail.scanType.toString())) {
+                    if (SHIPPED_TRACKING_STATUS_CODES.includes(scanDetail?.scanType?.toString())) {
                         results.shippedAt = new Date(event.date);
                     }
 
