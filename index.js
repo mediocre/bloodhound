@@ -4,6 +4,7 @@ const UPS = require('./carriers/ups');
 const FedEx = require('./carriers/fedEx');
 const USPS = require('./carriers/usps');
 const DHL = require('./carriers/dhl');
+const DhlEcommerceSolutions = require('./carriers/dhlEcommerceSolutions');
 
 const geography = require('./util/geography');
 
@@ -52,6 +53,7 @@ function Bloodhound(options) {
     }
 
     const dhl = new DHL(options && options.dhl);
+    const dhlEcommerceSolutions = new DhlEcommerceSolutions(options && options.)
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
@@ -66,6 +68,8 @@ function Bloodhound(options) {
             return 'UPS';
         } else if (usps.isTrackingNumberValid(trackingNumber)) {
             return 'USPS';
+        } else if (dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
+            return 'DHL eCommerce Solutions';
         } else {
             return undefined;
         }
@@ -105,6 +109,8 @@ function Bloodhound(options) {
 
         if (options.carrier === 'dhl') {
             dhl.track(trackingNumber, options, callback);
+        } else if (options.carrier === 'dhl ecommerce solutions') {
+            dhlEcommerceSolutions.track(trackingNumber, options, callback);
         } else if (options.carrier === 'fedex') {
             fedEx.track(trackingNumber, options, callback);
         } else if (options.carrier === 'newgistics') {
