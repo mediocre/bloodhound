@@ -53,7 +53,7 @@ function Bloodhound(options) {
     }
 
     const dhl = new DHL(options && options.dhl);
-    const dhlEcommerceSolutions = new DhlEcommerceSolutions(options && options.)
+    const dhlEcommerceSolutions = new DhlEcommerceSolutions(options && options.dhl)
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
     const ups = new UPS(options && options.ups);
