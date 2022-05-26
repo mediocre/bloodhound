@@ -40,8 +40,10 @@ describe('dhlEcommerceSolutions.track', function() {
     this.timeout(10000);
 
     const bloodhound = new Bloodhound({
-        usps: {
-            userId: process.env.USPS_USERID
+        dhlEcommerceSolutions: {
+            client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
+            client_secret: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_SECRET,
+            environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
         }
     });
 
