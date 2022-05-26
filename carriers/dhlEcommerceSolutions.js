@@ -2,12 +2,11 @@ const async = require('async');
 const moment = require('moment-timezone');
 const DhlClient = require('dhl-ecommerce-solutions');
 
-// These tracking descriptions indicate the shipment was delivered
-const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
+// These tracking codes indicate the shipment was delivered
+const DELIVERED_TRACKING_STATUS_CODES = ['600', '607'];
 
-// These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
-const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY', 'PROCESSED THROUGH SORT FACILITY'];
-
+// These tracking codes should indicate the shipment was shipped (shows movement beyond a shipping label being created)
+const SHIPPED_TRACKING_STATUS_CODES = ['520', '526', '540', '580', '598'];
 // EST is listed as an abbreviation for the America/Chicago timezone. America/Boise lists MST, MDT, PST and PDT, and alphabetically comes before any other timezone that lists those abbreviations. The whole abbreviation situation is a mess in Moment Timezone.
 // Further, the generic 'ET', 'CT', etc. are not listed at all. Instead, we are just going to maintain our own mapping.
 let timezoneList;
@@ -117,7 +116,7 @@ function DhlEcommerceSolutions(options) {
 
             events.forEach(event => {
                 const _event = {
-                    // TODO: Individual events don't seem to have address information. There is a recipient and a pickupAddress, but neither of those seem likely to change as the package moves.
+                    // TODO: Events may have a 'location' which has an example value like 'Hebron, KY, US' and also 'postalCode' and 'country'. None of the example results actually include these fields.
                     address: {},
                     date: moment.tz(`${event.date} ${event.time}`, 'YYYY-MM-DD HH:mm:ss', getTimezoneName(event.timeZone)).toDate(),
                     description: event.primaryEventDescription
@@ -128,15 +127,15 @@ function DhlEcommerceSolutions(options) {
                     return;
                 }
 
-                if (event.description) {
-                    _event.details = event.description;
+                if (event.secondaryEventDescription) {
+                    _event.details = event.secondaryEventDescription;
                 }
 
-                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_STATUS_CODES.includes(_event.primaryEventId)) {
                     results.deliveredAt = _event.date;
                 }
 
-                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_STATUS_CODES.includes(_event.primaryEventId)) {
                     results.shippedAt = _event.date;
                 }
 
