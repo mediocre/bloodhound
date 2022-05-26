@@ -26,7 +26,7 @@ describe('Error handling', function() {
     });
 
     it('Should return an error when a carrier is not specified', function(done) {
-        bloodhound.track('hello world', { carrier: null }, function(err, data) {
+        bloodhound.track('unknown', { carrier: null }, function(err, data) {
             assert(err);
             assert.strictEqual(err.message, 'Unknown carrier.');
             assert.strictEqual(data, undefined);
@@ -57,7 +57,7 @@ describe('bloodhound.guessCarrier', function() {
     const bloodhound = new Bloodhound();
 
     it('Should return an error for an unknown carrier', function() {
-        assert.strictEqual(bloodhound.guessCarrier('hello world'), undefined);
+        assert.strictEqual(bloodhound.guessCarrier('unknown'), undefined);
     });
 
     it('Should guess a FedEx tracking number', function() {
