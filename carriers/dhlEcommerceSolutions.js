@@ -88,7 +88,7 @@ function DhlEcommerceSolutions(options) {
         }
 
         async.retry(function(callback) {
-            dhlClient.getTrackingByPackageId(trackingNumber, callback);
+            dhlClient.getTrackingByTrackingId(trackingNumber, callback);
         }, function(err, body) {
             const results = {
                 carrier: 'DHL eCommerce Solutions',
