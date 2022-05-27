@@ -104,7 +104,7 @@ function DhlEcommerceSolutions(options) {
                 return callback(err);
             }
 
-            if (!body || !body.packages || !body.packages.length) {
+            if (!body?.packages?.length) {
                 return callback(null, results);
             }
 
@@ -143,7 +143,7 @@ function DhlEcommerceSolutions(options) {
             });
 
             // Add url to carrier tracking page
-            results.url = `http://webtrack.dhlglobalmail.com/?trackingnumber=${encodeURIComponent(trackingNumber)}`;
+            results.url = `https://www.dhl.com/global-en/home/tracking/tracking-ecommerce.html?tracking-id=${encodeURIComponent(trackingNumber)}`;
 
             // Reverse results again to get events in order Most Recent - Least Recent
             results.events.reverse();

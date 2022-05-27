@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2022-05-27
+### Added
+- DHL eCommerce Solutions support.
+
 ## [1.8.1] - 2021-07-31
 ### Changed
 - Updated the pitney-bowes module to ~0.3.0.
