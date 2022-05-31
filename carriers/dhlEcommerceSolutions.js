@@ -114,10 +114,38 @@ function DhlEcommerceSolutions(options) {
             // Reverse the array to get events in order Least Recent - Most Recent
             const events = package.events.reverse();
 
+            // Used when there is no address data present
+            var previousAddress = package.pickupDetail?.pickupAddress;
+
             events.forEach(event => {
+                if (!event.location || !event.country || event.postalCode === '0') {
+                    event.address = previousAddress;
+                } else {
+                    const locationTokens = event.location.split(',').map(t => t.trim());
+
+                    if (!locationTokens || locationTokens.length !== 3) {
+                        // TODO: Geolocate??
+                        event.address = previousAddress;
+                    } else {
+                        event.address = {
+                            city: locationTokens[0],
+                            country: event.country,
+                            state: locationTokens[1],
+                            postalCode: event.postalCode
+                        }
+
+                        // Save the current address as the previousAddress
+                        previousAddress = event.address;
+                    }
+                }
+
                 const _event = {
-                    // TODO: Events may have a 'location' which has an example value like 'Hebron, KY, US' and also 'postalCode' and 'country'. None of the example results actually include these fields.
-                    address: {},
+                    address: {
+                        city: event.address?.city,
+                        country: event.address?.country,
+                        state: event.address?.state,
+                        zip: event.address?.postalCode
+                    },
                     date: moment.tz(`${event.date} ${event.time}`, 'YYYY-MM-DD HH:mm:ss', getTimezoneName(event.timeZone)).toDate(),
                     description: event.primaryEventDescription
                 };
@@ -131,11 +159,11 @@ function DhlEcommerceSolutions(options) {
                     _event.details = event.secondaryEventDescription;
                 }
 
-                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_STATUS_CODES.includes(_event.primaryEventId)) {
+                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_STATUS_CODES.includes(event.primaryEventId.toString())) {
                     results.deliveredAt = _event.date;
                 }
 
-                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_STATUS_CODES.includes(_event.primaryEventId)) {
+                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_STATUS_CODES.includes(event.primaryEventId.toString())) {
                     results.shippedAt = _event.date;
                 }
 

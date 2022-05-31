@@ -47,7 +47,7 @@ describe('dhlEcommerceSolutions.track', function() {
         }
     });
 
-    it.skip('should return a valid response with no errors', function(done) {
+    it('should return a valid response with no errors', function(done) {
         bloodhound.track('9361269903505749570437', 'DHL eCommerce Solutions', function(err, actual) {
             assert.ifError(err);
             done();
