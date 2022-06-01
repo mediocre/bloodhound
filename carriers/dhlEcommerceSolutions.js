@@ -171,7 +171,7 @@ function DhlEcommerceSolutions(options) {
             });
 
             // Add url to carrier tracking page
-            results.url = `https://www.dhl.com/global-en/home/tracking/tracking-ecommerce.html?tracking-id=${encodeURIComponent(trackingNumber)}`;
+            results.url = `https://webtrack.dhlecs.com/orders?trackingNumber=${encodeURIComponent(trackingNumber)}`;
 
             // Reverse results again to get events in order Most Recent - Least Recent
             results.events.reverse();
