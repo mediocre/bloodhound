@@ -8,13 +8,13 @@ describe('DHL eCommerce Solutions', function() {
         const dhlecs = new DhlEcommerceSolutions();
 
         const validTrackingNumbers = [
-            '1234567890',
-            '123456789012345678901234567890123456789'
+            '9312310912400000000000',
+            '93999109124123456789012345'
         ];
 
         const invalidTrackingNumbers = [
-            '123456789',
-            '1234567890123456789012345678901234567890'
+            '9312310912300000000000',
+            '9212310912432100000000'
 
         ];
 
@@ -48,7 +48,7 @@ describe('dhlEcommerceSolutions.track', function() {
     });
 
     it('should return a valid response with no errors', function(done) {
-        bloodhound.track('9361269903505749570437', 'DHL eCommerce Solutions', function(err, actual) {
+        bloodhound.track('9361210912405749570437', 'DHL eCommerce Solutions', function(err, actual) {
             assert.ifError(err);
             done();
         });

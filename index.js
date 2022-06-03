@@ -65,7 +65,9 @@ function Bloodhound(options) {
     const usps = new USPS(options && options.usps);
 
     this.guessCarrier = function(trackingNumber) {
-        if (dhl.isTrackingNumberValid(trackingNumber)) {
+        if (dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
+            return 'DHL eCommerce Solutions';
+        } else if (dhl.isTrackingNumberValid(trackingNumber)) {
             return 'DHL';
         } else if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
@@ -73,8 +75,6 @@ function Bloodhound(options) {
             return 'UPS';
         } else if (usps.isTrackingNumberValid(trackingNumber)) {
             return 'USPS';
-        } else if (dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
-            return 'DHL eCommerce Solutions';
         } else {
             return undefined;
         }

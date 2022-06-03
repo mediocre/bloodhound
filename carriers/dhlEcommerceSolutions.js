@@ -68,12 +68,18 @@ function DhlEcommerceSolutions(options) {
 
     this.isTrackingNumberValid = function(trackingNumber) {
         // 10-39 characters is as definite as I could find... https://www.dhl.com/us-en/home/customer-service/ecommerce-solutions-tracking-faq.html
-        // https://mydhl.express.dhl/es/en/forms/tracking-number-not-10-digits.html mentions a few specifics for DHL Ecommerce, but doesn't seem exhaustive.
-        // A few other (https://parcelsapp.com/en/carriers/dhl-ecommerce, https://elextensions.com/track-dhl-ecommerce-shipments-using-dhl-tracking-numbers/) places mention more explicit formats but:
-        //    * also list 10-39 characters
-        //    * are not authoritative
-        let length = trackingNumber?.length ?? 0;
-        return length >= 10 && length <= 39
+        // For US domestic mail, DHL eCommerce Solutions tracking numbers will be USPS IMpb numbers.
+        // IMpb numbers that start with 93 expect a 6-digit Mailer ID. If they start with 92, it's a 9-digit Mailer ID. 109124 is the 6-digit Mailer ID for DHL eCommerce Solutions.
+        // Minus the digits that are meant to be suppressed in printed form, the numbers are all either 22 or 26 digits long.
+        if (/^93/.test(trackingNumber)) {
+            return /^93\d{3}109124\d{11}(?:\d{4})?$/.test(trackingNumber);
+        } else if (/^92/.test(trackingNumber)) {
+            // For now, we don't have a 9-digit Mailer ID to look for for DHL eCommerce Solutions.
+            //return /^92\d{3}000000000\d{8}(?:\d{4})?$/.test(trackingNumber);
+            return false;
+        }
+
+        return false;
     };
 
     this.track = function(trackingNumber, _options, callback) {
