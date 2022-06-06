@@ -56,7 +56,7 @@ describe('DHL', function() {
 });
 
 describe('dhl.track', function() {
-    this.timeout(10000);
+    this.timeout(60000);
 
     const bloodhound = new Bloodhound({
         usps: {
@@ -64,8 +64,8 @@ describe('dhl.track', function() {
         }
     });
 
-    it.skip('should return a valid response with no errors', function(done) {
-        bloodhound.track('9361269903505749570437', 'dhl', function(err, actual) {
+    it.only('should return a valid response with no errors', function(done) {
+        bloodhound.track('420553099361210912400312253154', 'dhl', function(err, actual) {
             assert.ifError(err);
             done();
         });
