@@ -167,8 +167,8 @@ function DHL(options) {
                     results.events.push(_event);
                 });
 
-                // Add url to carrier tracking page
-                results.url = `http://webtrack.dhlglobalmail.com/?trackingnumber=${encodeURIComponent(trackingNumber)}`;
+                // Add URL to carrier tracking page
+                results.url = `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${encodeURIComponent(trackingNumber)}&submit=1`;
 
                 // Reverse results again to get events in order Most Recent - Least Recent
                 results.events.reverse();
