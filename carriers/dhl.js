@@ -11,10 +11,6 @@ const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED'];
 // These tracking descriptions should indicate the shipment was shipped (shows movement beyond a shipping label being created)
 const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'ARRIVAL AT POST OFFICE', 'OUT FOR DELIVERY', 'PROCESSED THROUGH SORT FACILITY'];
 
-// In an IMpb number, an initial '420' followed by ZIP or ZIP+4 is part of the barcode but is not supposed to be printed. If the tracking number comes from a barcode scanner, it will have that info.
-// 109124 is a Mailer ID provided by DHL. See https://postalpro.usps.com/shipping/impb/BarcodePackageIMSpec for full IMpb specs.
-const DHL_IMPB_REGEX = new RegExp(/^(?:420(?:\d{9}|\d{5}))?(93\d{3}109124(?:\d{14}|\d{10})\d)$/);
-
 const geography = require('../util/geography');
 
 function DHL(options) {
@@ -24,11 +20,8 @@ function DHL(options) {
         // Remove spaces and uppercase
         trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
 
-        if (DHL_IMPB_REGEX.test(trackingNumber)) {
-            // Strip off the IMpb routing code and ZIP
-            trackingNumber = trackingNumber.replace(DHL_IMPB_REGEX, '$1');
-
-            return checkDigit(trackingNumber, [3, 1], 10);
+        if ([/94748\d{17}$/, /93612\d{17}$/].some(regex => regex.test(trackingNumber))) {
+            return true;
         }
 
         return false;
