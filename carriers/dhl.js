@@ -1,4 +1,5 @@
 const async = require('async');
+const moment = require('moment-timezone');
 const request = require('request');
 
 const checkDigit = require('../util/checkDigit');
@@ -13,6 +14,8 @@ const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILI
 // In an IMpb number, an initial '420' followed by ZIP or ZIP+4 is part of the barcode but is not supposed to be printed. If the tracking number comes from a barcode scanner, it will have that info.
 // 109124 is a Mailer ID provided by DHL. See https://postalpro.usps.com/shipping/impb/BarcodePackageIMSpec for full IMpb specs.
 const DHL_IMPB_REGEX = new RegExp(/^(?:420(?:\d{9}|\d{5}))?(93\d{3}109124(?:\d{14}|\d{10})\d)$/);
+
+const geography = require('../util/geography');
 
 function DHL(options) {
     const usps = new USPS(options && options.usps);
@@ -47,7 +50,7 @@ function DHL(options) {
             forever: true,
             gzip: true,
             headers: {
-                'DHL-API-Key': options.apiKey
+                'DHL-API-Key': options.apiKey || process.env.DHL_API_KEY
             },
             json: true,
             method: 'GET',
@@ -94,68 +97,88 @@ function DHL(options) {
             const events = shipment.events.reverse();
 
             // Used when there is no address data present
-            var previousAddress = shipment.origin && shipment.origin.address;
+            var previousAddress = shipment.origin?.address;
 
+            // Set address and locationString of each event
             events.forEach(event => {
-                // If the event doesn't have a location, make one up using the previousAddress
-                if (!event.location) {
-                    event.location = {
-                        address: previousAddress
-                    }
-                }
-
-                // If the event's location contains an address without a comma (UNITED STATES), use the previousAddress instead
-                if (event.location && event.location.address && event.location.address.addressLocality && !event.location.address.addressLocality.includes(',')) {
+                if (!event.location?.address) {
+                    event.location = event.location || {};
                     event.location.address = previousAddress;
                 }
-
-                // Save the current address as the previousAddress
-                previousAddress = event.location.address;
-
-                const addressTokens = event.location.address.addressLocality.split(',').map(t => t.trim());
-
-                const _event = {
-                    address: {
-                        city: addressTokens[0],
-                        country: event.location.address.countryCode,
-                        state: addressTokens[1],
-                        zip: event.location.address.postalCode
-                    },
-                    date: new Date(event.timestamp),
-                    description: event.status
-                };
-
-                // Ensure event is after minDate (used to prevent data from reused tracking numbers)
-                if (_event.date < _options.minDate) {
-                    return;
-                }
-
-                if (event.description) {
-                    _event.details = event.description;
-                }
-
-                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
-                    results.deliveredAt = _event.date;
-                }
-
-                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
-                    results.shippedAt = _event.date;
-                }
-
-                results.events.push(_event);
+                event.locationString = `${event.location.address?.addressLocality} ${event.location.address?.postalCode} ${event.location.address?.countryCode}`.trim();
             });
 
-            // Add url to carrier tracking page
-            results.url = `http://webtrack.dhlglobalmail.com/?trackingnumber=${encodeURIComponent(trackingNumber)}`;
+            // Get unique array of locations (remove falsy values)
+            const locations = Array.from(new Set(events.map(event => event.locationString))).filter(l => l);
 
-            // Reverse results again to get events in order Most Recent - Least Recent
-            results.events.reverse();
+            // Lookup each location
+            async.mapLimit(locations, 10, function(location, callback) {
+                geography.parseLocation(location, options, function(err, address) {
+                    if (err || !address) {
+                        return callback(err, address);
+                    }
 
-            if (!results.shippedAt && results.deliveredAt) {
-                results.shippedAt = results.deliveredAt;
-            }
+                    address.location = location;
 
-            callback(null, results);
+                    callback(null, address);
+                });
+            }, function(err, addresses) {
+                if (err) {
+                    return callback(err);
+                }
+
+                events.forEach(event => {
+                    const address = addresses.find(a => a && a.location === event.locationString);
+
+                    // Use the geolocated timezone, or ET as a default
+                    let timezone = 'America/New_York';
+                    if (address && address.timezone) {
+                        timezone = address.timezone;
+                    }
+
+                    const _event = {
+                        address: {
+                            city: address.city,
+                            country: event.location.address.countryCode,
+                            state: address.state,
+                            zip: event.location.address.postalCode
+                        },
+                        date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
+                        description: event.status
+                    };
+
+                    // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                    if (_event.date < _options.minDate) {
+                        return;
+                    }
+
+                    if (event.description) {
+                        _event.details = event.description;
+                    }
+
+                    if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                        results.deliveredAt = _event.date;
+                    }
+
+                    if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                        results.shippedAt = _event.date;
+                    }
+
+                    results.events.push(_event);
+                });
+
+                // Add url to carrier tracking page
+                results.url = `http://webtrack.dhlglobalmail.com/?trackingnumber=${encodeURIComponent(trackingNumber)}`;
+
+                // Reverse results again to get events in order Most Recent - Least Recent
+                results.events.reverse();
+
+                if (!results.shippedAt && results.deliveredAt) {
+                    results.shippedAt = results.deliveredAt;
+                }
+
+                callback(null, results);
+            });
         });
     }
 }
