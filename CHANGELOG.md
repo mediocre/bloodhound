@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.9.0] - 2021-06-08
-### Chanded
+### Changed
 - Updated the DHL API to use https://developer.dhl.com/api-reference/shipment-tracking.
 
 ## [1.8.1] - 2021-07-31
