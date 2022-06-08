@@ -66,6 +66,9 @@ By default, when Bloodhound encounters a timestamp without a UTC offset it will 
 const Bloodhound = require('@mediocre/bloodhound');
 
 const bloodhound = new Bloodhound({
+    dhl: {
+        apiKey: 'DHL API key from https://developer.dhl.com'
+    },
     fedEx: {
         account_number: '123456789',
         environment: 'live',
@@ -100,6 +103,8 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
     console.log(data);
 });
 ```
+**dhl**
+The DHL API requires an API key: https://developer.dhl.com.
 
 **fedEx**
 
