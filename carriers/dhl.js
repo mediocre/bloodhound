@@ -50,7 +50,7 @@ function DHL(options) {
             forever: true,
             gzip: true,
             headers: {
-                'DHL-API-Key': options.apiKey || process.env.DHL_API_KEY
+                'DHL-API-Key': options.apiKey
             },
             json: true,
             method: 'GET',
