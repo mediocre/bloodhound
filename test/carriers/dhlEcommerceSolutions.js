@@ -44,14 +44,14 @@ describe('dhlEcommerceSolutions.track', function() {
 
     const bloodhound = new Bloodhound({
         dhlEcommerceSolutions: {
-            client_id: process.env.DHL_ECOMMERCE_CLIENT_ID,
-            client_secret: process.env.DHL_ECOMMERCE_CLIENT_SECRET,
+            client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
+            client_secret: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_SECRET,
             environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
         }
     });
 
     it('should return a valid response with no errors', function(done) {
-        bloodhound.track('420726449361210912400330222910', 'dhl', function(err) {
+        bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
             assert.ifError(err);
             assert.equal('DHL eCommerce Solutions', actual.carrier);
             done();

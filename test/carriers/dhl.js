@@ -55,8 +55,8 @@ describe('dhl.track', function() {
     it('should fall through to DHL eCommerce solutions and return a response with no errors when DHL UTAPI fails', function(done) {
         const bloodhound = new Bloodhound({
             dhlEcommerceSolutions: {
-                client_id: process.env.DHL_ECOMMERCE_CLIENT_ID,
-                client_secret: process.env.DHL_ECOMMERCE_CLIENT_SECRET,
+                client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
+                client_secret: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_SECRET,
                 environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
             }
         });
