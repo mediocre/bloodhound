@@ -47,6 +47,7 @@ describe('USPS', function() {
         ];
 
         const invalidTrackingNumbers = [
+            // incorrect check digit (last digit)
             '4206810692612927005269000028978090'
         ];
 

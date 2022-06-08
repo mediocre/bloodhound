@@ -18,8 +18,12 @@ function Bloodhound(options) {
         geography.geocoder = NodeGeocoder(options.geocoder);
     }
 
-    // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
     if (options.pettyCache) {
+        // Allow DHL to cache geocode results in Redis (via petty-cache)
+        if (options.dhl) {
+            options.dhl.pettyCache = options.pettyCache;
+        }
+
         // Allow PitneyBowes to cache geocode results in Redis (via petty-cache)
         if (options.pitneyBowes) {
             options.pitneyBowes.pettyCache = options.pettyCache;
