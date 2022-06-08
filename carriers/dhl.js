@@ -2,7 +2,7 @@ const async = require('async');
 const moment = require('moment-timezone');
 const request = require('request');
 
-const checkDigit = require('../util/checkDigit');
+const DhlEcommerceSolutions = require('./dhlEcommerceSolutions');
 const USPS = require('./usps');
 
 // These tracking descriptions indicate the shipment was delivered
@@ -14,6 +14,7 @@ const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILI
 const geography = require('../util/geography');
 
 function DHL(options) {
+    const dhlEcommerceSolutions = new DhlEcommerceSolutions(options && options.dhlEcommerceSolutions);
     const usps = new USPS(options && options.usps);
 
     this.isTrackingNumberValid = function(trackingNumber) {
@@ -24,7 +25,7 @@ function DHL(options) {
             return true;
         }
 
-        return false;
+        return dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber);
     };
 
     this.track = function(trackingNumber, _options, callback) {
@@ -64,14 +65,6 @@ function DHL(options) {
                 callback(null, body);
             });
         }, function(err, body) {
-            if (err) {
-                // If DHL fails, try USPS
-                if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                    return usps.track(trackingNumber, callback);
-                }
-
-                return callback(err);
-            }
 
             const results = {
                 carrier: 'DHL',
@@ -79,99 +72,118 @@ function DHL(options) {
                 raw: body
             };
 
-            if (!body || !body.shipments || !body.shipments.length) {
-                return callback(null, results);
+            if (err || !body?.shipments?.length) {
+                // If DHL fails, try DHL eCommerce Solutions
+                if (options.dhlEcommerceSolutions && dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
+                    async.retry(function(callback) {
+                        dhlEcommerceSolutions.track(trackingNumber, callback);
+                    }, function(err, results) {
+                        // If DHL eCommerce Solutions fails, try USPS
+                        if (err || !results.raw?.packages?.length) {
+                            if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                                return usps.track(trackingNumber, callback);
+                            }
+                        }
+
+                        return callback(err, results);
+                    });
+                } else if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                    return usps.track(trackingNumber, callback);
+                } else {
+                    return callback(err, results);
+                }
+            } else {
+                // We only support the first shipment
+                const shipment = body.shipments[0];
+
+                // Reverse the array to get events in order Least Recent - Most Recent
+                const events = shipment.events.reverse();
+
+                // Used when there is no address data present
+                var previousAddress = shipment.origin?.address;
+
+                // Set address and locationString of each event
+                events.forEach(event => {
+                    if (!event.location?.address) {
+                        event.location = event.location || {};
+                        event.location.address = previousAddress;
+                    }
+                    event.locationString = `${event.location.address?.addressLocality} ${event.location.address?.postalCode} ${event.location.address?.countryCode}`.trim();
+                });
+
+                // Get unique array of locations (remove falsy values)
+                const locations = Array.from(new Set(events.map(event => event.locationString))).filter(l => l);
+
+                // Lookup each location
+                async.mapLimit(locations, 10, function(location, callback) {
+                    geography.parseLocation(location, options, function(err, address) {
+                        if (err || !address) {
+                            return callback(err, address);
+                        }
+
+                        address.location = location;
+
+                        callback(null, address);
+                    });
+                }, function(err, addresses) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    events.forEach(event => {
+                        const address = addresses.find(a => a && a.location === event.locationString);
+
+                        // Use the geolocated timezone, or ET as a default
+                        let timezone = 'America/New_York';
+                        if (address && address.timezone) {
+                            timezone = address.timezone;
+                        }
+
+                        const _event = {
+                            address: {
+                                city: address.city,
+                                country: event.location.address.countryCode,
+                                state: address.state,
+                                zip: event.location.address.postalCode
+                            },
+                            date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
+                            description: event.status
+                        };
+
+                        // Ensure event is after minDate (used to prevent data from reused tracking numbers)
+                        if (_event.date < _options.minDate) {
+                            return;
+                        }
+
+                        if (event.description) {
+                            _event.details = event.description;
+                        }
+
+                        if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                            results.deliveredAt = _event.date;
+                        }
+
+                        if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                            results.shippedAt = _event.date;
+                        }
+
+                        results.events.push(_event);
+                    });
+
+                    // Add URL to carrier tracking page
+                    results.url = `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${encodeURIComponent(trackingNumber)}&submit=1`;
+
+                    // Reverse results again to get events in order Most Recent - Least Recent
+                    results.events.reverse();
+
+                    if (!results.shippedAt && results.deliveredAt) {
+                        results.shippedAt = results.deliveredAt;
+                    }
+
+                    callback(null, results);
+                });
             }
 
-            // We only support the first shipment
-            const shipment = body.shipments[0];
-
-            // Reverse the array to get events in order Least Recent - Most Recent
-            const events = shipment.events.reverse();
-
-            // Used when there is no address data present
-            var previousAddress = shipment.origin?.address;
-
-            // Set address and locationString of each event
-            events.forEach(event => {
-                if (!event.location?.address) {
-                    event.location = event.location || {};
-                    event.location.address = previousAddress;
-                }
-                event.locationString = `${event.location.address?.addressLocality} ${event.location.address?.postalCode} ${event.location.address?.countryCode}`.trim();
-            });
-
-            // Get unique array of locations (remove falsy values)
-            const locations = Array.from(new Set(events.map(event => event.locationString))).filter(l => l);
-
-            // Lookup each location
-            async.mapLimit(locations, 10, function(location, callback) {
-                geography.parseLocation(location, options, function(err, address) {
-                    if (err || !address) {
-                        return callback(err, address);
-                    }
-
-                    address.location = location;
-
-                    callback(null, address);
-                });
-            }, function(err, addresses) {
-                if (err) {
-                    return callback(err);
-                }
-
-                events.forEach(event => {
-                    const address = addresses.find(a => a && a.location === event.locationString);
-
-                    // Use the geolocated timezone, or ET as a default
-                    let timezone = 'America/New_York';
-                    if (address && address.timezone) {
-                        timezone = address.timezone;
-                    }
-
-                    const _event = {
-                        address: {
-                            city: address.city,
-                            country: event.location.address.countryCode,
-                            state: address.state,
-                            zip: event.location.address.postalCode
-                        },
-                        date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
-                        description: event.status
-                    };
-
-                    // Ensure event is after minDate (used to prevent data from reused tracking numbers)
-                    if (_event.date < _options.minDate) {
-                        return;
-                    }
-
-                    if (event.description) {
-                        _event.details = event.description;
-                    }
-
-                    if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
-                        results.deliveredAt = _event.date;
-                    }
-
-                    if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
-                        results.shippedAt = _event.date;
-                    }
-
-                    results.events.push(_event);
-                });
-
-                // Add URL to carrier tracking page
-                results.url = `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${encodeURIComponent(trackingNumber)}&submit=1`;
-
-                // Reverse results again to get events in order Most Recent - Least Recent
-                results.events.reverse();
-
-                if (!results.shippedAt && results.deliveredAt) {
-                    results.shippedAt = results.deliveredAt;
-                }
-
-                callback(null, results);
-            });
         });
     }
 }
