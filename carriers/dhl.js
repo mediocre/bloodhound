@@ -39,60 +39,67 @@ function DHL(options) {
             _options.minDate = new Date(0);
         }
 
-        // This is the API being used from: https://developer.dhl.com/api-reference/shipment-tracking
-        const req = {
-            forever: true,
-            gzip: true,
-            headers: {
-                'DHL-API-Key': options.apiKey
-            },
-            json: true,
-            method: 'GET',
-            timeout: 5000,
-            url: `https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingNumber}`
-        };
+        if (options.dhlEcommerceSolutions && dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
+            async.retry(function(callback) {
+                dhlEcommerceSolutions.track(trackingNumber, callback);
+            }, function(err, results) {
+                // If DHL eCommerce Solutions fails, try UTAPI
+                if (err || !results.raw?.packages?.length) {
+                    return trackWithUTAPI();
+                }
 
-        async.retry(function(callback) {
-            request(req, function(err, res, body) {
+                return callback(err, results);
+            });
+        } else {
+            return trackWithUTAPI();
+        }
+
+        function trackWithUTAPI() {
+            // This is the API being used from: https://developer.dhl.com/api-reference/shipment-tracking
+            const req = {
+                forever: true,
+                gzip: true,
+                headers: {
+                    'DHL-API-Key': options.apiKey
+                },
+                json: true,
+                method: 'GET',
+                timeout: 5000,
+                url: `https://api-eu.dhl.com/track/shipments?trackingNumber=${trackingNumber}`
+            };
+
+            async.retry(function(callback) {
+                request(req, function(err, res, body) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    if (res.statusCode !== 200) {
+                        return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href} ${body || ''}`.trim()));
+                    }
+
+                    callback(null, body);
+                });
+            }, function(err, body) {
                 if (err) {
+                    // If UTAPI fails, try USPS
+                    if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                        return usps.track(trackingNumber, callback);
+                    }
+
                     return callback(err);
                 }
 
-                if (res.statusCode !== 200) {
-                    return callback(new Error(`${res.statusCode} ${res.request.method} ${res.request.href} ${body || ''}`.trim()));
+                const results = {
+                    carrier: 'DHL',
+                    events: [],
+                    raw: body
+                };
+
+                if (!body || !body.shipments || !body.shipments.length) {
+                    return callback(null, results);
                 }
 
-                callback(null, body);
-            });
-        }, function(err, body) {
-
-            const results = {
-                carrier: 'DHL',
-                events: [],
-                raw: body
-            };
-
-            if (err || !body?.shipments?.length) {
-                // If DHL fails, try DHL eCommerce Solutions
-                if (options.dhlEcommerceSolutions && dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
-                    async.retry(function(callback) {
-                        dhlEcommerceSolutions.track(trackingNumber, callback);
-                    }, function(err, results) {
-                        // If DHL eCommerce Solutions fails, try USPS
-                        if (err || !results.raw?.packages?.length) {
-                            if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                                return usps.track(trackingNumber, callback);
-                            }
-                        }
-
-                        return callback(err, results);
-                    });
-                } else if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                    return usps.track(trackingNumber, callback);
-                } else {
-                    return callback(err, results);
-                }
-            } else {
                 // We only support the first shipment
                 const shipment = body.shipments[0];
 
@@ -182,9 +189,8 @@ function DHL(options) {
 
                     callback(null, results);
                 });
-            }
-
-        });
+            });
+        }
     }
 }
 

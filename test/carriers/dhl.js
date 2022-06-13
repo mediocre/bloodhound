@@ -38,7 +38,7 @@ describe('DHL', function() {
 describe('dhl.track', function() {
     this.timeout(10000);
 
-    it.skip('should return a valid response with no errors', function(done) {
+    it('should return a valid response with no errors', function(done) {
         const bloodhound = new Bloodhound({
             dhl: {
                 apiKey: process.env.DHL_API_KEY
@@ -52,7 +52,7 @@ describe('dhl.track', function() {
         });
     });
 
-    it('should fall through to DHL eCommerce solutions and return a response with no errors when DHL UTAPI fails', function(done) {
+    it('should try DHL eCommerce solutions first', function(done) {
         const bloodhound = new Bloodhound({
             dhlEcommerceSolutions: {
                 client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
@@ -62,32 +62,36 @@ describe('dhl.track', function() {
         });
 
         bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
+            // No packages with length to track, so this is falling through to UTAPI
+            assert.equal(err.message.includes('401 GET https://api-eu.dhl.com/track/shipments'), true);
+            assert.equal(undefined, actual);
+            done();
+        });
+    });
+
+    it('should fall through to DHL UTAPI and return a response with no errors when DHL eCommerce Solutions fails', function(done) {
+        const bloodhound = new Bloodhound({
+            dhl: {
+                apiKey: process.env.DHL_API_KEY
+            },
+            dhlEcommerceSolutions: {
+                client_id: 'fail',
+                client_secret: 'fail',
+                environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
+            }
+        });
+
+        bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
             assert.ifError(err);
-            assert.equal('DHL eCommerce Solutions', actual.carrier);
+            assert.equal('DHL', actual.carrier);
             done();
         });
     });
 
     it('should fall through to USPS and return a response with no errors when DHL UTAPI fails', function(done) {
         const bloodhound = new Bloodhound({
-            usps: {
-                userId: process.env.USPS_USERID
-            }
-        });
-
-        bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
-            assert.ifError(err);
-            assert.equal('USPS', actual.carrier);
-            done();
-        });
-    });
-
-    it('should fall through to USPS and return a response with no errors when DHL eCommerce Solutions fails', function(done) {
-        const bloodhound = new Bloodhound({
-            dhlEcommerceSolutions: {
-                client_id: '12345678901234567890123456789012',
-                client_secret: '1234567890123456',
-                environment_url: 'https://api-sandbox.dhlecs.com'
+            dhl: {
+                apiKey: '123'
             },
             usps: {
                 userId: process.env.USPS_USERID

@@ -37,24 +37,25 @@ describe('DHL eCommerce Solutions', function() {
             });
         });
     });
-});
 
-describe('dhlEcommerceSolutions.track', function() {
-    this.timeout(10000);
+    describe('dhlEcommerceSolutions.track', function() {
+        this.timeout(10000);
 
-    const bloodhound = new Bloodhound({
-        dhlEcommerceSolutions: {
-            client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
-            client_secret: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_SECRET,
-            environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
-        }
-    });
+        const bloodhound = new Bloodhound({
+            dhlEcommerceSolutions: {
+                client_id: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_ID,
+                client_secret: process.env.DHL_ECOMMERCE_SOLUTIONS_CLIENT_SECRET,
+                environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
+            }
+        });
 
-    it('should return a valid response with no errors', function(done) {
-        bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
-            assert.ifError(err);
-            assert.equal('DHL eCommerce Solutions', actual.carrier);
-            done();
+        it('should return a DHL error when no packages are associated with tracking number', function(done) {
+            bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
+                // No packages with length to track, so this is falling through to UTAPI
+                assert.equal(err.message.includes('401 GET https://api-eu.dhl.com/track/shipments'), true);
+                assert.equal(undefined, actual);
+                done();
+            });
         });
     });
 });
