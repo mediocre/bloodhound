@@ -45,6 +45,11 @@ function Bloodhound(options) {
         options.dhl = {};
     }
 
+    // Allow DHL to use DHL eCommerce Solutions
+    if (options.dhlEcommerceSolutions) {
+        options.dhl.dhlEcommerceSolutions = options.dhlEcommerceSolutions;
+    }
+
     // Allow DHL to use USPS
     if (options.usps) {
         options.dhl.usps = options.usps;
