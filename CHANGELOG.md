@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2021-06-13
+### Changed
+- Updated DHL to use DHL eCommerce Solutions first if configured.
+
 ## [1.10.0] - 2021-06-13
 ### Changed
 - Updated DHL to use DHL eCommerce Solutions if configured.
