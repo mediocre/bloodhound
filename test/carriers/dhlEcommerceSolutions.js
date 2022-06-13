@@ -4,16 +4,16 @@ const Bloodhound = require('../../index');
 const DhlEcommerceSolutions = require('../../carriers/dhlEcommerceSolutions');
 
 describe('DHL eCommerce Solutions', function() {
+    const validTrackingNumbers = [
+        '420480369374810912400407068201'
+    ];
+
     describe('dhlEcommerceSolutions.isTrackingNumberValid', function() {
         const dhlEcommerceSolutions = new DhlEcommerceSolutions({
             client_id: process.env.DHL_ECOMMERCE_CLIENT_ID,
             client_secret: process.env.DHL_ECOMMERCE_CLIENT_SECRET,
             environment_url: process.env.DHL_ECOMMERCE_SOLUTIONS_ENVIRONMENT_URL
         });
-
-        const validTrackingNumbers = [
-            '420726449361210912400330222910'
-        ];
 
         const invalidTrackingNumbers = [
             '9970 4895 0367 429',
@@ -38,7 +38,7 @@ describe('DHL eCommerce Solutions', function() {
         });
     });
 
-    describe('dhlEcommerceSolutions.track', function() {
+    describe.skip('dhlEcommerceSolutions.track', function() {
         this.timeout(10000);
 
         const bloodhound = new Bloodhound({
@@ -50,7 +50,7 @@ describe('DHL eCommerce Solutions', function() {
         });
 
         it('should return a DHL error when no packages are associated with tracking number', function(done) {
-            bloodhound.track('420726449361210912400330222910', 'dhl', function(err, actual) {
+            bloodhound.track(validTrackingNumbers[0], 'dhl', function(err, actual) {
                 // No packages with length to track, so this is falling through to UTAPI
                 assert.equal(err.message.includes('401 GET https://api-eu.dhl.com/track/shipments'), true);
                 assert.equal(undefined, actual);
