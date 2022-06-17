@@ -4,22 +4,26 @@ const DhlEcommerceClient = require('dhl-ecommerce-solutions');
 
 const checkDigit = require('../util/checkDigit');
 
-// These tracking codes indicate the shipment was delivered - [600, 607]
+// These tracking codes indicate the shipment was delivered
 const DELIVERED_TRACKING_DESCRIPTIONS = ['DELIVERED', 'SECOND DELIVERY ATTEMPT SUCCESSFUL'];
 
-// These tracking codes should indicate the shipment was shipped (shows movement beyond a shipping label being created) - [350, 400, 520, 526, 540, 580, 598]
-const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'TENDERED TO DELIVERY SERVICE PROVIDER', 'ARRIVAL AT POST OFFICE', 'ARRIVED USPS SORT FACILITY', 'PROCESSED THROUGH USPS SORT FACILITY', 'OUT FOR SECOND DELIVERY ATTEMPT', 'OUT FOR DELIVERY'];
+// These tracking codes should indicate the shipment was shipped (shows movement beyond a shipping label being created)
+const SHIPPED_TRACKING_DESCRIPTIONS = ['ARRIVAL AT POST OFFICE', 'ARRIVAL DESTINATION DHL ECOMMERCE FACILITY', 'ARRIVED USPS SORT FACILITY', 'DEPARTURE ORIGIN DHL ECOMMERCE FACILITY', 'OUT FOR DELIVERY', 'OUT FOR SECOND DELIVERY ATTEMPT', 'PACKAGE RECEIVED AT DHL ECOMMERCE DISTRIBUTION CENTER', 'PROCESSED', 'PROCESSED THROUGH USPS SORT FACILITY', 'TENDERED TO DELIVERY SERVICE PROVIDER'];
+
 // EST is listed as an abbreviation for the America/Chicago timezone. America/Boise lists MST, MDT, PST and PDT, and alphabetically comes before any other timezone that lists those abbreviations. The whole abbreviation situation is a mess in Moment Timezone.
 // Further, the generic 'ET', 'CT', etc. are not listed at all. Instead, we are just going to maintain our own mapping.
 let timezoneList;
+
 function getTimezoneName(abbr) {
     // Attempt to look up a timezone with the same name as the abbreviation provided
     let timezoneByName = moment.tz.zone(abbr);
+
     if (timezoneByName) {
         return abbr;
     }
 
     let timezone = 'America/New_York';
+
     switch (abbr) {
         case 'CT':
         case 'CST':
