@@ -41,20 +41,20 @@ function DHL(options) {
 
         if (options.dhlEcommerceSolutions && dhlEcommerceSolutions.isTrackingNumberValid(trackingNumber)) {
             async.retry(function(callback) {
-                dhlEcommerceSolutions.track(trackingNumber, callback);
+                dhlEcommerceSolutions.track(trackingNumber, _options, callback);
             }, function(err, results) {
                 // If DHL eCommerce Solutions fails, try UTAPI
                 if (err || !results.raw?.packages?.length) {
-                    return trackWithUTAPI();
+                    return trackWithUTAPI(_options);
                 }
 
                 return callback(err, results);
             });
         } else {
-            return trackWithUTAPI();
+            return trackWithUTAPI(_options);
         }
 
-        function trackWithUTAPI() {
+        function trackWithUTAPI(_options) {
             // This is the API being used from: https://developer.dhl.com/api-reference/shipment-tracking
             const req = {
                 forever: true,
@@ -84,7 +84,7 @@ function DHL(options) {
                 if (err) {
                     // If UTAPI fails, try USPS
                     if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                        return usps.track(trackingNumber, callback);
+                        return usps.track(trackingNumber, _options, callback);
                     }
 
                     return callback(err);
