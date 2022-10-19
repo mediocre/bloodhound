@@ -4,7 +4,7 @@ const normalize = require('us-states-normalize');
 const PettyCache = require('petty-cache');
 const tzlookup = require('tz-lookup');
 
-var pettyCache;
+let pettyCache;
 
 function geocode(location, callback) {
     async.auto({
@@ -70,7 +70,7 @@ function geocode(location, callback) {
 }
 
 exports.addressToString = function(address) {
-    var value = '';
+    let value = '';
 
     if (address.city) {
         value += address.city.trim();
@@ -111,7 +111,7 @@ exports.parseLocation = async.memoize(function(location, options, callback) {
     }
 
     // Use Redis (via Petty Cache)
-    if (options && options.pettyCache) {
+    if (options?.pettyCache) {
         if (!pettyCache) {
             pettyCache = new PettyCache(options.pettyCache.port, options.pettyCache.host, options.pettyCache.options);
         }
