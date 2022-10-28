@@ -142,15 +142,16 @@ function DHL(options) {
 
                         // Use the geolocated timezone, or ET as a default
                         let timezone = 'America/New_York';
-                        if (address && address.timezone) {
+
+                        if (address?.timezone) {
                             timezone = address.timezone;
                         }
 
                         const _event = {
                             address: {
-                                city: address.city,
+                                city: address?.city,
                                 country: event.location.address.countryCode,
-                                state: address.state,
+                                state: address?.state,
                                 zip: event.location.address.postalCode
                             },
                             date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
