@@ -90,6 +90,8 @@ function USPS(options) {
 
                 if (err) {
                     return callback(err);
+                } else if (!data) {
+                    return callback(new Error('Invalid or missing TrackResponse'));
                 } else if (data.Error) {
                     // Invalid credentials or Invalid Tracking Number
                     return callback(new Error(data.Error.Description[0]));
