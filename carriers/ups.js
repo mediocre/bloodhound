@@ -148,7 +148,7 @@ function UPS(options) {
                 return callback(err);
             }
 
-            const packageInfo = body.TrackResponse.Shipment.Package || body.TrackResponse.Shipment;
+            const packageInfo = body?.TrackResponse?.Shipment?.Package ?? body.TrackResponse.Shipment;
             var activitiesList = [];
 
             if (Array.isArray(packageInfo)) {
