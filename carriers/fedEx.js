@@ -116,7 +116,7 @@ function FedEx(options) {
             };
 
             // Ensure track reply has events
-            if (!trackReply.CompletedTrackDetails || !trackReply.CompletedTrackDetails.length || !trackReply.CompletedTrackDetails[0] || !trackReply.CompletedTrackDetails[0].TrackDetails || !trackReply.CompletedTrackDetails[0].TrackDetails.length || !trackReply.CompletedTrackDetails[0].TrackDetails[0] || !trackReply.CompletedTrackDetails[0].TrackDetails[0].Events || !trackReply.CompletedTrackDetails[0].TrackDetails[0].Events.length) {
+            if (!trackReply?.CompletedTrackDetails?.[0]?.TrackDetails?.[0]?.Events?.length) {
                 return callback(null, results);
             }
 
@@ -127,10 +127,10 @@ function FedEx(options) {
 
                 const event = {
                     address: {
-                        city: e.Address.City,
-                        country: e.Address.CountryCode,
-                        state: e.Address.StateOrProvinceCode,
-                        zip: e.Address.PostalCode
+                        city: e?.Address?.City,
+                        country: e?.Address?.CountryCode,
+                        state: e?.Address?.StateOrProvinceCode,
+                        zip: e?.Address?.PostalCode
                     },
                     date: new Date(e.Timestamp),
                     description: e.EventDescription
