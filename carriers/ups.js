@@ -118,12 +118,14 @@ function UPS(options) {
                 }
 
                 if (body && !body.TrackResponse) {
-                    if (body.Fault && body.Fault.detail && body.Fault.detail.Errors && body.Fault.detail.Errors.ErrorDetail && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode && body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description) {
+                    if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
                         return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
+                    } else {
+                        return callback(new Error('Invalid or missing TrackResponse'));
                     }
                 }
 
-                if (body && body.TrackResponse && body.TrackResponse.Response && body.TrackResponse.Response.Error) {
+                if (body?.TrackResponse?.Response?.Error) {
                     return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription))
                 }
 
