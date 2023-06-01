@@ -95,7 +95,7 @@ function USPS(options) {
                 } else if (data.Error) {
                     // Invalid credentials or Invalid Tracking Number
                     return callback(new Error(data.Error.Description[0]));
-                } else if (data.TrackResponse.TrackInfo[0].Error) {
+                } else if (!data?.TrackResponse?.TrackInfo?.[0] || data.TrackResponse.TrackInfo[0].Error) {
                     // No Tracking Information
                     return callback(null, results);
                 }
