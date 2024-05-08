@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.0] - 2024-05-08
+### Changed
+- Updated DHL to use "description" and "remark" fields (see https://developer.dhl.com/api-reference/shipment-tracking?language_content_entity=en#release-notes-section/ecommerce-status-code).
+
 ## [1.12.0] - 2024-05-08
 ### Changed
 - Updated FedEx to return the most recent tracking number data when FedEx creates a duplicate tracking number.
