@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2024-05-08
+### Changed
+- Updated FedEx to return the most recent tracking number data when FedEx creates a duplicate tracking number.
+
 ## [1.11.0] - 2021-06-13
 ### Changed
 - Updated DHL to use DHL eCommerce Solutions first if configured.

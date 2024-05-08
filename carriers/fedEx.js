@@ -102,7 +102,49 @@ function FedEx(options) {
                     return callback(new Error(trackReply.Notifications[0].Message));
                 }
 
-                callback(null, trackReply);
+                // Return if only one track detail is returned
+                if (trackReply?.CompletedTrackDetails?.[0]?.TrackDetails.length === 1) {
+                    return callback(null, trackReply);
+                }
+
+                async.mapLimit(trackReply.CompletedTrackDetails[0].TrackDetails, 10, function(trackDetail, callback) {
+                    const trackRequest = {
+                        SelectionDetails: {
+                            PackageIdentifier: {
+                                Type: 'TRACKING_NUMBER_OR_DOORTAG',
+                                Value: trackingNumber
+                            },
+                            TrackingNumberUniqueIdentifier: trackDetail.TrackingNumberUniqueIdentifier
+                        },
+                        ProcessingOptions: 'INCLUDE_DETAILED_SCANS'
+                    };
+
+                    async.retry(function(callback) {
+                        async.timeout(fedExClient.track, 5000)(trackRequest, function(err, trackReply) {
+                            if (err) {
+                                return callback(err);
+                            }
+
+                            if (trackReply.HighestSeverity === 'ERROR') {
+                                return callback(new Error(trackReply.Notifications[0].Message));
+                            }
+
+                            callback(null, trackReply);
+                        });
+                    }, callback);
+                }, function(err, trackReplies) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    // Sort track replies by timestamp
+                    trackReplies.sort((a, b) => b.CompletedTrackDetails[0].TrackDetails[0].StatusDetail.CreationTime - a.CompletedTrackDetails[0].TrackDetails[0].StatusDetail.CreationTime);
+
+                    // Get the most recent track reply
+                    trackReply = trackReplies[0];
+
+                    callback(null, trackReply);
+                });
             });
         }, function(err, trackReply) {
             if (err) {
