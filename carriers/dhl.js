@@ -155,7 +155,7 @@ function DHL(options) {
                                 zip: event.location.address.postalCode
                             },
                             date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
-                            description: event.status
+                            description: event.description
                         };
 
                         // Ensure event is after minDate (used to prevent data from reused tracking numbers)
@@ -163,8 +163,8 @@ function DHL(options) {
                             return;
                         }
 
-                        if (event.description) {
-                            _event.details = event.description;
+                        if (event.remark) {
+                            _event.details = event.remark;
                         }
 
                         if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
