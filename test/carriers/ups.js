@@ -13,7 +13,14 @@ function areEventsEqual(a, b) {
 }
 
 describe('UPS', function() {
-    this.timeout(10000);
+    this.timeout(25000);
+
+    beforeEach(function(done) {
+        // This is to prevent the UPS API from rate limiting us
+        setTimeout(() => {
+            done();
+        }, 15000);
+    });
 
     const bloodhound = new Bloodhound({
         ups: {
@@ -47,8 +54,8 @@ describe('UPS', function() {
                     assert(err);
 
                     done();
-                })
-            })
+                });
+            });
         });
 
         describe('Invalid UPS Access', function() {
@@ -65,7 +72,7 @@ describe('UPS', function() {
                     assert(err);
 
                     done();
-                })
+                });
             });
         });
     });
@@ -118,7 +125,7 @@ describe('UPS', function() {
     describe('ups.track', function() {
         this.timeout(60000);
 
-        it('should return an empty result if there is no tracking information available ', function(done) {
+        it('should return an empty result if there is no tracking information available', function(done) {
             bloodhound.track('1Z12345E1505270452', 'ups', function(err, actual) {
                 assert.ifError(err);
 
