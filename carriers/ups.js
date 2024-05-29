@@ -7,10 +7,10 @@ const geography = require('../util/geography');
 const USPS = require('./usps');
 
 function getActivities(package) {
-    var activitiesList = package.Activity;
+    var activitiesList = package.activity;
 
-    if (!Array.isArray(package.Activity)) {
-        activitiesList = [package.Activity];
+    if (!Array.isArray(package.activity)) {
+        activitiesList = [package.activity];
     }
 
     // Filter undefined activities
@@ -18,12 +18,12 @@ function getActivities(package) {
 
     if (activitiesList.length) {
         activitiesList.forEach(activity => {
-            if (activity.ActivityLocation) {
+            if (activity.activityLocation) {
                 activity.address = {
-                    city: activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
-                    country: activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
-                    state: activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
-                    zip: activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
+                    city: activity.activityLocation.city || (activity.activityLocation.address && activity.activityLocation.address.city),
+                    country: activity.activityLocation.countryCode || (activity.activityLocation.address && activity.activityLocation.Address.countryCode),
+                    state: activity.activityLocation.stateProvinceCode || (activity.activityLocation.address && activity.activityLocation.address.stateProvinceCode),
+                    zip: activity.activityLocation.postalCode || (activity.activityLocation.address && activity.activityLocation.address.postalCode)
                 }
 
                 if ((activity.address.city && activity.address.state) || activity.address.zip) {
@@ -37,6 +37,18 @@ function getActivities(package) {
 
         return activitiesList;
     }
+}
+
+function makeId(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+    }
+    return result;
 }
 
 function UPS(options) {
@@ -70,41 +82,19 @@ function UPS(options) {
             _options.minDate = new Date(0);
         }
 
+        const transId = makeId(55);
+
+        const baseUrl = options.baseUrl || 'https://onlinetools.ups.com';
+
         const req = {
-            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-            forever: true,
-            gzip: true,
-            json: {
-                Security: {
-                    UPSServiceAccessToken: {
-                        AccessLicenseNumber: options.accessKey
-                    },
-                    UsernameToken: {
-                        Username: options.username,
-                        Password: options.password
-                    }
-                },
-                TrackRequest: {
-                    InquiryNumber: trackingNumber,
-                    Request: {
-                        RequestAction: 'Track',
-                        RequestOption: 'activity',
-                        SubVersion: '1907'
-                    }
-                }
-            },
-            method: 'POST',
-            timeout: 5000,
-            url: '/rest/Track'
+            'method': 'GET',
+            'url': `${baseUrl}/api/track/v1/details/${trackingNumber}?locale=en_US&returnSignature=false&returnMilestones=false&returnPOD=false`,
+            'headers': {
+                'transId': `${transId}`,
+                'transactionSrc': `${_options.applicationName}`,
+                'Authorization': `Bearer ${_options.token}`
+            }
         };
-
-        // The REST API doesn't support UPS Mail Innovations. Use the XML API instead.
-        if (usps.isTrackingNumberValid(trackingNumber)) {
-            delete req.json;
-
-            req.body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
-            req.url = '/ups.app/xml/Track';
-        }
 
         async.retry(function(callback) {
             request(req, function(err, res, body) {
@@ -112,21 +102,16 @@ function UPS(options) {
                     return callback(err);
                 }
 
-                // Convert XML to JSON if necessary
-                if (body && body.startsWith && body.startsWith('<?xml version="1.0"?>')) {
-                    body = xml2json.parse(body, { parseNodeValue: false });
-                }
-
-                if (body && !body.TrackResponse) {
-                    if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
-                        return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
+                if (body && !body.trackResponse) {
+                    if (body?.fault?.detail?.errors?.errorDetail?.primaryErrorCode?.description) {
+                        return callback(new Error(body.fault.detail.errors.errorDetail.primaryErrorCode.description));
                     } else {
                         return callback(new Error('Invalid or missing TrackResponse'));
                     }
                 }
 
-                if (body?.TrackResponse?.Response?.Error) {
-                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription))
+                if (body?.trackResponse?.response?.error) {
+                    return callback(new Error(body.trackResponse.response.error.errorDescription))
                 }
 
                 callback(null, body);
@@ -150,7 +135,7 @@ function UPS(options) {
                 return callback(err);
             }
 
-            const packageInfo = body?.TrackResponse?.Shipment?.Package ?? body.TrackResponse.Shipment;
+            const packageInfo = body?.trackResponse?.shipment?.package ?? body.trackResponse.shipment;
             var activitiesList = [];
 
             if (Array.isArray(packageInfo)) {
@@ -168,7 +153,7 @@ function UPS(options) {
             }
 
             // Get the activity locations for all activities that don't have a GMTDate or GMTTime
-            async.mapLimit(Array.from(new Set(activitiesList.filter(activity => (!activity.GMTDate || !activity.GMTTime) && activity.location).map(activity => activity.location))), 10, function(location, callback) {
+            async.mapLimit(Array.from(new Set(activitiesList.filter(activity => (!activity.gmtDate || !activity.gmtTime) && activity.location).map(activity => activity.location))), 10, function(location, callback) {
                 geography.parseLocation(location, options, function(err, address) {
                     if (err || !address) {
                         return callback(err);
@@ -198,13 +183,13 @@ function UPS(options) {
 
                     const event = {
                         address: activity.address,
-                        description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
+                        description: activity.description || (activity.status && activity.status.description) || (activity.status && activity.status.statusType && activity.status.statusType.description)
                     };
 
-                    if (activity.GMTDate && activity.GMTTime) {
-                        event.date = moment.tz(`${activity.GMTDate} ${activity.GMTTime}`, 'YYYY-MM-DD HH.mm.ss', 'UTC').toDate();
+                    if (activity.gmtDate && activity.gmtTime) {
+                        event.date = moment.tz(`${activity.gmtDate} ${activity.gmtTime}`, 'YYYY-MM-DD HH.mm.ss', 'UTC').toDate();
                     } else {
-                        event.date = moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate();
+                        event.date = moment.tz(`${activity.date} ${activity.time}`, 'YYYYMMDD HHmmss', timezone).toDate();
                     }
 
                     // Ensure event is after minDate (used to prevent data from reused tracking numbers)
@@ -212,9 +197,9 @@ function UPS(options) {
                         return;
                     }
 
-                    if (activity.Status && activity.Status.Type === 'D' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'D' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'D') {
+                    if (activity.status && activity.status.type === 'D' || activity.status && activity.status.statusType && activity.status.statusType.code === 'D' || activity.status && activity.status.statusCode && activity.status.statusCode.code === 'D') {
                         results.deliveredAt = event.date;
-                    } else if (activity.Status && activity.Status.Type === 'I' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'I' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'I') {
+                    } else if (activity.status && activity.status.type === 'I' || activity.status && activity.status.statusType && activity.status.statusType.code === 'I' || activity.status && activity.status.statusCode && activity.status.statusCode.code === 'I') {
                         results.shippedAt = event.date;
                     }
 
