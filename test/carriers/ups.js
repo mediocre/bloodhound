@@ -24,11 +24,10 @@ describe('UPS', function() {
 
     const bloodhound = new Bloodhound({
         ups: {
-            accessKey: process.env.UPS_ACCESS_KEY,
             baseUrl: 'https://wwwcie.ups.com',
-            password: process.env.UPS_PASSWORD,
-            username: process.env.UPS_USERNAME
-        }
+            applicationName: 'itrac-tracking',
+            token: 'eyJraWQiOiI2NGM0YjYyMC0yZmFhLTQzNTYtYjA0MS1mM2EwZjM2Y2MxZmEiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.eyJzdWIiOiJhcEBzdHJhdGl4Y29ycC5jb20iLCJjbGllbnRpZCI6InVOMEdPWE5sckZ5aE92aUROS1FzYlQ4bXpJM1dHNWJJekl1WmNhbEs2V3l5SDhKbiIsImlzcyI6Imh0dHBzOi8vYXBpcy51cHMuY29tIiwidXVpZCI6IkRGNDg4MTQwLTExMEMtMUUyNS1CQkNFLTdERDhBMkNBRkJCMSIsInNpZCI6IjY0YzRiNjIwLTJmYWEtNDM1Ni1iMDQxLWYzYTBmMzZjYzFmYSIsImF1ZCI6Iml0cmFjMzYwIiwiYXQiOiIxdjZFRGpCaE5PcDRFVkFDcjZBMG5sQ044OW52IiwibmJmIjoxNzE3MDI2MjAwLCJEaXNwbGF5TmFtZSI6Iml0cmFjMzYwIiwiZXhwIjoxNzE3MDQwNjAwLCJpYXQiOjE3MTcwMjYyMDAsImp0aSI6ImQ1MTZmNWI3LTRiZTEtNDVjOC04MDdiLTA3NzIzMDg4MzU3NCJ9.oiwmK2HWmkSCpt1FLbRM-UkiM9YfZH6nGqRArFkK2MCtKsgsooTMKDD6LT3D9outc8sA7V7UyDub9Q_EehmKQZvspjquDoYN0hW1o42X9-BYRtJXo7j7jyzCe74G-agwlFGBzE-YzxIk7fR_gCJBMfoSs_-bIHJq4N6YYNZsHV_avPboBxH-s99My6zE99wEbM_L08QcIh3MCrM-45MTH7tezd_kPyPSx9_h9p7HenaAkmV5bhSeeWAYWwSRWazUuXfDhTQnIXyBejBoEy9qCb6loQ_DRKHUmUrxD608Jf-jzGU8YqmdbYIkRiaK_67Tsx1NFZMCUEyWQW6_JJ_XOyQg1xH5D3xznhhiZqyigImdB6zwxW_ZgOxo3lv2Sm8Aa6GPE8YqVqAB_V0qqUH9dpe3gf16IG2_Ma14V_xVF_f4LFM_g7BrE7T-EAoiQRtRjphZWUhG-2hpbxWr2GWI0zQaakQjCiFIKvv7NzU7IpOT3-bFgGlH1ug51Iw7fI0133EsmsHo4xObzNfqZ6RnkSuYTQeveDN3tDdlFT_j1F0sFzyD9oqorRT38YFBfTtX6kT_CkEJBobb5LPslLOt5Z2um1euH7MpWotb74XIh0EmV4XPuIOE-Ti4ZYC1dR57GGFColsNOIwaggFiR3bbyljT0XUoE6_PIKU5l3AFLis',
+        },
     });
 
     describe('Error Handling', function() {

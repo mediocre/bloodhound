@@ -82,7 +82,7 @@ function UPS(options) {
             _options.minDate = new Date(0);
         }
 
-        const transId = makeId(55);
+        const transId = makeId(25);
 
         const baseUrl = options.baseUrl || 'https://onlinetools.ups.com';
 
@@ -91,10 +91,12 @@ function UPS(options) {
             'url': `${baseUrl}/api/track/v1/details/${trackingNumber}?locale=en_US&returnSignature=false&returnMilestones=false&returnPOD=false`,
             'headers': {
                 'transId': `${transId}`,
-                'transactionSrc': `${_options.applicationName}`,
-                'Authorization': `Bearer ${_options.token}`
+                'transactionSrc': `${options.applicationName}`,
+                'Authorization': `Bearer ${options.token}`
             }
         };
+
+        console.log(req);
 
         async.retry(function(callback) {
             request(req, function(err, res, body) {
@@ -102,11 +104,15 @@ function UPS(options) {
                     return callback(err);
                 }
 
+                console.log('body', body);
+
+                body = JSON.parse(body);
+
                 if (body && !body.trackResponse) {
                     if (body?.fault?.detail?.errors?.errorDetail?.primaryErrorCode?.description) {
                         return callback(new Error(body.fault.detail.errors.errorDetail.primaryErrorCode.description));
                     } else {
-                        return callback(new Error('Invalid or missing TrackResponse'));
+                        return callback(new Error('Invalid or missing trackResponse'));
                     }
                 }
 

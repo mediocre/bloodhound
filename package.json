@@ -1,44 +1,51 @@
 {
-    "description": "Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (DHL, FedEx, UPS, USPS) in a common format.",
-    "dependencies": {
-        "async": "~3.2.0",
-        "dhl-ecommerce-solutions": "~0.3.0",
-        "fast-xml-parser": "~3.21.0",
-        "moment-timezone": "~0.5.28",
-        "node-geocoder": "~3.28.0",
-        "petty-cache": "~3.2.0",
-        "pitney-bowes": "~0.3.1",
-        "shipping-fedex": "0.2.0",
-        "tz-lookup": "~6.1.25",
-        "us-states-normalize": "~1.0.0"
-    },
-    "devDependencies": {
-        "coveralls": "*",
-        "mocha": "*",
-        "nyc": "*"
-    },
-    "homepage": "https://github.com/mediocre/bloodhound",
-    "keywords": [
-        "dhl",
-        "fedex",
-        "logistics",
-        "newgistics",
-        "pitney-bowes",
-        "shipping",
-        "tracking",
-        "ups",
-        "usps"
-    ],
-    "license": "Apache-2.0",
-    "main": "index.js",
-    "name": "@mediocre/bloodhound",
-    "scripts": {
-        "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
-        "test": "mocha --exit --reporter spec test/* --timeout 30000"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mediocre/bloodhound.git"
-    },
-    "version": "1.13.0"
+  "description": "Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (DHL, FedEx, UPS, USPS) in a common format.",
+  "dependencies": {
+    "async": "~3.2.0",
+    "dhl-ecommerce-solutions": "~0.3.0",
+    "fast-xml-parser": "~3.21.0",
+    "moment-timezone": "~0.5.28",
+    "node-geocoder": "~3.28.0",
+    "petty-cache": "~3.2.0",
+    "pitney-bowes": "~0.3.1",
+    "shipping-fedex": "0.2.0",
+    "tz-lookup": "~6.1.25",
+    "us-states-normalize": "~1.0.0"
+  },
+  "devDependencies": {
+    "coveralls": "*",
+    "mocha": "*",
+    "nyc": "*"
+  },
+  "homepage": "https://github.com/mediocre/bloodhound",
+  "keywords": [
+    "dhl",
+    "fedex",
+    "logistics",
+    "newgistics",
+    "pitney-bowes",
+    "shipping",
+    "tracking",
+    "ups",
+    "usps"
+  ],
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "name": "@troyaaronjones/bloodhound",
+  "scripts": {
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "test": "mocha --exit --reporter spec test/* --timeout 30000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mediocre/bloodhound.git"
+  },
+  "version": "1.13.1",
+  "bugs": {
+    "url": "https://github.com/troyaaronjones/bloodhound/issues"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": "Troy jones"
 }
