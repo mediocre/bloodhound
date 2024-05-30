@@ -40,7 +40,7 @@
     "type": "git",
     "url": "git+https://github.com/mediocre/bloodhound.git"
   },
-  "version": "1.13.1",
+  "version": "1.13.2",
   "bugs": {
     "url": "https://github.com/troyaaronjones/bloodhound/issues"
   },

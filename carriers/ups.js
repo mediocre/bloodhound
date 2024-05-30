@@ -6,11 +6,11 @@ const xml2json = require('fast-xml-parser');
 const geography = require('../util/geography');
 const USPS = require('./usps');
 
-function getActivities(package) {
-    var activitiesList = package.activity;
+function getActivities(packages) {
+    var activitiesList = packages.activity;
 
-    if (!Array.isArray(package.activity)) {
-        activitiesList = [package.activity];
+    if (!Array.isArray(packages.activity)) {
+        activitiesList = [packages.activity];
     }
 
     // Filter undefined activities
@@ -18,12 +18,12 @@ function getActivities(package) {
 
     if (activitiesList.length) {
         activitiesList.forEach(activity => {
-            if (activity.activityLocation) {
+            if (activity.location) {
                 activity.address = {
-                    city: activity.activityLocation.city || (activity.activityLocation.address && activity.activityLocation.address.city),
-                    country: activity.activityLocation.countryCode || (activity.activityLocation.address && activity.activityLocation.Address.countryCode),
-                    state: activity.activityLocation.stateProvinceCode || (activity.activityLocation.address && activity.activityLocation.address.stateProvinceCode),
-                    zip: activity.activityLocation.postalCode || (activity.activityLocation.address && activity.activityLocation.address.postalCode)
+                    city: activity.location.city || (activity.location.address && activity.location.address.city),
+                    country: activity.location.countryCode || (activity.location.address && activity.location.address.countryCode),
+                    state: activity.location.stateProvince || (activity.location.address && activity.location.address.stateProvince),
+                    zip: activity.location.postalCode || (activity.location.address && activity.location.address.postalCode)
                 }
 
                 if ((activity.address.city && activity.address.state) || activity.address.zip) {
@@ -129,23 +129,51 @@ function UPS(options) {
                 raw: body
             };
 
+            console.log('I am here before warning block');
+
+            if (body?.trackResponse?.shipment?.length > 0) {
+                if (body?.trackResponse?.shipment[0]?.warnings?.length > 0) {
+                    if (body?.trackResponse?.shipment[0]?.warnings[0]?.message) {
+                        return callback(null, results);
+                    }
+                }
+            }
+
+            console.log('I am here after warning block');
+
             if (err) {
+                console.log("In error block");
                 if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
                     return usps.track(trackingNumber, _options, callback);
                 }
 
-                if (err.message === 'No tracking information available') {
+                if (err.message === 'No tracking information available' || err.message === 'Tracking Information Not Found') {
                     return callback(null, results);
                 }
 
                 return callback(err);
             }
 
-            const packageInfo = body?.trackResponse?.shipment?.package ?? body.trackResponse.shipment;
+            let packageInfo = null;
+
+            console.log('body', body);
+
+            if (body?.trackResponse?.shipment?.length > 0) {
+                packageInfo = body?.trackResponse?.shipment[0].package;
+            } if (body?.trackResponse?.shipment && body?.trackResponse?.shipment?.package) {
+                packageInfo = body?.trackResponse?.shipment?.package;
+            }
+
+            console.log(packageInfo);
+
+            if (!packageInfo) {
+                return callback(null, results);
+            }
+
             var activitiesList = [];
 
             if (Array.isArray(packageInfo)) {
-                activitiesList = packageInfo.map(package => getActivities(package)).flat();
+                activitiesList = packageInfo.map(packages => getActivities(packages)).flat();
             } else {
                 activitiesList = getActivities(packageInfo);
             }
@@ -170,6 +198,9 @@ function UPS(options) {
                     callback(null, address);
                 });
             }, function(err, addresses) {
+
+                console.log('got to main block');
+
                 if (err) {
                     return callback(err);
                 }
@@ -191,6 +222,7 @@ function UPS(options) {
                         address: activity.address,
                         description: activity.description || (activity.status && activity.status.description) || (activity.status && activity.status.statusType && activity.status.statusType.description)
                     };
+
 
                     if (activity.gmtDate && activity.gmtTime) {
                         event.date = moment.tz(`${activity.gmtDate} ${activity.gmtTime}`, 'YYYY-MM-DD HH.mm.ss', 'UTC').toDate();
