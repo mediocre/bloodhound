@@ -172,11 +172,11 @@ function DhlEcommerceSolutions(options) {
                     _event.details = event.secondaryEventDescription;
                 }
 
-                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                if (!results.deliveredAt && _event.description && DELIVERED_TRACKING_DESCRIPTIONS.find(desc => _event.description.toUpperCase().startsWith(desc))) {
                     results.deliveredAt = _event.date;
                 }
 
-                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.includes(_event.description.toUpperCase())) {
+                if (!results.shippedAt && _event.description && SHIPPED_TRACKING_DESCRIPTIONS.find(desc => _event.description.toUpperCase().startsWith(desc))) {
                     results.shippedAt = _event.date;
                 }
 
