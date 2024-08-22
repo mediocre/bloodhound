@@ -3,7 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const FedEx = require('../../carriers/fedEx');
 
-describe.only('FedEx', function() {
+describe('FedEx', function() {
     // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();
