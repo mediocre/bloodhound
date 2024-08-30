@@ -1,4 +1,6 @@
 const async = require('async');
+const cache = require('memory-cache');
+const createError = require('http-errors');
 
 const request = require('request');
 
@@ -16,15 +18,17 @@ const SHIPPED_TRACKING_STATUS_CODES = ['AR', 'DP', 'IT', 'OD'];
 // The events from these tracking status codes are filtered because their timestamps are nonsensical: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
 const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
-let fedex_credentials = undefined;
-
 function FedEx(options) {
     this.authenticate = function(callback) {
-        if (fedex_credentials?.access_token && fedex_credentials?.expires_at < Date.now()) {
-            return callback();
+        const key = `fedex_credentials_${options.api_key}`;
+
+        const credentials = cache.get(key);
+
+        if (credentials) {
+            return callback(null, credentials);
         }
 
-        let trackOptions = {
+        let authOptions = {
             form: {
                 grant_type: 'client_credentials',
                 client_id: options.api_key,
@@ -34,16 +38,23 @@ function FedEx(options) {
             url: `${options.url}/oauth/token`
         };
 
-        request(trackOptions, function(err, response, body) {
+        request(authOptions, function(err, response, body) {
             if (err) {
                 return callback(err);
             }
 
-            let credentials = JSON.parse(body);
-            credentials.expires_at = Date.now() + ((credentials.expires_in - 100) * 1000);
+            if (response.statusCode !== 200) {
+                const err = createError(response.statusCode);
+                err.response = response;
 
-            fedex_credentials = credentials;
-            return callback();
+                return callback(err);
+            }
+
+            let credentials = JSON.parse(body);
+
+            cache.put(key, credentials, (credentials.expires_in - 100) * 1000);
+
+            return callback(null, credentials);
         });
     };
 
@@ -109,7 +120,7 @@ function FedEx(options) {
             _options.minDate = new Date(0);
         }
 
-        this.authenticate(function(err) {
+        this.authenticate(function(err, fedex_credentials) {
             if (err) {
                 return callback(err);
             }

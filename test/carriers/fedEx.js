@@ -40,12 +40,7 @@ describe('FedEx', function() {
 
         const bloodhound = new Bloodhound({
             fedEx: {
-                account_number: process.env.FEDEX_ACCOUNT_NUMBER,
                 api_key: process.env.FEDEX_API_KEY,
-                environment: process.env.FEDEX_ENVIRONMENT,
-                key: process.env.FEDEX_KEY,
-                meter_number: process.env.FEDEX_METER_NUMBER,
-                password: process.env.FEDEX_PASSWORD,
                 secret_key: process.env.FEDEX_SECRET_KEY,
                 url: process.env.FEDEX_URL
             }
