@@ -11,7 +11,8 @@
         "petty-cache": "~3.2.0",
         "pitney-bowes": "~0.3.1",
         "tz-lookup": "~6.1.25",
-        "us-states-normalize": "~1.0.0"
+        "us-states-normalize": "~1.0.0",
+        "xml2js": "~0.4.23"
     },
     "devDependencies": {
         "coveralls": "*",
