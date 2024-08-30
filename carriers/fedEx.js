@@ -33,7 +33,7 @@ function FedEx(options) {
                 client_secret: options.secret_key
             },
             method: 'POST',
-            url: `${options.url}/oauth/token`
+            url: `${options.url ?? 'https://apis.fedex.com'}/oauth/token`
         };
 
         request(req, function(err, response, body) {
@@ -139,7 +139,7 @@ function FedEx(options) {
                     ]
                 },
                 method: 'POST',
-                url: `${options.url}/track/v1/trackingnumbers`
+                url: `${options.url ?? 'https://apis.fedex.com'}/track/v1/trackingnumbers`
             };
 
             async.retry(function(callback) {
