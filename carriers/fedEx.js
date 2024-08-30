@@ -1,7 +1,6 @@
 const async = require('async');
 const cache = require('memory-cache');
 const createError = require('http-errors');
-
 const request = require('request');
 
 const checkDigit = require('../util/checkDigit');
@@ -19,16 +18,15 @@ const SHIPPED_TRACKING_STATUS_CODES = ['AR', 'DP', 'IT', 'OD'];
 const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
 function FedEx(options) {
-    this.authenticate = function(callback) {
-        const key = `fedex_credentials_${options.api_key}`;
+    this.getAccessToken = function(callback) {
+        const key = options.api_key;
+        const accessToken = cache.get(key);
 
-        const credentials = cache.get(key);
-
-        if (credentials) {
-            return callback(null, credentials);
+        if (accessToken) {
+            return callback(null, accessToken);
         }
 
-        let authOptions = {
+        const authOptions = {
             form: {
                 grant_type: 'client_credentials',
                 client_id: options.api_key,
@@ -50,11 +48,11 @@ function FedEx(options) {
                 return callback(err);
             }
 
-            let credentials = JSON.parse(body);
+            const accessToken = JSON.parse(body);
 
-            cache.put(key, credentials, (credentials.expires_in - 100) * 1000);
+            cache.put(key, accessToken, (accessToken.expires_in - 100) * 1000);
 
-            return callback(null, credentials);
+            return callback(null, accessToken);
         });
     };
 
@@ -120,7 +118,7 @@ function FedEx(options) {
             _options.minDate = new Date(0);
         }
 
-        this.authenticate(function(err, fedex_credentials) {
+        this.getAccessToken(function(err, accessToken) {
             if (err) {
                 return callback(err);
             }
@@ -128,7 +126,7 @@ function FedEx(options) {
             const trackRequestOptions = {
                 gzip: true,
                 headers: {
-                    Authorization: `Bearer ${fedex_credentials.access_token}`
+                    Authorization: `Bearer ${accessToken.access_token}`
                 },
                 json: {
                     includeDetailedScans: true,
@@ -153,6 +151,7 @@ function FedEx(options) {
                     if (trackResponse?.output?.alerts?.length) {
                         let alerts = trackResponse.output.alerts;
                         let warnings = alerts.filter(alert => alert.alertType === 'WARNING');
+
                         if (warnings.length) {
                             return callback(new Error(warnings.map(warning => `${warning.code}: ${warning.message}`).join(', ')));
                         }
@@ -229,8 +228,6 @@ function FedEx(options) {
                     results.shippedAt = results.deliveredAt;
                 }
 
-                // console.log(typeof callback);
-                // console.dir(callback, { color: true, depth: null });
                 callback(null, results);
             });
         });
