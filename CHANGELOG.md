@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2024-08-30
+### Changed
+- Migrated the FedEx carrier integration away from the deprecated WSDL endpoints to the new OAuth/JSON endpoints.
+
 ## [1.13.0] - 2024-05-08
 ### Changed
 - Updated DHL to use "description" and "remark" fields (see https://developer.dhl.com/api-reference/shipment-tracking?language_content_entity=en#release-notes-section/ecommerce-status-code).

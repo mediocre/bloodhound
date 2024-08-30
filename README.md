@@ -103,11 +103,7 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
 **dhl**
 The DHL API requires an API key: https://developer.dhl.com.
 
-**fedEx**
-
-FedEx options are passed to the [shipping-fedex](https://www.npmjs.com/package/shipping-fedex) module.
-
-**geocoder**
+*geocoder**
 
 By default Bloodhound uses the OpenStreetMap geocode provider. You can optionally specify geocoder options which are passed to the [node-geocode](https://www.npmjs.com/package/node-geocoder) module.
 
