@@ -3,8 +3,10 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const FedEx = require('../../carriers/fedEx');
 
+// FedEx Mock Tracking Numbers
+// https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
+// https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexground%C2%AEeconomy(formerlyknownasfedexsmartpost%C2%AE)
 describe('FedEx', function() {
-    // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();
 
@@ -33,9 +35,7 @@ describe('FedEx', function() {
         });
     });
 
-    // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.track', function() {
-        this.retries(0);
         this.timeout(20000);
 
         const bloodhound = new Bloodhound({
@@ -1944,8 +1944,7 @@ describe('FedEx', function() {
             });
         });
 
-        // new API has no Mock Tracking Numbers for FedEx Freight LTL and our numbers have been reused
-        // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
+        // new API has no Mock Tracking Numbers for FedEx Freight LTL and our numbers have been reused/recycled
         describe.skip('FedEx Freight LTL', function() {
             it('Picked Up', function(done) {
                 bloodhound.track('2873008051', 'fedex', function(err, actual) {
