@@ -17,9 +17,13 @@ const SHIPPED_TRACKING_STATUS_CODES = ['AR', 'DP', 'IT', 'OD'];
 // The events from these tracking status codes are filtered because their timestamps are nonsensical: https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FTracking_Shipments.htm%23Tracking_Statusbc-5&rhtocid=_26_0_4
 const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
-function FedEx(options) {
+function FedEx(args) {
+    const options = Object.assign({
+        url: 'https://apis.fedex.com'
+    }, args);
+
     this.getAccessToken = function(callback) {
-        const key = options.api_key;
+        const key = args.api_key;
         const accessToken = cache.get(key);
 
         if (accessToken) {
@@ -29,11 +33,11 @@ function FedEx(options) {
         const req = {
             form: {
                 grant_type: 'client_credentials',
-                client_id: options.api_key,
-                client_secret: options.secret_key
+                client_id: args.api_key,
+                client_secret: args.secret_key
             },
             method: 'POST',
-            url: `${options.url ?? 'https://apis.fedex.com'}/oauth/token`
+            url: `${options.url}/oauth/token`
         };
 
         request(req, function(err, response, body) {
@@ -139,7 +143,7 @@ function FedEx(options) {
                     ]
                 },
                 method: 'POST',
-                url: `${options.url ?? 'https://apis.fedex.com'}/track/v1/trackingnumbers`
+                url: `${options.url}/track/v1/trackingnumbers`
             };
 
             async.retry(function(callback) {
