@@ -58,7 +58,7 @@ bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
 
 ### new Bloodhound(options)
 
-Creates a new Bloodhound client. Each carrier requires a different combination of credentials (account numbers, meter numbers, passwords, user IDs, etc).
+Creates a new Bloodhound client. Each carrier requires a different combination of credentials (API keys, account numbers, passwords, user IDs, etc).
 
 By default, when Bloodhound encounters a timestamp without a UTC offset it will geocode using OpenStreetMap (which does not require an API key). You can optionally use a different geocoder. You can also optionally cache geocode results in Redis.
 
@@ -70,11 +70,8 @@ const bloodhound = new Bloodhound({
         apiKey: 'DHL API key from https://developer.dhl.com'
     },
     fedEx: {
-        account_number: '123456789',
-        environment: 'live',
-        key: 'abcdefghijklmnop',
-        meter_number: '987654321',
-        password: 'abcdefghijklmnopqrstuvwxy'
+        api_key: 'abcdefghijklmnopqrstuvwxyz',
+        secret_key: 'abcdefghijklmnopqrstuvwxyz'
     },
     geocoder: {
         apiKey: 'GOOGLE_API_KEY',
