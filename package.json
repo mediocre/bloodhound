@@ -10,7 +10,6 @@
         "node-geocoder": "~3.28.0",
         "petty-cache": "~3.2.0",
         "pitney-bowes": "~0.3.1",
-        "shipping-fedex": "0.2.0",
         "tz-lookup": "~6.1.25",
         "us-states-normalize": "~1.0.0"
     },
