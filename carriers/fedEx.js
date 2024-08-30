@@ -26,7 +26,7 @@ function FedEx(options) {
             return callback(null, accessToken);
         }
 
-        const authOptions = {
+        const req = {
             form: {
                 grant_type: 'client_credentials',
                 client_id: options.api_key,
@@ -36,7 +36,7 @@ function FedEx(options) {
             url: `${options.url}/oauth/token`
         };
 
-        request(authOptions, function(err, response, body) {
+        request(req, function(err, response, body) {
             if (err) {
                 return callback(err);
             }
