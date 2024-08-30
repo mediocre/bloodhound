@@ -87,8 +87,8 @@ function Bloodhound(options) {
 
         // Options are optional
         if (typeof options === 'function') {
-            options = {};
             callback = options;
+            options = {};
         }
 
         // Backwards compatibility

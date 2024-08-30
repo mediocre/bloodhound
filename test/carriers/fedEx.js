@@ -3,8 +3,10 @@ const assert = require('assert');
 const Bloodhound = require('../../index');
 const FedEx = require('../../carriers/fedEx');
 
+// FedEx Mock Tracking Numbers
+// https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
+// https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexground%C2%AEeconomy(formerlyknownasfedexsmartpost%C2%AE)
 describe('FedEx', function() {
-    // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();
 
@@ -33,23 +35,19 @@ describe('FedEx', function() {
         });
     });
 
-    // https://www.fedex.com/us/developer/webhelp/ws/2018/US/index.htm#t=wsdvg%2FAppendix_F_Test_Server_Mock_Tracking_Numbers.htm
     describe('fedEx.track', function() {
-        this.retries(3);
         this.timeout(20000);
 
         const bloodhound = new Bloodhound({
             fedEx: {
-                account_number: process.env.FEDEX_ACCOUNT_NUMBER,
-                environment: process.env.FEDEX_ENVIRONMENT,
-                key: process.env.FEDEX_KEY,
-                meter_number: process.env.FEDEX_METER_NUMBER,
-                password: process.env.FEDEX_PASSWORD
+                api_key: process.env.FEDEX_API_KEY,
+                secret_key: process.env.FEDEX_SECRET_KEY,
+                url: process.env.FEDEX_URL
             }
         });
 
         describe('FedEx Express and Ground', function() {
-            it.skip('Shipment information sent to FedEx', function(done) {
+            it('Shipment information sent to FedEx', function(done) {
                 bloodhound.track('449044304137821', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -70,12 +68,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=449044304137821'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Tendered', function(done) {
+            it('Tendered', function(done) {
                 bloodhound.track('149331877648230', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -107,12 +107,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=149331877648230'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Picked Up', function(done) {
+            it('Picked Up', function(done) {
                 bloodhound.track('020207021381215', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -133,24 +135,53 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=020207021381215'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            // Skipping this test because FedEx doesn't return any events
-            it.skip('Arrived at FedEx location', function(done) {
+            it('Arrived at FedEx location', function(done) {
                 bloodhound.track('403934084723025', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
-                    const expected = {};
+                    const expected = {
+                        carrier: 'FedEx',
+                        events: [
+                            {
+                                address: {
+                                    city: 'GROVE CITY',
+                                    country: 'US',
+                                    state: 'OH',
+                                    zip: '43123'
+                                },
+                                date: new Date('2014-01-04T05:43:00.000Z'),
+                                description: 'Arrived at FedEx location'
+                            },
+                            {
+                                address: {
+                                    city: undefined,
+                                    country: 'US',
+                                    state: undefined,
+                                    zip: '43822'
+                                },
+                                date: new Date('2014-01-03T20:03:00.000Z'),
+                                description: 'Shipment information sent to FedEx'
+                            }
+                        ],
+                        shippedAt: new Date('2014-01-04T05:43:00.000Z'),
+                        url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=403934084723025'
+                    };
+
+                    delete actual.raw;
 
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('At local FedEx facility', function(done) {
+            it('At local FedEx facility', function(done) {
                 bloodhound.track('920241085725456', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -222,12 +253,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=920241085725456'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('At destination sort facility', function(done) {
+            it('At destination sort facility', function(done) {
                 bloodhound.track('568838414941', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -246,7 +279,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-01-07T23:40:00.000Z'),
-                                description: 'Departed FedEx location',
+                                description: 'Departed FedEx hub',
                                 address: {
                                     city: 'MEMPHIS',
                                     country: 'US',
@@ -266,7 +299,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-01-06T01:23:00.000Z'),
-                                description: 'Arrived at FedEx location',
+                                description: 'Arrived at FedEx hub',
                                 address: {
                                     city: 'MEMPHIS',
                                     country: 'US',
@@ -279,12 +312,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=568838414941'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Departed FedEx location', function(done) {
+            it('Departed FedEx location', function(done) {
                 bloodhound.track('039813852990618', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -326,12 +361,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=039813852990618'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('On FedEx vehicle for delivery', function(done) {
+            it('On FedEx vehicle for delivery', function(done) {
                 bloodhound.track('231300687629630', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -443,12 +480,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=231300687629630'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('International shipment release', function(done) {
+            it('International shipment release', function(done) {
                 bloodhound.track('797806677146', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -477,7 +516,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-02-06T06:00:00.000Z'),
-                                description: 'Arrived at FedEx location',
+                                description: 'Arrived at FedEx hub',
                                 address: {
                                     city: 'MEMPHIS',
                                     country: 'US',
@@ -550,12 +589,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=797806677146'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Customer not available or business closed (Delivery Exception 007)', function(done) {
+            it('Customer not available or business closed (Delivery Exception 007)', function(done) {
                 bloodhound.track('377101283611590', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -658,12 +699,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=377101283611590'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Local Delivery Restriction (Delivery Exception 083)', function(done) {
+            it('Local Delivery Restriction (Delivery Exception 083)', function(done) {
                 bloodhound.track('852426136339213', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -777,12 +820,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=852426136339213'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Incorrect Address (Delivery Exception 03)', function(done) {
+            it('Incorrect Address (Delivery Exception 03)', function(done) {
                 bloodhound.track('797615467620', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -832,7 +877,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-01-14T09:59:00.000Z'),
-                                description: 'Departed FedEx location',
+                                description: 'Departed FedEx hub',
                                 address: {
                                     city: 'MEMPHIS',
                                     country: 'US',
@@ -842,7 +887,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-01-14T06:45:00.000Z'),
-                                description: 'Arrived at FedEx location',
+                                description: 'Arrived at FedEx hub',
                                 address: {
                                     city: 'MEMPHIS',
                                     country: 'US',
@@ -875,12 +920,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=797615467620'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Unable to Deliver (Shipment Exception 099)', function(done) {
+            it('Unable to Deliver (Shipment Exception 099)', function(done) {
                 bloodhound.track('957794015041323', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -965,12 +1012,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=957794015041323'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Returned to Sender/Shipper', function(done) {
+            it('Returned to Sender/Shipper', function(done) {
                 bloodhound.track('076288115212522', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1113,12 +1162,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=076288115212522'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Clearance delay (International)', function(done) {
+            it('Clearance delay (International)', function(done) {
                 bloodhound.track('581190049992', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1159,7 +1210,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-02-06T17:44:00.000Z'),
-                                description: 'Arrived at FedEx location',
+                                description: 'Arrived at FedEx hub',
                                 address: {
                                     city: 'ROISSY CHARLES DE GAULLE CEDEX',
                                     country: 'FR',
@@ -1179,7 +1230,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-02-06T10:52:00.000Z'),
-                                description: 'Departed FedEx location',
+                                description: 'Departed FedEx hub',
                                 address: {
                                     city: 'INDIANAPOLIS',
                                     country: 'US',
@@ -1199,7 +1250,7 @@ describe('FedEx', function() {
                             },
                             {
                                 date: new Date('2014-02-05T18:08:00.000Z'),
-                                description: 'Arrived at FedEx location',
+                                description: 'Arrived at FedEx hub',
                                 address: {
                                     city: 'INDIANAPOLIS',
                                     country: 'US',
@@ -1233,12 +1284,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=581190049992'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Delivered', function(done) {
+            it('Delivered', function(done) {
                 bloodhound.track('122816215025810', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1352,12 +1405,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=122816215025810'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Hold at Location', function(done) {
+            it('Hold at Location', function(done) {
                 bloodhound.track('843119172384577', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1546,12 +1601,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=843119172384577'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Shipment Canceled', function(done) {
+            it('Shipment Canceled', function(done) {
                 bloodhound.track('070358180009382', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1582,6 +1639,8 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=070358180009382'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
@@ -1589,7 +1648,7 @@ describe('FedEx', function() {
         });
 
         describe('FedEx SmartPost', function() {
-            it.skip('Shipment information sent to FedEx', function(done) {
+            it('Shipment information sent to FedEx', function(done) {
                 bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1610,12 +1669,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=02394653001023698293'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('In transit', function(done) {
+            it('In transit', function(done) {
                 bloodhound.track('61292701078443410536', function(err, actual) {
                     assert.ifError(err);
 
@@ -1667,12 +1728,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=61292701078443410536'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Out for delivery', function(done) {
+            it('Out for delivery', function(done) {
                 bloodhound.track('61292700726653585070', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1747,12 +1810,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=61292700726653585070'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Delivered', function(done) {
+            it('Delivered', function(done) {
                 bloodhound.track('02394653018047202719', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1871,29 +1936,44 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=02394653018047202719'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
         });
 
-        describe('FedEx Freight LTL', function() {
-            it.skip('Picked Up', function(done) {
+        // new API has no Mock Tracking Numbers for FedEx Freight LTL and our numbers have been reused/recycled
+        describe.skip('FedEx Freight LTL', function() {
+            it('Picked Up', function(done) {
                 bloodhound.track('2873008051', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
                     const expected = {
                         carrier: 'FedEx',
-                        events: [],
+                        events: [{
+                            address: {
+                                city: undefined,
+                                country: undefined,
+                                state: undefined,
+                                zip: undefined
+                            },
+                            date: new Date('2024-04-10T15:28:05.000Z'),
+                            description: 'Shipment information sent to FedEx'
+                        }
+                        ],
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=2873008051'
                     };
+
+                    delete actual.raw;
 
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('In transit', function(done) {
+            it('In transit', function(done) {
                 bloodhound.track('1960003216', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1901,17 +1981,17 @@ describe('FedEx', function() {
                         carrier: 'FedEx',
                         events: [
                             {
-                                date: new Date('2015-03-21T02:12:00.000Z'),
-                                description: 'In transit',
+                                date: new Date('2024-04-10T20:31:00.000Z'),
+                                description: 'Picked up',
                                 address: {
-                                    city: 'WICHITA',
+                                    city: 'CORDOVA',
                                     country: 'US',
-                                    state: 'KS',
-                                    zip: '67215'
+                                    state: 'TN',
+                                    zip: '38016'
                                 }
                             },
                             {
-                                date: new Date('2015-03-20T14:55:00.000Z'),
+                                date: new Date('2024-04-10T15:28:05.000Z'),
                                 description: 'Left FedEx origin facility',
                                 address: {
                                     city: 'DES MOINES',
@@ -1925,12 +2005,14 @@ describe('FedEx', function() {
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=1960003216'
                     };
 
+                    delete actual.raw;
+
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
             });
 
-            it.skip('Weather delay (Shipment Exception)', function(done) {
+            it('Weather delay (Shipment Exception)', function(done) {
                 bloodhound.track('1208673524', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
@@ -1999,7 +2081,7 @@ describe('FedEx', function() {
                 });
             });
 
-            it.skip('Delivered', function(done) {
+            it('Delivered', function(done) {
                 bloodhound.track('1636374036', 'fedex', function(err, actual) {
                     assert.ifError(err);
 
