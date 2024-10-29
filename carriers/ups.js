@@ -121,8 +121,6 @@ function UPS(options) {
                     if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
                         return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
                     } else {
-                        // eslint-disable-next-line no-console
-                        console.dir(body, { depth: null });
                         return callback(new Error('Invalid or missing TrackResponse'));
                     }
                 }
