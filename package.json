@@ -7,7 +7,7 @@
         "http-errors": "~2.0.0",
         "memory-cache": "~0.2.0",
         "moment-timezone": "~0.5.28",
-        "node-geocoder": "~3.28.0",
+        "node-geocoder": "~4.4.1",
         "petty-cache": "~3.2.0",
         "pitney-bowes": "~0.3.1",
         "tz-lookup": "~6.1.25",
