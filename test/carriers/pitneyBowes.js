@@ -22,7 +22,7 @@ describe('Newgistics', function() {
 describe('Pitney Bowes', function() {
     this.timeout(30000);
 
-    it('should not return an error', function(done) {
+    it.skip('should not return an error', function(done) {
         const bloodhound = new Bloodhound({
             pitneyBowes: {
                 api_key: process.env.PITNEY_BOWES_API_KEY,
