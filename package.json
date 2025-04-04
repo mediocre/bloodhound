@@ -3,7 +3,7 @@
     "dependencies": {
         "async": "~3.2.0",
         "dhl-ecommerce-solutions": "~0.3.0",
-        "fast-xml-parser": "~3.21.0",
+        "fast-xml-parser": "~5.2.0",
         "http-errors": "~2.0.0",
         "memory-cache": "~0.2.0",
         "moment-timezone": "~0.5.28",
