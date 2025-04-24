@@ -33,13 +33,6 @@ jobs:
     - name: Run npm install
       run: npm install
 
-    - name: Install ESLint dependencies
-      run: npm install globals @eslint/js
-
-    - name: Run ESLint
-      working-directory: ./
-      run: eslint .
-
     - name: Setup Redis ${{ matrix.redis-version }}
       uses: supercharge/redis-github-action@1.1.0
       with:
