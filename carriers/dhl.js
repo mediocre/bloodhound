@@ -192,7 +192,7 @@ function DHL(options) {
                 });
             });
         }
-    }
+    };
 }
 
 module.exports = DHL;

@@ -24,7 +24,7 @@ function getActivities(package) {
                     country: activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
                     state: activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
                     zip: activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
-                }
+                };
 
                 if ((activity.address.city && activity.address.state) || activity.address.zip) {
                     activity.location = geography.addressToString(activity.address);
@@ -126,7 +126,7 @@ function UPS(options) {
                 }
 
                 if (body?.TrackResponse?.Response?.Error) {
-                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription))
+                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription));
                 }
 
                 callback(null, body);
@@ -241,8 +241,8 @@ function UPS(options) {
 
                 callback(null, results);
             });
-        })
-    }
+        });
+    };
 }
 
 module.exports = UPS;

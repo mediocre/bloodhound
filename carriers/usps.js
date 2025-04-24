@@ -208,7 +208,7 @@ function USPS(options) {
                 });
             });
         });
-    }
+    };
 }
 
 module.exports = USPS;

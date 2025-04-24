@@ -145,12 +145,12 @@ function DhlEcommerceSolutions(options) {
                             country: event.country,
                             state: locationTokens[1],
                             postalCode: event.postalCode
-                        }
+                        };
 
                         // Save the current address as the previousAddress
                         previousAddress = event.address;
                     }
-                }
+                };
 
                 const _event = {
                     address: {
@@ -195,7 +195,7 @@ function DhlEcommerceSolutions(options) {
 
             callback(null, results);
         });
-    }
-}
+    };
+};
 
 module.exports = DhlEcommerceSolutions;

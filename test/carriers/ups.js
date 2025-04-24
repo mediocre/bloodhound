@@ -241,7 +241,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
         });
 
@@ -435,7 +435,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
 
         });
@@ -466,7 +466,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
 
             it('2nd Delivery Attempt', function(done) {
@@ -544,7 +544,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
 
         });
@@ -615,7 +615,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
         });
 
@@ -645,7 +645,7 @@ describe('UPS', function() {
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
                     done();
-                })
+                });
             });
         });
 
@@ -676,7 +676,7 @@ describe('UPS', function() {
 
                     done();
                 });
-            })
+            });
         });
     });
 });

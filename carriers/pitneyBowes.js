@@ -154,7 +154,7 @@ function PitneyBowes(options) {
                 callback(null, results);
             });
         });
-    }
+    };
 }
 
 module.exports = PitneyBowes;

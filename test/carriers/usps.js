@@ -1,6 +1,6 @@
 const assert = require('assert');
 const Bloodhound = require('../../index');
-const USPS = require('../../carriers/usps.js')
+const USPS = require('../../carriers/usps.js');
 
 describe('USPS', function() {
     this.timeout(10000);
@@ -99,7 +99,7 @@ describe('USPS', function() {
                 assert(err);
                 done();
             });
-        })
+        });
     });
 
     describe('Invalid USPS Credentials', function() {
@@ -120,8 +120,8 @@ describe('USPS', function() {
             bloodhound.track('12c &^trackf0', 'usps', function(err) {
                 assert(err);
                 done();
-            })
-        })
+            });
+        });
     });
 
     describe('USPS Tracking', function() {
@@ -163,7 +163,7 @@ describe('USPS', function() {
                     deliveredAt: new Date('2019-07-19T20:57:00.000Z'),
                     url: 'https://tools.usps.com/go/TrackConfirmAction?qtc_tLabels1=4207866492612927005269000029964826',
                     shippedAt: new Date('2019-07-19T20:57:00.000Z')
-                }
+                };
 
                 assert.deepStrictEqual(actual, expected);
                 done();
