@@ -37,7 +37,7 @@ jobs:
       run: npm install globals @eslint/js
 
     - name: Run ESLint
-      working-directory: ./analytics-service/
+      working-directory: ./bloodhound/
       run: eslint .
 
     - name: Setup Redis ${{ matrix.redis-version }}
