@@ -6,8 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.1.0] - 2025-06-27
 ### Added
-- Added Amazon Shipping tracking support for TBA/TBM/TBC tracking numbers
-- Comprehensive event code mapping for Amazon tracking events including delivery attempts, exceptions, returns, and holds
+- Added Amazon Shipping tracking support for TBA/TBM/TBC tracking numbers.
 
 ## [2.0.0] - 2024-08-30
 ### Changed
