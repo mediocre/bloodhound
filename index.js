@@ -1,4 +1,5 @@
 const NodeGeocoder = require('node-geocoder');
+const Amazon = require('./carriers/amazon');
 const PitneyBowes = require('./carriers/pitneyBowes');
 const UPS = require('./carriers/ups');
 const FedEx = require('./carriers/fedEx');
@@ -60,6 +61,7 @@ function Bloodhound(options) {
         options.ups.usps = options.usps;
     }
 
+    const amazon = new Amazon(options && options.amazon);
     const dhl = new DHL(options && options.dhl);
     const fedEx = new FedEx(options && options.fedEx);
     const pitneyBowes = new PitneyBowes(options && options.pitneyBowes);
@@ -67,7 +69,9 @@ function Bloodhound(options) {
     const usps = new USPS(options && options.usps);
 
     this.guessCarrier = function(trackingNumber) {
-        if (dhl.isTrackingNumberValid(trackingNumber)) {
+        if (amazon.isTrackingNumberValid(trackingNumber)) {
+            return 'Amazon';
+        } else if (dhl.isTrackingNumberValid(trackingNumber)) {
             return 'DHL';
         } else if (fedEx.isTrackingNumberValid(trackingNumber)) {
             return 'FedEx';
@@ -112,7 +116,9 @@ function Bloodhound(options) {
         trackingNumber = trackingNumber.replace(/\s/g, '');
         trackingNumber = trackingNumber.toUpperCase();
 
-        if (options.carrier === 'dhl') {
+        if (options.carrier === 'amazon') {
+            amazon.track(trackingNumber, options, callback);
+        } else if (options.carrier === 'dhl') {
             dhl.track(trackingNumber, options, callback);
         } else if (options.carrier === 'fedex') {
             fedEx.track(trackingNumber, options, callback);
