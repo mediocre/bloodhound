@@ -1,5 +1,5 @@
 {
-    "description": "Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (DHL, FedEx, UPS, USPS) in a common format.",
+    "description": "Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (Amazon, DHL, FedEx, UPS, USPS) in a common format.",
     "dependencies": {
         "async": "~3.2.0",
         "dhl-ecommerce-solutions": "~0.3.0",
@@ -23,6 +23,7 @@
     },
     "homepage": "https://github.com/mediocre/bloodhound",
     "keywords": [
+        "amazon",
         "dhl",
         "fedex",
         "logistics",
@@ -44,5 +45,5 @@
         "type": "git",
         "url": "https://github.com/mediocre/bloodhound.git"
     },
-    "version": "2.0.0"
+    "version": "2.1.0"
 }

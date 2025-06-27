@@ -5,7 +5,7 @@
 
 ![Elvis Presley & Bloodhound - Photo - 1964](https://res.cloudinary.com/mediocre/image/upload/v1562632498/rpkudq0xpyysdty9nkzk.jpg)
 
-Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (DHL, FedEx, UPS, USPS) in a common format.
+Bloodhound is a Node.js package that allows you to retrieve tracking data from shipping carriers (Amazon, DHL, FedEx, UPS, USPS) in a common format.
 
 This module was inspired by the excellent `shipit` module. We built Bloodhound to provide better support for parsing of timestamps (read more below).
 
@@ -33,6 +33,7 @@ Bloodhound can guess the carrier given a tracking number explicity through the `
 Bloodhound also examines each of the activity/movement/scan events for "shipped" and "delievered" event types (beyond simple electronic events like "shipping label created" or "manifest file sent"). When a matching event type is encountered Bloodhound returns a `shippedAt` and `deliveredAt` date.
 
 ## Supported Carriers
+- Amazon
 - DHL
 - FedEx
 - UPS
@@ -100,7 +101,13 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
     console.log(data);
 });
 ```
+
+**amazon**
+
+The Amazon Shipping carrier does not require any configuration. It works with Amazon Shipping tracking numbers (TBA/TBM/TBC format).
+
 **dhl**
+
 The DHL API requires an API key: https://developer.dhl.com.
 
 *geocoder**
