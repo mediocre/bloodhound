@@ -68,7 +68,7 @@ function Amazon() {
         trackingNumber = trackingNumber.replace(/\s/g, '');
         trackingNumber = trackingNumber.toUpperCase();
 
-        // Amazon tracking numbers: TB + (A|B|C) + 12 digits
+        // Amazon Shipping tracking numbers: TB + (A|B|C) + 12 digits
         return /^TB[A-CM][0-9]{12}$/.test(trackingNumber);
     };
 

@@ -104,7 +104,7 @@ bloodhound.track('tracking number', 'FedEx', function(err, data) {
 
 **amazon**
 
-The Amazon carrier does not require any configuration. It works with Amazon tracking numbers (TBA/TBM/TBC format).
+The Amazon carrier does not require any configuration. It works with Amazon Shipping tracking numbers (TBA/TBM/TBC format).
 
 **dhl**
 
