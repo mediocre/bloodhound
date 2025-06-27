@@ -153,7 +153,7 @@ function Amazon() {
             }
 
             // Sort events by date (oldest first)
-            results.events.sort((a, b) => new Date(a.date) - new Date(b.date));
+            results.events.sort((a, b) => a.date - b.date);
 
             return callback(null, results);
         } catch (err) {
