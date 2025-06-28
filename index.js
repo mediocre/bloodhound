@@ -116,7 +116,7 @@ function Bloodhound(options) {
         trackingNumber = trackingNumber.replace(/\s/g, '');
         trackingNumber = trackingNumber.toUpperCase();
 
-        if (options.carrier === 'amazon') {
+        if (['amazon', 'amazon shipping'].includes(options.carrier )) {
             amazon.track(trackingNumber, options, callback);
         } else if (options.carrier === 'dhl') {
             dhl.track(trackingNumber, options, callback);
