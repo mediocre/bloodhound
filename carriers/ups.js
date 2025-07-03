@@ -113,7 +113,7 @@ function UPS(options) {
                 }
 
                 // Convert XML to JSON if necessary
-                if (body?.startsWith('<?xml version="1.0"?>')) {
+                if (body?.startsWith?.('<?xml version="1.0"?>')) {
                     body = xml2json.parse(body, { parseNodeValue: false });
                 }
 
