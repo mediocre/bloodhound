@@ -113,15 +113,15 @@ function UPS(options) {
                 }
 
                 // Convert XML to JSON if necessary
-                if (body && body.startsWith && body.startsWith('<?xml version="1.0"?>')) {
+                if (body?.startsWith('<?xml version="1.0"?>')) {
                     body = xml2json.parse(body, { parseNodeValue: false });
                 }
 
-                if (body && !body.TrackResponse) {
+                if (!body?.TrackResponse) {
                     if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
                         return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
                     } else {
-                        return callback(new Error('Invalid or missing TrackResponse'));
+                        return callback(new Error(body || 'Invalid response from UPS'));
                     }
                 }
 
