@@ -179,6 +179,29 @@ function FedEx(args) {
                     raw: trackReply
                 };
 
+                // Extract the first tracking result from a nested FedEx tracking respons
+                const trackResult = trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0];
+
+                // Extract estimated delivery window if available
+                const timeWindow = trackResult?.estimatedDeliveryTimeWindow;
+                // Get a single delivery date if the time window is missing
+                const singleDate = trackResult?.estimatedDeliveryDate || trackResult?.standardTransitDate;
+
+                // Check if a time window is available
+                if (timeWindow?.window?.begins && timeWindow?.window?.ends) {
+                    results.estimatedDeliveryDate = {
+                        earliestDeliveryDate: new Date(timeWindow.window.begins).toISOString(),
+                        latestDeliveryDate: new Date(timeWindow.window.ends).toISOString()
+                    };
+                } else if (singleDate) {
+                    // If FedEx only provides a single date (not a range), use the same date for both earliest and latest
+                    const isoDate = new Date(singleDate).toISOString();
+                    results.estimatedDeliveryDate = {
+                        earliestDeliveryDate: isoDate,
+                        latestDeliveryDate: isoDate
+                    };
+                }
+
                 // Ensure track reply has events
                 if (!trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0]?.scanEvents?.length) {
                     return callback(null, results);
