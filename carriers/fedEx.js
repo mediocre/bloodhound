@@ -19,7 +19,7 @@ const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
 function FedEx(args) {
     const options = Object.assign({
-        url: 'https://apis.fedex.com'
+        url: 'https://apis-sandbox.fedex.com'
     }, args);
 
     this.getAccessToken = function(callback) {
@@ -178,14 +178,12 @@ function FedEx(args) {
                     events: [],
                     raw: trackReply
                 };
-
                 // Extract the first tracking result from a nested FedEx tracking respons
                 const trackResult = trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0];
-
                 // Extract estimated delivery window if available
                 const timeWindow = trackResult?.estimatedDeliveryTimeWindow;
                 // Get a single delivery date if the time window is missing
-                const singleDate = trackResult?.estimatedDeliveryDate || trackResult?.standardTransitDate;
+                const singleDate = trackResult?.estimatedDeliveryDate || trackResult?.standardTransitTimeWindow;
 
                 // Check if a time window is available
                 if (timeWindow?.window?.begins && timeWindow?.window?.ends) {
@@ -201,12 +199,10 @@ function FedEx(args) {
                         latestDeliveryDate: isoDate
                     };
                 }
-
                 // Ensure track reply has events
-                if (!trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0]?.scanEvents?.length) {
+                if (!trackReply?.output?.completeTrackResults[0]?.trackResults[0]?.scanEvents?.length) {
                     return callback(null, results);
                 }
-
                 trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0]?.scanEvents.forEach(e => {
                     if (TRACKING_STATUS_CODES_BLACKLIST.includes(e.eventType)) {
                         return;
