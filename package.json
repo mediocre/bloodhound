@@ -16,9 +16,10 @@
     },
     "devDependencies": {
         "@eslint/js": "*",
-        "globals": "*",
         "coveralls": "*",
+        "globals": "*",
         "mocha": "*",
+        "nock": "^14.0.5",
         "nyc": "*"
     },
     "homepage": "https://github.com/mediocre/bloodhound",
