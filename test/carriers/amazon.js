@@ -201,5 +201,51 @@ describe('Amazon', function() {
                 done();
             });
         });
+
+        it('should parse proofOfDelivery photo and receivedBy when available', function(done) {
+            // Patch fetch globally for this test
+            const originalFetch = global.fetch;
+            global.fetch = async () => ({
+                ok: true,
+                json: async () => ({
+                    payload: {
+                        eventHistory: [
+                            {
+                                eventCode: 'Delivered',
+                                eventTime: '2023-12-14T15:30:00Z',
+                                shipmentType: 'FORWARD',
+                                location: {
+                                    city: 'London',
+                                    countryCode: 'GB',
+                                    postalCode: 'SXXA 1XX',
+                                    stateOrRegion: 'England'
+                                }
+                            }
+                        ],
+                        summary: {
+                            status: 'Delivered',
+                            proofOfDelivery: {
+                                deliveryImageURL: 'https://amzn-s3-dXXXXX.amazonaws.com/key?XXXXXXe96d844123456',
+                                receivedBy: 'John Doe'
+                            }
+                        }
+                    }
+                })
+            });
+
+            bloodhound.track('UK0123456789', 'amazon', function(err, actual) {
+                // Restore fetch
+                global.fetch = originalFetch;
+                assert.ifError(err);
+                assert(actual.proofOfDelivery);
+                assert(Array.isArray(actual.proofOfDelivery.photos));
+                assert.strictEqual(actual.proofOfDelivery.photos.length, 1);
+                assert.strictEqual(actual.proofOfDelivery.photos[0].url, 'https://amzn-s3-dXXXXX.amazonaws.com/key?XXXXXXe96d844123456');
+                assert.strictEqual(actual.proofOfDelivery.photos[0].description, 'Delivery photo');
+                assert(actual.proofOfDelivery.photos[0].expiresAt);
+                assert.strictEqual(actual.proofOfDelivery.receivedBy, 'John Doe');
+                done();
+            });
+        });
     });
 });

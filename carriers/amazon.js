@@ -155,6 +155,34 @@ function Amazon() {
             // Sort events by date (oldest first)
             results.events.sort((a, b) => a.date - b.date);
 
+            let summary = undefined;
+            if (json.summary) {
+                summary = json.summary;
+            } else if (json.payload && json.payload.summary) {
+                summary = json.payload.summary;
+            }
+            if (
+                summary &&
+                summary.status === 'Delivered' &&
+                summary.proofOfDelivery &&
+                summary.proofOfDelivery.deliveryImageURL
+            ) {
+                const deliveryImageURL = summary.proofOfDelivery.deliveryImageURL;
+                const receivedBy = summary.proofOfDelivery.receivedBy;
+                // The URL expires after 72 hours from now
+                const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+                results.proofOfDelivery = {
+                    photos: [
+                        {
+                            url: deliveryImageURL,
+                            expiresAt,
+                            description: 'Delivery photo'
+                        }
+                    ],
+                    receivedBy: receivedBy || undefined
+                };
+            }
+            console.log(results);
             return callback(null, results);
         } catch (err) {
             return callback(err);
