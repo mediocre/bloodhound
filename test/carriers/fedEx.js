@@ -48,7 +48,7 @@ describe.only('FedEx', function() {
         });
 
         it('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
-            nock('https://apis-sandbox.fedex.com')
+            nock('https://apis.fedex.com')
                 .post('/oauth/token')
                 .reply(200, {
                     access_token: 'fake-token-123',
@@ -56,7 +56,7 @@ describe.only('FedEx', function() {
                     expires_in: 3600
                 });
 
-            nock('https://apis-sandbox.fedex.com')
+            nock('https://apis.fedex.com')
                 .post('/track/v1/trackingnumbers')
                 .reply(200, {
                     output: {
@@ -77,7 +77,7 @@ describe.only('FedEx', function() {
                 fedEx: {
                     api_key: 'fake',
                     secret_key: 'fake',
-                    url: 'https://apis-sandbox.fedex.com',
+                    url: 'https://apis.fedex.com',
                     expires_in: 3600
                 }
             });
@@ -102,7 +102,7 @@ describe.only('FedEx', function() {
         });
 
         it('SmartPost: should handle missing estimatedDeliveryTimeWindow gracefully', function(done) {
-            nock('https://apis-sandbox.fedex.com')
+            nock('https://apis.fedex.com')
                 .post('/oauth/token')
                 .reply(200, {
                     access_token: 'fake-token-123',
@@ -110,7 +110,7 @@ describe.only('FedEx', function() {
                     expires_in: 3600
                 });
 
-            nock('https://apis-sandbox.fedex.com')
+            nock('https://apis.fedex.com')
                 .post('/track/v1/trackingnumbers')
                 .reply(200, {
                     output: {
@@ -124,7 +124,7 @@ describe.only('FedEx', function() {
                 fedEx: {
                     api_key: 'fake',
                     secret_key: 'fake',
-                    url: 'https://apis-sandbox.fedex.com',
+                    url: 'https://apis.fedex.com',
                     expires_in: 3600
                 }
             });

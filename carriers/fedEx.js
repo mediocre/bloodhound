@@ -19,7 +19,7 @@ const TRACKING_STATUS_CODES_BLACKLIST = ['PU', 'PX'];
 
 function FedEx(args) {
     const options = Object.assign({
-        url: 'https://apis-sandbox.fedex.com'
+        url: 'https://apis.fedex.com'
     }, args);
 
     this.getAccessToken = function(callback) {
