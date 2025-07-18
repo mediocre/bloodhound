@@ -7,7 +7,7 @@ const FedEx = require('../../carriers/fedEx');
 // FedEx Mock Tracking Numbers
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexground%C2%AEeconomy(formerlyknownasfedexsmartpost%C2%AE)
-describe('FedEx', function() {
+describe.only('FedEx', function() {
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();
 
@@ -1392,7 +1392,6 @@ describe('FedEx', function() {
             it('Delivered', function(done) {
                 bloodhound.track('122816215025810', 'fedex', function(err, actual) {
                     assert.ifError(err);
-
                     const expected = {
                         carrier: 'FedEx',
                         events: [
