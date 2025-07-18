@@ -201,5 +201,118 @@ describe('Amazon', function() {
                 done();
             });
         });
+
+        it('should parse promised delivery date from API response', function(done) {
+            // Mock response to test promised delivery date parsing
+            const mockResponse = {
+                promisedDeliveryDate: '2023-01-16T12:00:00Z',
+                eventHistory: JSON.stringify({
+                    eventHistory: [{
+                        eventTime: '2023-01-15T10:00:00Z',
+                        eventCode: 'InTransit',
+                        statusSummary: { localisedStringId: 'swa_rex_intransit' }
+                    }]
+                })
+            };
+
+            // Mock the fetch to return our test data
+            const originalFetch = global.fetch;
+            global.fetch = async () => ({
+                ok: true,
+                json: async () => mockResponse
+            });
+
+            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+                // Restore original fetch
+                global.fetch = originalFetch;
+
+                assert.ifError(err);
+
+                assert(actual.estimatedDeliveryDate, 'Should have estimated delivery date');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2023-01-16T12:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2023-01-16T12:00:00.000Z');
+
+                done();
+            });
+        });
+
+        it('should parse Amazon deliveryWindow from shippingPromiseSet correctly', function(done) {
+            // Create a mock response with a delivery window time range
+            const mockResponse = {
+                eventHistory: JSON.stringify({
+                    eventHistory: [{
+                        eventTime: '2023-01-15T10:00:00Z',
+                        eventCode: 'InTransit',
+                        statusSummary: { localisedStringId: 'swa_rex_intransit' }
+                    }]
+                }),
+                promisedDeliveryDate: '2023-01-16T12:00:00Z',
+                shippingPromiseSet: {
+                    deliveryWindow: {
+                        start: '2023-01-16T08:00:00Z',
+                        end: '2023-01-16T12:00:00Z'
+                    }
+                }
+            };
+
+            // Mock the fetch to return our test data
+            const originalFetch = global.fetch;
+            global.fetch = async () => ({
+                ok: true,
+                json: async () => mockResponse
+            });
+
+            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+                global.fetch = originalFetch;
+
+                assert.ifError(err);
+
+                // Verify that estimatedDeliveryDate is set correctly from delivery window
+                assert(actual.estimatedDeliveryDate, 'Should have estimated delivery date');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2023-01-16T08:00:00.000Z',
+                    'Should use delivery window start time');
+                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2023-01-16T12:00:00.000Z',
+                    'Should use delivery window end time');
+
+                // Verify that the delivery window overrides the promisedDeliveryDate
+                assert.notStrictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2023-01-16T12:00:00.000Z',
+                    'Should not use promised delivery date when delivery window is available');
+
+                done();
+            });
+        });
+
+        it('should handle timezone information correctly', function(done) {
+            const mockResponse = {
+                promisedDeliveryDate: '2023-01-16T15:30:45.123Z',
+                eventHistory: JSON.stringify({
+                    eventHistory: [{
+                        eventTime: '2023-01-15T10:00:00Z',
+                        eventCode: 'InTransit',
+                        statusSummary: { localisedStringId: 'swa_rex_intransit' }
+                    }]
+                })
+            };
+
+            const originalFetch = global.fetch;
+            global.fetch = async () => ({
+                ok: true,
+                json: async () => mockResponse
+            });
+
+            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+                global.fetch = originalFetch;
+
+                assert.ifError(err);
+
+                assert(actual.estimatedDeliveryDate, 'Should have estimated delivery date');
+
+                // Should preserve the original timestamp with milliseconds
+                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2023-01-16T15:30:45.123Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2023-01-16T15:30:45.123Z');
+
+                done();
+            });
+        });
     });
 });

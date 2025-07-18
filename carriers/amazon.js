@@ -152,6 +152,36 @@ function Amazon() {
                 }
             }
 
+            // Parse promised delivery date for estimated delivery
+            if (json.promisedDeliveryDate) {
+                const promisedDate = new Date(json.promisedDeliveryDate);
+
+                // Check if the promised date is valid
+                if (!isNaN(promisedDate.getTime())) {
+                    results.estimatedDeliveryDate = {
+                        earliestDeliveryDate: promisedDate.toISOString(),
+                        latestDeliveryDate: promisedDate.toISOString()
+                    };
+                }
+            }
+
+            // Check for delivery window in ShippingPromiseSet
+            if (json.shippingPromiseSet && json.shippingPromiseSet.deliveryWindow) {
+                const window = json.shippingPromiseSet.deliveryWindow;
+
+                if (window.start && window.end) {
+                    const start = new Date(window.start);
+                    const end = new Date(window.end);
+
+                    if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+                        results.estimatedDeliveryDate = {
+                            earliestDeliveryDate: start.toISOString(),
+                            latestDeliveryDate: end.toISOString()
+                        };
+                    }
+                }
+            }
+
             // Sort events by date (oldest first)
             results.events.sort((a, b) => a.date - b.date);
 
