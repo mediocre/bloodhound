@@ -161,16 +161,13 @@ function Amazon() {
             } else if (json.payload && json.payload.summary) {
                 summary = json.payload.summary;
             }
-            if (
-                summary &&
-                summary.status === 'Delivered' &&
-                summary.proofOfDelivery &&
-                summary.proofOfDelivery.deliveryImageURL
-            ) {
+
+            if (summary &&summary.status === 'Delivered' && summary.proofOfDelivery && summary.proofOfDelivery.deliveryImageURL) {
                 const deliveryImageURL = summary.proofOfDelivery.deliveryImageURL;
                 const receivedBy = summary.proofOfDelivery.receivedBy;
                 // The URL expires after 72 hours from now
                 const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+
                 results.proofOfDelivery = {
                     photos: [
                         {
@@ -182,7 +179,6 @@ function Amazon() {
                     receivedBy: receivedBy || undefined
                 };
             }
-            console.log(results);
             return callback(null, results);
         } catch (err) {
             return callback(err);
