@@ -124,7 +124,6 @@ function Amazon() {
                     };
                 }
             }
-
             // Parse event history for detailed tracking events
             if (json.eventHistory) {
                 const eventHistory = typeof json.eventHistory === 'string' ? JSON.parse(json.eventHistory) : json.eventHistory;
@@ -166,6 +165,9 @@ function Amazon() {
                     }
                 }
             }
+            results.events.sort((a, b) => a.date - b.date);
+
+            return callback(null, results);
         } catch (err) {
             return callback(err);
         }

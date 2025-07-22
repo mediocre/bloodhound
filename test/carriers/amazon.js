@@ -75,13 +75,13 @@ describe('Amazon', function() {
 
     describe('amazon.track', function() {
         it('should return tracking information for a valid delivered package', function(done) {
-            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
 
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
                 assert.strictEqual(typeof actual.url, 'string');
-                assert(actual.url.includes('TBA321677302718'));
+                assert(actual.url.includes('TBA322242594054'));
 
                 // Check that we have meaningful events
                 const hasDeliveredEvent = actual.events.some(event =>
@@ -113,7 +113,7 @@ describe('Amazon', function() {
         });
 
         it('should handle tracking numbers with spaces', function(done) {
-            bloodhound.track('TBA 3216 7730 2718', 'amazon', function(err, actual) {
+            bloodhound.track('TBA 3222 4259 4054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
@@ -122,7 +122,7 @@ describe('Amazon', function() {
         });
 
         it('should handle lowercase tracking numbers', function(done) {
-            bloodhound.track('tba321677302718', 'amazon', function(err, actual) {
+            bloodhound.track('tba322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
@@ -130,7 +130,7 @@ describe('Amazon', function() {
             });
         });
 
-        it.only('should return empty events for invalid tracking number', function(done) {
+        it('should return empty events for invalid tracking number', function(done) {
             bloodhound.track('TBA000000000000', 'amazon', function(err, actual) {
                 // Should not return an error, but should have empty events (consistent with other carriers)
                 assert.ifError(err);
@@ -203,11 +203,11 @@ describe('Amazon', function() {
         });
 
         it('should return estimatedDeliveryDate for a real Amazon tracking number', function(done) {
-            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert(actual.estimatedDeliveryDate);
-                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2025-05-31T03:00:00.000Z');
-                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2025-05-31T03:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2025-06-23T08:00:00.000Z');
                 done();
             });
         });
