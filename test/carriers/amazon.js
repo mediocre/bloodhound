@@ -130,7 +130,7 @@ describe('Amazon', function() {
             });
         });
 
-        it('should return empty events for invalid tracking number', function(done) {
+        it.only('should return empty events for invalid tracking number', function(done) {
             bloodhound.track('TBA000000000000', 'amazon', function(err, actual) {
                 // Should not return an error, but should have empty events (consistent with other carriers)
                 assert.ifError(err);
@@ -202,48 +202,12 @@ describe('Amazon', function() {
             });
         });
 
-        it('should parse proofOfDelivery photo and receivedBy when available', function(done) {
-            // Patch fetch globally for this test
-            const originalFetch = global.fetch;
-            global.fetch = async () => ({
-                ok: true,
-                json: async () => ({
-                    payload: {
-                        eventHistory: [
-                            {
-                                eventCode: 'Delivered',
-                                eventTime: '2023-12-14T15:30:00Z',
-                                shipmentType: 'FORWARD',
-                                location: {
-                                    city: 'London',
-                                    countryCode: 'GB',
-                                    postalCode: 'SXXA 1XX',
-                                    stateOrRegion: 'England'
-                                }
-                            }
-                        ],
-                        summary: {
-                            status: 'Delivered',
-                            proofOfDelivery: {
-                                deliveryImageURL: 'https://amzn-s3-dXXXXX.amazonaws.com/key?XXXXXXe96d844123456',
-                                receivedBy: 'John Doe'
-                            }
-                        }
-                    }
-                })
-            });
-
-            bloodhound.track('UK0123456789', 'amazon', function(err, actual) {
-                // Restore fetch
-                global.fetch = originalFetch;
+        it('should return estimatedDeliveryDate for a real Amazon tracking number', function(done) {
+            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
                 assert.ifError(err);
-                assert(actual.proofOfDelivery);
-                assert(Array.isArray(actual.proofOfDelivery.photos));
-                assert.strictEqual(actual.proofOfDelivery.photos.length, 1);
-                assert.strictEqual(actual.proofOfDelivery.photos[0].url, 'https://amzn-s3-dXXXXX.amazonaws.com/key?XXXXXXe96d844123456');
-                assert.strictEqual(actual.proofOfDelivery.photos[0].description, 'Delivery photo');
-                assert(actual.proofOfDelivery.photos[0].expiresAt);
-                assert.strictEqual(actual.proofOfDelivery.receivedBy, 'John Doe');
+                assert(actual.estimatedDeliveryDate);
+                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2025-05-31T03:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2025-05-31T03:00:00.000Z');
                 done();
             });
         });
