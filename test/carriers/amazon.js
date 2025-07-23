@@ -1,4 +1,6 @@
 const assert = require('assert');
+const nock = require('nock');
+
 const Bloodhound = require('../../index');
 const Amazon = require('../../carriers/amazon');
 
@@ -75,13 +77,13 @@ describe('Amazon', function() {
 
     describe('amazon.track', function() {
         it('should return tracking information for a valid delivered package', function(done) {
-            bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
+            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
 
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
                 assert.strictEqual(typeof actual.url, 'string');
-                assert(actual.url.includes('TBA321677302718'));
+                assert(actual.url.includes('TBA322242594054'));
 
                 // Check that we have meaningful events
                 const hasDeliveredEvent = actual.events.some(event =>
@@ -113,7 +115,7 @@ describe('Amazon', function() {
         });
 
         it('should handle tracking numbers with spaces', function(done) {
-            bloodhound.track('TBA 3216 7730 2718', 'amazon', function(err, actual) {
+            bloodhound.track('TBA 3222 4259 4054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
@@ -122,7 +124,7 @@ describe('Amazon', function() {
         });
 
         it('should handle lowercase tracking numbers', function(done) {
-            bloodhound.track('tba321677302718', 'amazon', function(err, actual) {
+            bloodhound.track('tba322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert.strictEqual(actual.carrier, 'Amazon');
                 assert(actual.events.length > 0);
@@ -198,6 +200,31 @@ describe('Amazon', function() {
                     }
                 }
 
+                done();
+            });
+        });
+
+        it('should return estimatedDeliveryDate for a real Amazon tracking number', function(done) {
+            nock('https://track.amazon.com')
+                .get('/api/tracker/TBA322242594054')
+                .reply(200, {
+                    progressTracker: JSON.stringify({
+                        summary: {
+                            metadata: {
+                                expectedDeliveryDate: '2025-06-23T08:00:00.000Z'
+                            }
+                        }
+                    }),
+                    eventHistory: JSON.stringify({
+                        eventHistory: []
+                    })
+                });
+
+            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
+                assert.ifError(err);
+                assert(actual.estimatedDeliveryDate);
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-06-23T08:00:00.000Z');
                 done();
             });
         });
