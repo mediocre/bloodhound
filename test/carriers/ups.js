@@ -140,7 +140,7 @@ describe('UPS', function() {
             });
         });
 
-        it.only('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
+        it('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
             nock('https://onlinetools.ups.com')
                 .post('/rest/Track')
                 .reply(200, {
