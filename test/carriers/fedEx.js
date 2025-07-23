@@ -89,8 +89,8 @@ describe('FedEx', function() {
                         carrier: 'FedEx',
                         events: [],
                         estimatedDeliveryDate: {
-                            earliestDeliveryDate: '2024-06-01T13:00:00.000Z',
-                            latestDeliveryDate: '2024-06-02T22:00:00.000Z'
+                            earliest: '2024-06-01T13:00:00.000Z',
+                            latest: '2024-06-02T22:00:00.000Z'
                         }
                     };
 

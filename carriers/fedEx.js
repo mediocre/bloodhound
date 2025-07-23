@@ -186,8 +186,8 @@ function FedEx(args) {
                 // Check if a time window is available
                 if (timeWindow?.window?.begins && timeWindow?.window?.ends) {
                     results.estimatedDeliveryDate = {
-                        earliestDeliveryDate: new Date(timeWindow.window.begins).toISOString(),
-                        latestDeliveryDate: new Date(timeWindow.window.ends).toISOString()
+                        earliest: new Date(timeWindow.window.begins).toISOString(),
+                        latest: new Date(timeWindow.window.ends).toISOString()
                     };
                 }
                 // Ensure track reply has events
