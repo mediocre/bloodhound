@@ -151,6 +151,19 @@ function UPS(options) {
             }
 
             const packageInfo = body?.TrackResponse?.Shipment?.Package ?? body.TrackResponse.Shipment;
+
+            // Add estimatedDeliveryDate if DeliveryDetail.Date is present
+            if (packageInfo?.DeliveryDetail?.Date) {
+                const dateStr = packageInfo.DeliveryDetail.Date;
+                const isoDate = new Date(
+                    `${dateStr.substring(0,4)}-${dateStr.substring(4,6)}-${dateStr.substring(6,8)}T00:00:00Z`
+                ).toISOString();
+                results.estimatedDeliveryDate = {
+                    earliest: isoDate,
+                    latest: isoDate
+                };
+            }
+
             var activitiesList = [];
 
             if (Array.isArray(packageInfo)) {

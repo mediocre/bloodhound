@@ -139,6 +139,15 @@ describe('UPS', function() {
             });
         });
 
+        it('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
+            bloodhound.track('1ZWV2634YW14457118', 'ups', function(err, actual) {
+                assert.ifError(err);
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-07-28T00:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-07-28T00:00:00.000Z');
+                done();
+            });
+        });
+
         it('should return tracking information with no errors', function(done) {
             bloodhound.track('5548789114', 'ups', function(err) {
                 assert.ifError(err);
