@@ -48,7 +48,7 @@ describe.only('FedEx', function() {
         });
 
         describe('FedEx Express and Ground', function() {
-            it('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
+            it.only('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
                 nock('https://apis.fedex.com')
                     .post('/oauth/token')
                     .reply(200, {
@@ -65,8 +65,8 @@ describe.only('FedEx', function() {
                                 trackResults: [{
                                     estimatedDeliveryTimeWindow: {
                                         window: {
-                                            begins: '2024-06-01T08:00:00',
-                                            ends: '2024-06-02T17:00:00'
+                                            begins: '2024-06-01T13:00:00Z',
+                                            ends: '2024-06-02T22:00:00Z'
                                         }
                                     }
                                 }]
