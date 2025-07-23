@@ -147,11 +147,11 @@ describe('UPS', function() {
                     TrackResponse: {
                         Shipment: {
                             Package: {
-                                Activity: []
+                                Activity: [],
+                                DeliveryDetail: {
+                                    Date: '20250728'
+                                }
                             }
-                        },
-                        DeliveryDetail: {
-                            Date: '20250728'
                         }
                     }
                 });
