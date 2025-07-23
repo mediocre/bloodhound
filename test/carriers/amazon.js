@@ -222,8 +222,8 @@ describe('Amazon', function() {
             bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert(actual.estimatedDeliveryDate);
-                assert.strictEqual(actual.estimatedDeliveryDate.earliestDeliveryDate, '2025-06-23T08:00:00.000Z');
-                assert.strictEqual(actual.estimatedDeliveryDate.latestDeliveryDate, '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-06-23T08:00:00.000Z');
                 done();
             });
         });

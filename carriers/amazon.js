@@ -119,8 +119,8 @@ function Amazon() {
                     }
                     const isoDate = new Date(dateValue).toISOString();
                     results.estimatedDeliveryDate = {
-                        earliestDeliveryDate: isoDate,
-                        latestDeliveryDate: isoDate
+                        earliest: isoDate,
+                        latest: isoDate
                     };
                 }
             }
