@@ -1,4 +1,5 @@
 const assert = require('assert');
+const nock = require('nock');
 const Bloodhound = require('../../index');
 const Amazon = require('../../carriers/amazon');
 
@@ -203,6 +204,21 @@ describe('Amazon', function() {
         });
 
         it('should return estimatedDeliveryDate for a real Amazon tracking number', function(done) {
+            nock('https://track.amazon.com')
+                .get('/api/tracker/TBA322242594054')
+                .reply(200, {
+                    progressTracker: JSON.stringify({
+                        summary: {
+                            metadata: {
+                                expectedDeliveryDate: '2025-06-23T08:00:00.000Z'
+                            }
+                        }
+                    }),
+                    eventHistory: JSON.stringify({
+                        eventHistory: []
+                    })
+                });
+
             bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert(actual.estimatedDeliveryDate);
