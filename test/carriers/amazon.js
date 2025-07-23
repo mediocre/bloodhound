@@ -1,5 +1,6 @@
 const assert = require('assert');
 const nock = require('nock');
+
 const Bloodhound = require('../../index');
 const Amazon = require('../../carriers/amazon');
 

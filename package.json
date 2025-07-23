@@ -19,7 +19,7 @@
         "coveralls": "*",
         "globals": "*",
         "mocha": "*",
-        "nock": "^14.0.6",
+        "nock": "*",
         "nyc": "*"
     },
     "homepage": "https://github.com/mediocre/bloodhound",
