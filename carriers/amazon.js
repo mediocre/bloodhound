@@ -109,10 +109,24 @@ function Amazon() {
                 return callback(null, results);
             }
 
+            if (json.progressTracker) {
+                const progressTracker = typeof json.progressTracker === 'string' ? JSON.parse(json.progressTracker) : json.progressTracker;
+
+                if (progressTracker.summary.metadata.expectedDeliveryDate) {
+                    let dateValue = progressTracker.summary.metadata.expectedDeliveryDate;
+                    if (typeof dateValue === 'object' && dateValue.date) {
+                        dateValue = dateValue.date;
+                    }
+                    const isoDate = new Date(dateValue).toISOString();
+                    results.estimatedDeliveryDate = {
+                        earliest: isoDate,
+                        latest: isoDate
+                    };
+                }
+            }
             // Parse event history for detailed tracking events
             if (json.eventHistory) {
                 const eventHistory = typeof json.eventHistory === 'string' ? JSON.parse(json.eventHistory) : json.eventHistory;
-
                 if (eventHistory.eventHistory && Array.isArray(eventHistory.eventHistory)) {
                     for (let i = 0; i < eventHistory.eventHistory.length; i++) {
                         const event = eventHistory.eventHistory[i];
@@ -151,8 +165,6 @@ function Amazon() {
                     }
                 }
             }
-
-            // Sort events by date (oldest first)
             results.events.sort((a, b) => a.date - b.date);
 
             return callback(null, results);

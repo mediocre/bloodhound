@@ -161,7 +161,6 @@ describe('FedEx', function() {
                     };
 
                     delete actual.raw;
-
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });
