@@ -164,6 +164,7 @@ function UPS(options) {
                 };
             }
 
+
             var activitiesList = [];
 
             if (Array.isArray(packageInfo)) {

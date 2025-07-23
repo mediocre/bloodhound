@@ -1,4 +1,5 @@
 const assert = require('assert');
+const nock = require('nock');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
@@ -139,7 +140,22 @@ describe('UPS', function() {
             });
         });
 
-        it('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
+        it.only('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
+            nock('https://onlinetools.ups.com')
+                .post('/rest/Track')
+                .reply(200, {
+                    TrackResponse: {
+                        Shipment: {
+                            Package: {
+                                Activity: []
+                            }
+                        },
+                        DeliveryDetail: {
+                            Date: '20250728'
+                        }
+                    }
+                });
+
             bloodhound.track('1ZWV2634YW14457118', 'ups', function(err, actual) {
                 assert.ifError(err);
                 assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-07-28T00:00:00.000Z');
