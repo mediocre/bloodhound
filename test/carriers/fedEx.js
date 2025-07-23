@@ -7,7 +7,7 @@ const FedEx = require('../../carriers/fedEx');
 // FedEx Mock Tracking Numbers
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexground%C2%AEeconomy(formerlyknownasfedexsmartpost%C2%AE)
-describe.only('FedEx', function() {
+describe('FedEx', function() {
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();
 
@@ -48,7 +48,7 @@ describe.only('FedEx', function() {
         });
 
         describe('FedEx Express and Ground', function() {
-            it.only('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
+            it('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
                 nock('https://apis.fedex.com')
                     .post('/oauth/token')
                     .reply(200, {
