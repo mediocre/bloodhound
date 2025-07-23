@@ -74,7 +74,8 @@ describe('USPS', function() {
         it('should return an error for invalid base URL', function(done) {
             const bloodhound = new Bloodhound({
                 usps: {
-                    baseUrl: 'http://localhost:99999',
+                    //baseUrl: 'https://httpbin.org/delay/10#',
+                    baseUrl: 'https://localhost:99999',
                     userId: process.env.USPS_USERID
                 }
             });
