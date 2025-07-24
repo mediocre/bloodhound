@@ -1,4 +1,5 @@
 const assert = require('assert');
+const nock = require('nock');
 const Bloodhound = require('../../index');
 const UPS = require('../../carriers/ups');
 
@@ -140,7 +141,7 @@ describe('UPS', function() {
         });
 
         it('should return tracking information with no errors', function(done) {
-            bloodhound.track('5548789114', 'ups', function(err) {
+            bloodhound.track('1Z12345E0305271640', 'ups', function(err) {
                 assert.ifError(err);
                 done();
             });
@@ -644,6 +645,32 @@ describe('UPS', function() {
                     assert.strictEqual(actual.events.length, expectedEvents.length);
                     expectedEvents.every(expectedEvent => assert(actual.events.some(e => areEventsEqual(expectedEvent, e))));
 
+                    done();
+                });
+            });
+        });
+
+        describe('Estimated Delivery Date', function() {
+            it('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
+                nock('https://wwwcie.ups.com')
+                    .post('/rest/Track')
+                    .reply(200, {
+                        TrackResponse: {
+                            Shipment: {
+                                Package: {
+                                    Activity: [],
+                                    DeliveryDetail: {
+                                        Date: '20250728'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                bloodhound.track('1ZWV2634YW14457118', 'ups', function(err, actual) {
+                    assert.ifError(err);
+                    assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-07-28T00:00:00.000Z');
+                    assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-07-28T00:00:00.000Z');
                     done();
                 });
             });
