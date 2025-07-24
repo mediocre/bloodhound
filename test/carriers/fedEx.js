@@ -1,4 +1,5 @@
 const assert = require('assert');
+const nock = require('nock');
 
 const Bloodhound = require('../../index');
 const FedEx = require('../../carriers/fedEx');
@@ -47,6 +48,58 @@ describe('FedEx', function() {
         });
 
         describe('FedEx Express and Ground', function() {
+            it('Non-SmartPost: should handle estimatedDeliveryTimeWindow if present', function(done) {
+                nock('https://apis.fedex.com')
+                    .post('/oauth/token')
+                    .reply(200, {
+                        access_token: 'fake-token-123',
+                        token_type: 'bearer',
+                        expires_in: 3600
+                    });
+
+                nock('https://apis.fedex.com')
+                    .post('/track/v1/trackingnumbers')
+                    .reply(200, {
+                        output: {
+                            completeTrackResults: [{
+                                trackResults: [{
+                                    estimatedDeliveryTimeWindow: {
+                                        window: {
+                                            begins: '2024-06-01T13:00:00Z',
+                                            ends: '2024-06-02T22:00:00Z'
+                                        }
+                                    }
+                                }]
+                            }]
+                        }
+                    });
+
+                const bloodhound = new Bloodhound({
+                    fedEx: {
+                        api_key: 'fake',
+                        secret_key: 'fake',
+                        url: 'https://apis.fedex.com',
+                        expires_in: 3600
+                    }
+                });
+
+                bloodhound.track('039813852990618', 'fedex', function(err, actual) {
+                    assert.ifError(err);
+                    const expected = {
+                        carrier: 'FedEx',
+                        events: [],
+                        estimatedDeliveryDate: {
+                            earliest: '2024-06-01T13:00:00.000Z',
+                            latest: '2024-06-02T22:00:00.000Z'
+                        }
+                    };
+
+                    delete actual.raw;
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                });
+            });
             it('Shipment information sent to FedEx', function(done) {
                 bloodhound.track('449044304137821', 'fedex', function(err, actual) {
                     assert.ifError(err);
@@ -1293,7 +1346,6 @@ describe('FedEx', function() {
             it('Delivered', function(done) {
                 bloodhound.track('122816215025810', 'fedex', function(err, actual) {
                     assert.ifError(err);
-
                     const expected = {
                         carrier: 'FedEx',
                         events: [
@@ -1647,6 +1699,48 @@ describe('FedEx', function() {
         });
 
         describe('FedEx SmartPost', function() {
+            it('SmartPost: should handle missing estimatedDeliveryTimeWindow gracefully', function(done) {
+                nock('https://apis.fedex.com')
+                    .post('/oauth/token')
+                    .reply(200, {
+                        access_token: 'fake-token-123',
+                        token_type: 'bearer',
+                        expires_in: 3600
+                    });
+
+                nock('https://apis.fedex.com')
+                    .post('/track/v1/trackingnumbers')
+                    .reply(200, {
+                        output: {
+                            completeTrackResults: [{
+                                trackResults: [{}]
+                            }]
+                        }
+                    });
+
+                const bloodhound = new Bloodhound({
+                    fedEx: {
+                        api_key: 'fake',
+                        secret_key: 'fake',
+                        url: 'https://apis.fedex.com',
+                        expires_in: 3600
+                    }
+                });
+
+                bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
+                    assert.ifError(err);
+
+                    const expected = {
+                        carrier: 'FedEx',
+                        events: []
+                    };
+
+                    delete actual.raw;
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                });
+            });
             it('Shipment information sent to FedEx', function(done) {
                 bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
                     assert.ifError(err);

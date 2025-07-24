@@ -178,12 +178,22 @@ function FedEx(args) {
                     events: [],
                     raw: trackReply
                 };
+                // Extract the first tracking result from a nested FedEx tracking respons
+                const trackResult = trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0];
+                // Extract estimated delivery window if available
+                const timeWindow = trackResult?.estimatedDeliveryTimeWindow;
 
+                // Check if a time window is available
+                if (timeWindow?.window?.begins && timeWindow?.window?.ends) {
+                    results.estimatedDeliveryDate = {
+                        earliest: new Date(timeWindow.window.begins).toISOString(),
+                        latest: new Date(timeWindow.window.ends).toISOString()
+                    };
+                }
                 // Ensure track reply has events
-                if (!trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0]?.scanEvents?.length) {
+                if (!trackReply?.output?.completeTrackResults[0]?.trackResults[0]?.scanEvents?.length) {
                     return callback(null, results);
                 }
-
                 trackReply?.output?.completeTrackResults?.[0]?.trackResults?.[0]?.scanEvents.forEach(e => {
                     if (TRACKING_STATUS_CODES_BLACKLIST.includes(e.eventType)) {
                         return;
@@ -224,7 +234,6 @@ function FedEx(args) {
 
                     results.events.push(event);
                 });
-
                 // Add url to carrier tracking page
                 results.url = `https://www.fedex.com/apps/fedextrack/?tracknumbers=${encodeURIComponent(trackingNumber)}`;
 
