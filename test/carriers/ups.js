@@ -141,7 +141,7 @@ describe('UPS', function() {
         });
 
         it('should set estimatedDeliveryDate from DeliveryDetail.Date when present', function(done) {
-            nock('https://onlinetools.ups.com')
+            nock('https://wwwcie.ups.com')
                 .post('/rest/Track')
                 .reply(200, {
                     TrackResponse: {
@@ -165,7 +165,7 @@ describe('UPS', function() {
         });
 
         it('should return tracking information with no errors', function(done) {
-            bloodhound.track('5548789114', 'ups', function(err) {
+            bloodhound.track('1Z12345E0305271640', 'ups', function(err) {
                 assert.ifError(err);
                 done();
             });

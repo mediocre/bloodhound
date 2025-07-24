@@ -34,9 +34,9 @@ function getActivities(package) {
                 activity.location = undefined;
             }
         });
-
-        return activitiesList;
     }
+
+    return activitiesList;
 }
 
 function UPS(options) {
@@ -163,7 +163,6 @@ function UPS(options) {
                     latest: isoDate
                 };
             }
-
 
             var activitiesList = [];
 
