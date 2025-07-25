@@ -142,7 +142,7 @@ describe('UPS', function() {
         });
 
         it('should return tracking information with no errors', function(done) {
-            bloodhound.track('1Z12345E0305271640', 'ups', function(err) {
+            bloodhound.track('5548789114', 'ups', function(err) {
                 assert.ifError(err);
                 done();
             });
