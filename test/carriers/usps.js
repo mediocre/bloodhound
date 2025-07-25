@@ -200,5 +200,22 @@ describe('USPS', function() {
                 done();
             });
         });
+
+        it('should return estimatedDeliveryDate when available in USPS response', function(done) {
+            bloodhound.track('9400150105798014348298', 'usps', function(err, actual) {
+                assert.ifError(err);
+                // Check if estimatedDeliveryDate exists (it may not always be present)
+                if (actual.estimatedDeliveryDate) {
+                    assert(actual.estimatedDeliveryDate.earliest, 'Should have earliest date');
+                    assert(actual.estimatedDeliveryDate.latest, 'Should have latest date');
+
+                    // Validate that the dates are valid ISO strings
+                    assert(!isNaN(new Date(actual.estimatedDeliveryDate.earliest).getTime()), 'earliest should be a valid date');
+                    assert(!isNaN(new Date(actual.estimatedDeliveryDate.latest).getTime()), 'latest should be a valid date');
+                }
+
+                done();
+            });
+        });
     });
 });

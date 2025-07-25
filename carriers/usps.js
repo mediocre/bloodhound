@@ -119,6 +119,16 @@ function USPS(options) {
                         scanDetailsList.push(trackDetail);
                     });
                 }
+                const trackInfo = data.TrackResponse.TrackInfo[0];
+
+                if (trackInfo?.ExpectedDeliveryDate) {
+                    const parsedDate = moment(trackInfo.ExpectedDeliveryDate[0], 'MMMM D, YYYY').toISOString();
+
+                    results.estimatedDeliveryDate = {
+                        earliest: parsedDate,
+                        latest: parsedDate
+                    };
+                }
 
                 // Set address and location of each scan detail
                 scanDetailsList.forEach(scanDetail => {
