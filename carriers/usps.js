@@ -119,6 +119,7 @@ function USPS(options) {
                         scanDetailsList.push(trackDetail);
                     });
                 }
+
                 const trackInfo = data.TrackResponse.TrackInfo[0];
 
                 if (trackInfo?.ExpectedDeliveryDate) {

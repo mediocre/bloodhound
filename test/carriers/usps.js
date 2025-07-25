@@ -1,4 +1,5 @@
 const assert = require('assert');
+const nock = require('nock');
 const Bloodhound = require('../../index');
 const USPS = require('../../carriers/usps.js');
 
@@ -202,18 +203,37 @@ describe('USPS', function() {
         });
 
         it('should return estimatedDeliveryDate when available in USPS response', function(done) {
+            const bloodhound = new Bloodhound({
+                usps: {
+                    userId: process.env.USPS_USERID
+                }
+            });
+
+            nock('https://production.shippingapis.com')
+                .get('/ShippingAPI.dll')
+                .query(true)
+                .reply(200, `
+                <TrackResponse>
+                  <TrackInfo>
+                    <ExpectedDeliveryDate>July 28, 2025</ExpectedDeliveryDate>
+                    <TrackSummary>
+                      <EventTime>12:00 pm</EventTime>
+                      <EventDate>July 28, 2025</EventDate>
+                      <Event>Delivered</Event>
+                      <EventCity>City</EventCity>
+                      <EventState>ST</EventState>
+                      <EventZIPCode>12345</EventZIPCode>
+                      <EventCountry>US</EventCountry>
+                      <EventCode>01</EventCode>
+                    </TrackSummary>
+                  </TrackInfo>
+                </TrackResponse>
+              `);
+
             bloodhound.track('9400150105798014348298', 'usps', function(err, actual) {
                 assert.ifError(err);
-                // Check if estimatedDeliveryDate exists (it may not always be present)
-                if (actual.estimatedDeliveryDate) {
-                    assert(actual.estimatedDeliveryDate.earliest, 'Should have earliest date');
-                    assert(actual.estimatedDeliveryDate.latest, 'Should have latest date');
-
-                    // Validate that the dates are valid ISO strings
-                    assert(!isNaN(new Date(actual.estimatedDeliveryDate.earliest).getTime()), 'earliest should be a valid date');
-                    assert(!isNaN(new Date(actual.estimatedDeliveryDate.latest).getTime()), 'latest should be a valid date');
-                }
-
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-07-28T05:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-07-28T05:00:00.000Z');
                 done();
             });
         });
