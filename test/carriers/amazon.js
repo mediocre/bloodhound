@@ -1,6 +1,6 @@
 const assert = require('assert');
 const nock = require('nock');
-
+const util = require('util');
 const Bloodhound = require('../../index');
 const Amazon = require('../../carriers/amazon');
 
@@ -223,8 +223,10 @@ describe('Amazon', function() {
             bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert(actual.estimatedDeliveryDate);
-                assert.strictEqual(actual.estimatedDeliveryDate.earliest, '2025-06-23T08:00:00.000Z');
-                assert.strictEqual(actual.estimatedDeliveryDate.latest, '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-06-23T08:00:00.000Z');
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true);
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true);
                 done();
             });
         });

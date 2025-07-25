@@ -117,13 +117,14 @@ function Amazon() {
                     if (typeof dateValue === 'object' && dateValue.date) {
                         dateValue = dateValue.date;
                     }
-                    const isoDate = new Date(dateValue).toISOString();
+                    const isoDate = new Date(dateValue);
                     results.estimatedDeliveryDate = {
                         earliest: isoDate,
                         latest: isoDate
                     };
                 }
             }
+
             // Parse event history for detailed tracking events
             if (json.eventHistory) {
                 const eventHistory = typeof json.eventHistory === 'string' ? JSON.parse(json.eventHistory) : json.eventHistory;
