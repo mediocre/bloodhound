@@ -1,5 +1,6 @@
 const assert = require('assert');
 const nock = require('nock');
+const util = require('util');
 
 const Bloodhound = require('../../index');
 const FedEx = require('../../carriers/fedEx');
@@ -85,17 +86,22 @@ describe('FedEx', function() {
 
                 bloodhound.track('039813852990618', 'fedex', function(err, actual) {
                     assert.ifError(err);
+
+                    delete actual.raw;
+
                     const expected = {
                         carrier: 'FedEx',
                         events: [],
                         estimatedDeliveryDate: {
-                            earliest: '2024-06-01T13:00:00.000Z',
-                            latest: '2024-06-02T22:00:00.000Z'
+                            earliest: new Date('2024-06-01T13:00:00.000Z'),
+                            latest: new Date('2024-06-02T22:00:00.000Z')
                         }
                     };
-
-                    delete actual.raw;
-
+                    // Assert that estimatedDeliveryDate values are strings, but also check if they can be parsed as dates
+                    assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2024-06-01T13:00:00.000Z');
+                    assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2024-06-02T22:00:00.000Z');
+                    assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true);
+                    assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true);
                     assert.deepStrictEqual(actual, expected);
                     done();
                 });

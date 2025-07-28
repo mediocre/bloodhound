@@ -138,6 +138,7 @@ function UPS(options) {
                 raw: body
             };
 
+
             if (err) {
                 if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
                     return usps.track(trackingNumber, _options, callback);
@@ -157,7 +158,7 @@ function UPS(options) {
                 const dateStr = packageInfo.DeliveryDetail.Date;
                 const isoDate = new Date(
                     `${dateStr.substring(0,4)}-${dateStr.substring(4,6)}-${dateStr.substring(6,8)}T00:00:00Z`
-                ).toISOString();
+                );
                 results.estimatedDeliveryDate = {
                     earliest: isoDate,
                     latest: isoDate
