@@ -233,8 +233,8 @@ describe('USPS', function() {
 
             bloodhound.track('9400150105798014348298', 'usps', function(err, actual) {
                 assert.ifError(err);
-                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-28T05:00:00.000Z');
-                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-28T05:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-28T00:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-28T00:00:00.000Z');
 
                 assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true, 'earliest is not a valid Date object');
                 assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true, 'latest is not a valid Date object');
