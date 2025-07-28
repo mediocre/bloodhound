@@ -1,4 +1,6 @@
 const assert = require('assert');
+const nock = require('nock');
+const util = require('util');
 const Bloodhound = require('../../index');
 const USPS = require('../../carriers/usps.js');
 
@@ -197,6 +199,45 @@ describe('USPS', function() {
         it('should skip Track Details that do no have time stamps', function(done) {
             bloodhound.track('9400110200830244685403', 'usps', function(err) {
                 assert.ifError(err);
+                done();
+            });
+        });
+
+        it('should return estimatedDeliveryDate when available in USPS response', function(done) {
+            const bloodhound = new Bloodhound({
+                usps: {
+                    userId: process.env.USPS_USERID
+                }
+            });
+
+            nock('https://production.shippingapis.com')
+                .get('/ShippingAPI.dll')
+                .query(true)
+                .reply(200, `
+                <TrackResponse>
+                  <TrackInfo>
+                    <ExpectedDeliveryDate>July 28, 2025</ExpectedDeliveryDate>
+                    <TrackSummary>
+                      <EventTime>12:00 pm</EventTime>
+                      <EventDate>July 28, 2025</EventDate>
+                      <Event>Delivered</Event>
+                      <EventCity>City</EventCity>
+                      <EventState>ST</EventState>
+                      <EventZIPCode>12345</EventZIPCode>
+                      <EventCountry>US</EventCountry>
+                      <EventCode>01</EventCode>
+                    </TrackSummary>
+                  </TrackInfo>
+                </TrackResponse>
+              `);
+
+            bloodhound.track('9400150105798014348298', 'usps', function(err, actual) {
+                assert.ifError(err);
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-28T00:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-28T00:00:00.000Z');
+
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true, 'earliest is not a valid Date object');
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true, 'latest is not a valid Date object');
                 done();
             });
         });
