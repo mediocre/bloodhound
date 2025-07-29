@@ -1,4 +1,6 @@
 const assert = require('assert');
+const nock = require('nock');
+const util = require('util');
 
 const Bloodhound = require('../../index');
 const DHL = require('../../carriers/dhl');
@@ -104,5 +106,48 @@ describe('DHL', function() {
                 done();
             });
         });
+
+        it('should return estimated delivery date for a real DHL tracking number', function(done) {
+            nock('https://api-eu.dhl.com')
+                .get('/track/shipments?trackingNumber=420944019261299999877816190127')
+                .reply(200, {
+                    shipments: [{
+                        id: '420944019261299999877816190127',
+                        service: 'DHL Express',
+                        status: 'transit',
+                        estimatedTimeOfDelivery: '2025-07-29',
+                        events: [
+                            {
+                                timestamp: '2025-07-25T10:00:00',
+                                description: 'Shipment picked up',
+                                location: {
+                                    address: {
+                                        addressLocality: 'Frankfurt',
+                                        postalCode: '60547',
+                                        countryCode: 'DE'
+                                    }
+                                }
+                            }
+                        ]
+                    }]
+                });
+
+            const bloodhound = new Bloodhound({
+                dhl: {
+                    apiKey: 'fake-api-key'
+                }
+            });
+
+            bloodhound.track('420944019261299999877816190127', 'dhl', function(err, actual) {
+                assert.ifError(err);
+                assert(actual.estimatedDeliveryDate);
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-29T05:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-29T05:00:00.000Z');
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true);
+                assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true);
+                done();
+            });
+        });
+
     });
 });
