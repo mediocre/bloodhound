@@ -5,7 +5,7 @@ const DHL = require('../../carriers/dhl');
 
 describe('DHL', function() {
     const validTrackingNumbers = [
-        '420480369374810912400407068201'
+        '420944019261299999877816190127'
     ];
 
     describe('dhl.isTrackingNumberValid', function() {
@@ -35,7 +35,7 @@ describe('DHL', function() {
         });
     });
 
-    describe.skip('dhl.track', function() {
+    describe('dhl.track', function() {
         this.timeout(10000);
 
         it('should return a valid response with no errors', function(done) {

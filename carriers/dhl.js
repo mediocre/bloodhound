@@ -21,7 +21,13 @@ function DHL(options) {
         // Remove spaces and uppercase
         trackingNumber = trackingNumber.replace(/\s/g, '').toUpperCase();
 
+        // Check for standard DHL formats
         if ([/94748\d{17}$/, /93612\d{17}$/].some(regex => regex.test(trackingNumber))) {
+            return true;
+        }
+
+        // Check for 30-digit DHL tracking numbers starting with 420
+        if (/^420\d{27}$/.test(trackingNumber)) {
             return true;
         }
 
@@ -102,6 +108,18 @@ function DHL(options) {
 
                 // We only support the first shipment
                 const shipment = body.shipments[0];
+
+                const estimatedDeliveryDate = shipment.estimatedTimeOfDelivery;
+
+                // Add estimated delivery date to results if available
+                if (estimatedDeliveryDate) {
+                    // DHL typically provides a single estimated delivery date, so we use it for both earliest and latest
+                    const deliveryDate = moment(estimatedDeliveryDate).toDate();
+                    results.estimatedDeliveryDate = {
+                        earliest: deliveryDate,
+                        latest: deliveryDate
+                    };
+                }
 
                 // Reverse the array to get events in order Least Recent - Most Recent
                 const events = shipment.events.reverse();
