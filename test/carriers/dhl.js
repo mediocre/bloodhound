@@ -113,7 +113,7 @@ describe('DHL', function() {
                 .reply(200, {
                     shipments: [{
                         id: '420944019261299999877816190127',
-                        service: 'DHL Express',
+                        service: 'ecommerce',
                         status: 'transit',
                         estimatedTimeOfDelivery: '2025-07-29',
                         events: [
@@ -141,8 +141,8 @@ describe('DHL', function() {
             bloodhound.track('420944019261299999877816190127', 'dhl', function(err, actual) {
                 assert.ifError(err);
                 assert(actual.estimatedDeliveryDate);
-                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-29T05:00:00.000Z');
-                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-29T05:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.earliest.toISOString(), '2025-07-29T00:00:00.000Z');
+                assert.strictEqual(actual.estimatedDeliveryDate.latest.toISOString(), '2025-07-29T00:00:00.000Z');
                 assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.earliest), true);
                 assert.strictEqual(util.types.isDate(actual.estimatedDeliveryDate.latest), true);
                 done();
