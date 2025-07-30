@@ -39,6 +39,11 @@ Bloodhound also examines each of the activity/movement/scan events for "shipped"
 - UPS
 - USPS
 
+**Estimated Delivery Dates**
+
+Bloodhound now provides `estimatedDeliveryDate` support across Amazon, DHL, FedEx, UPS and USPS carriers carriers when available.
+This allows clients to access projected delivery timeframes alongside real-time tracking updates
+
 ## Getting Started
 
 ```javascript

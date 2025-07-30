@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-07-30
+### Added
+- Added estimatedDeliveryDate support across Amazon, DHL, FedEx, UPS and USPS carriers.
+
 ## [2.1.0] - 2025-06-27
 ### Added
 - Added Amazon Shipping tracking support for TBA/TBM/TBC tracking numbers.
