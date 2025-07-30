@@ -41,8 +41,11 @@ Bloodhound also examines each of the activity/movement/scan events for "shipped"
 
 **Estimated Delivery Dates**
 
-Bloodhound now provides `estimatedDeliveryDate` support across Amazon, DHL, FedEx, UPS and USPS carriers carriers when available.
-This allows clients to access projected delivery timeframes alongside real-time tracking updates
+Bloodhound provides estimated delivery date information when available from carriers. This feature returns a date range with the earliest and latest expected delivery times, giving you a reliable delivery window for packages.
+
+This feature is supported across all major carriers (Amazon, DHL, FedEx, UPS, and USPS) when the carrier provides this information. For carriers that only provide a single delivery date estimate, both `earliest` and `latest` will contain the same value.
+
+Note that estimated delivery dates are dynamic and may change as packages move through the delivery network. Carriers update these estimates based on real-time shipping conditions, weather, and routing changes. It's recommended to track packages periodically to get the most current delivery estimates.
 
 ## Getting Started
 
@@ -154,6 +157,7 @@ bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
 **Data**
 ```json
 {
+    "deliveredAt": "2019-06-30T18:03:00.000Z",
     "events": [
         {
             "address": {
@@ -174,7 +178,10 @@ bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
             "description": "Sorting Complete"
         }
     ],
-    "shippedAt": "2019-05-13T17:32:00.000Z",
-    "deliveredAt": "2019-06-30T18:03:00.000Z"
+    "estimatedDeliveryDate": {
+        "earliest": "2019-06-28T13:00:00.000Z",
+        "latest": "2019-06-30T21:00:00.000Z"
+    },
+    "shippedAt": "2019-05-13T17:32:00.000Z"
 }
 ```
