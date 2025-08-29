@@ -17,6 +17,7 @@
     "devDependencies": {
         "@eslint/js": "*",
         "coveralls": "*",
+        "eslint": "*",
         "globals": "*",
         "mocha": "*",
         "nock": "*",
