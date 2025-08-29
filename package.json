@@ -43,9 +43,6 @@
         "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
         "test": "mocha --exit --reporter spec test/* --timeout 30000"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/mediocre/bloodhound.git"
-    },
+    "repository": "https://github.com/mediocre/bloodhound",
     "version": "2.2.0"
 }
