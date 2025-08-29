@@ -18,7 +18,8 @@
         "@eslint/js": "*",
         "globals": "*",
         "mocha": "*",
-        "nock": "*"
+        "nock": "*",
+        "nyc": "*"
     },
     "homepage": "https://github.com/mediocre/bloodhound",
     "keywords": [
