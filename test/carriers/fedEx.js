@@ -9,7 +9,7 @@ const FedEx = require('../../carriers/fedEx');
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexexpressandfedexground
 // https://developer.fedex.com/api/en-us/guides/api-reference.html#mocktrackingnumbersforfedexground%C2%AEeconomy(formerlyknownasfedexsmartpost%C2%AE)
 describe('FedEx', function() {
-    this.retries(3);
+    this.retries(5);
 
     describe('fedEx.isTrackingNumberValid', function() {
         const fedEx = new FedEx();

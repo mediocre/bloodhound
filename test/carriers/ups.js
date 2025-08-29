@@ -15,7 +15,7 @@ function areEventsEqual(a, b) {
 }
 
 describe('UPS', function() {
-    this.retries(3);
+    this.retries(5);
     this.timeout(25000);
 
     beforeEach(function(done) {
