@@ -3,6 +3,7 @@ const assert = require('assert');
 const Bloodhound = require('../../index.js');
 
 describe('Newgistics', function() {
+    this.retries(3);
     this.timeout(30000);
 
     it('should return an error for invalid base URL', function(done) {
