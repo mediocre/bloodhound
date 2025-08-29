@@ -1706,48 +1706,6 @@ describe('FedEx', function() {
         });
 
         describe('FedEx SmartPost', function() {
-            it('SmartPost: should handle missing estimatedDeliveryTimeWindow gracefully', function(done) {
-                nock('https://apis.fedex.com')
-                    .post('/oauth/token')
-                    .reply(200, {
-                        access_token: 'fake-token-123',
-                        token_type: 'bearer',
-                        expires_in: 3600
-                    });
-
-                nock('https://apis.fedex.com')
-                    .post('/track/v1/trackingnumbers')
-                    .reply(200, {
-                        output: {
-                            completeTrackResults: [{
-                                trackResults: [{}]
-                            }]
-                        }
-                    });
-
-                const bloodhound = new Bloodhound({
-                    fedEx: {
-                        api_key: 'fake',
-                        secret_key: 'fake',
-                        url: 'https://apis.fedex.com',
-                        expires_in: 3600
-                    }
-                });
-
-                bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
-                    assert.ifError(err);
-
-                    const expected = {
-                        carrier: 'FedEx',
-                        events: []
-                    };
-
-                    delete actual.raw;
-
-                    assert.deepStrictEqual(actual, expected);
-                    done();
-                });
-            });
             it('Shipment information sent to FedEx', function(done) {
                 bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
                     assert.ifError(err);
@@ -2034,6 +1992,48 @@ describe('FedEx', function() {
                         deliveredAt: new Date('2015-03-06T18:51:00.000Z'),
                         shippedAt: new Date('2015-03-02T23:14:26.000Z'),
                         url: 'https://www.fedex.com/apps/fedextrack/?tracknumbers=02394653018047202719'
+                    };
+
+                    delete actual.raw;
+
+                    assert.deepStrictEqual(actual, expected);
+                    done();
+                });
+            });
+            it('SmartPost: should handle missing estimatedDeliveryTimeWindow gracefully', function(done) {
+                nock('https://apis.fedex.com')
+                    .post('/oauth/token')
+                    .reply(200, {
+                        access_token: 'fake-token-123',
+                        token_type: 'bearer',
+                        expires_in: 3600
+                    });
+
+                nock('https://apis.fedex.com')
+                    .post('/track/v1/trackingnumbers')
+                    .reply(200, {
+                        output: {
+                            completeTrackResults: [{
+                                trackResults: [{}]
+                            }]
+                        }
+                    });
+
+                const bloodhound = new Bloodhound({
+                    fedEx: {
+                        api_key: 'fake',
+                        secret_key: 'fake',
+                        url: 'https://apis.fedex.com',
+                        expires_in: 3600
+                    }
+                });
+
+                bloodhound.track('02394653001023698293', 'fedex', function(err, actual) {
+                    assert.ifError(err);
+
+                    const expected = {
+                        carrier: 'FedEx',
+                        events: []
                     };
 
                     delete actual.raw;
