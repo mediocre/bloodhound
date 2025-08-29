@@ -33,13 +33,6 @@ jobs:
         redis-version: ${{ matrix.redis-version }}
 
     - name: Test
-      run: |
-        if [ "${{ matrix.node-version }}/${{ matrix.redis-version }}" == "${RUN_COVERAGE_FOR}" ]
-        then
-          npm run coveralls
-        else
-          npm test
-        fi
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         DHL_API_KEY: ${{ secrets.DHL_API_KEY }}
@@ -57,6 +50,13 @@ jobs:
         UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
         USPS_USERID: ${{ secrets.USPS_USERID }}
 
+      run: |
+        if [ "${{ matrix.node-version }}/${{ matrix.redis-version }}" == "${RUN_COVERAGE_FOR}" ]
+        then
+          npm run coveralls
+        else
+          npm test
+        fi
     - if: ${{ always() }}
       name: Send Slack notification
       run: |
