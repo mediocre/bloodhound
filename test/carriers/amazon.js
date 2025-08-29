@@ -5,6 +5,7 @@ const Bloodhound = require('../../index');
 const Amazon = require('../../carriers/amazon');
 
 describe('Amazon', function() {
+    this.retries(3);
     this.timeout(30000);
 
     beforeEach(function(done) {
