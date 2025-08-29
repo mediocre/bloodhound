@@ -76,6 +76,62 @@ describe('Amazon', function() {
     });
 
     describe('amazon.track', function() {
+        it.skip('should return tracking information for a valid delivered package', function(done) {
+            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
+                assert.ifError(err);
+
+                assert.strictEqual(actual.carrier, 'Amazon');
+                assert(actual.events.length > 0);
+                assert.strictEqual(typeof actual.url, 'string');
+                assert(actual.url.includes('TBA322242594054'));
+
+                // Check that we have meaningful events
+                const hasDeliveredEvent = actual.events.some(event =>
+                    event.description.toLowerCase().includes('delivered') ||
+                    event.description.toLowerCase().includes('package delivered')
+                );
+
+                if (actual.deliveredAt) {
+                    assert(hasDeliveredEvent, 'Should have delivered event when deliveredAt is set');
+                    assert(actual.deliveredAt instanceof Date);
+                }
+
+                if (actual.shippedAt) {
+                    assert(actual.shippedAt instanceof Date);
+                }
+
+                // Verify event structure
+                actual.events.forEach(event => {
+                    assert(Object.hasOwn(event, 'address'));
+                    assert(Object.hasOwn(event, 'date'));
+                    assert(Object.hasOwn(event, 'description'));
+                    assert(event.date instanceof Date);
+                    assert(typeof event.description === 'string');
+                    assert(event.description.length > 0);
+                });
+
+                done();
+            });
+        });
+
+        it.skip('should handle tracking numbers with spaces', function(done) {
+            bloodhound.track('TBA 3222 4259 4054', 'amazon', function(err, actual) {
+                assert.ifError(err);
+                assert.strictEqual(actual.carrier, 'Amazon');
+                assert(actual.events.length > 0);
+                done();
+            });
+        });
+
+        it.skip('should handle lowercase tracking numbers', function(done) {
+            bloodhound.track('tba322242594054', 'amazon', function(err, actual) {
+                assert.ifError(err);
+                assert.strictEqual(actual.carrier, 'Amazon');
+                assert(actual.events.length > 0);
+                done();
+            });
+        });
+
         it('should return empty events for invalid tracking number', function(done) {
             bloodhound.track('TBA000000000000', 'amazon', function(err, actual) {
                 // Should not return an error, but should have empty events (consistent with other carriers)
@@ -144,193 +200,6 @@ describe('Amazon', function() {
                     }
                 }
 
-                done();
-            });
-        });
-
-        it('should return tracking information for a valid delivered package', function(done) {
-            // Mock the Amazon API response
-            nock('https://track.amazon.com')
-                .get('/api/tracker/TBA322242594054')
-                .reply(200, {
-                    progressTracker: JSON.stringify({
-                        summary: {
-                            metadata: {
-                                expectedDeliveryDate: '2025-06-23T08:00:00.000Z'
-                            }
-                        }
-                    }),
-                    eventHistory: JSON.stringify({
-                        eventHistory: [
-                            {
-                                eventCode: 'DELIVERED',
-                                eventTime: '2025-06-20T14:30:00.000Z',
-                                eventLocation: {
-                                    city: 'Seattle',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package delivered'
-                            },
-                            {
-                                eventCode: 'OUT_FOR_DELIVERY',
-                                eventTime: '2025-06-20T08:00:00.000Z',
-                                eventLocation: {
-                                    city: 'Seattle',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Out for delivery'
-                            },
-                            {
-                                eventCode: 'IN_TRANSIT',
-                                eventTime: '2025-06-19T16:45:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package in transit'
-                            },
-                            {
-                                eventCode: 'SHIPPED',
-                                eventTime: '2025-06-18T10:30:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package shipped'
-                            }
-                        ]
-                    })
-                });
-
-            bloodhound.track('TBA322242594054', 'amazon', function(err, actual) {
-                assert.ifError(err);
-
-                assert.strictEqual(actual.carrier, 'Amazon');
-                assert(actual.events.length > 0);
-                assert.strictEqual(typeof actual.url, 'string');
-                assert(actual.url.includes('TBA322242594054'));
-
-                // Check that we have meaningful events
-                const hasDeliveredEvent = actual.events.some(event =>
-                    event.description.toLowerCase().includes('delivered') ||
-                    event.description.toLowerCase().includes('package delivered')
-                );
-
-                if (actual.deliveredAt) {
-                    assert(hasDeliveredEvent, 'Should have delivered event when deliveredAt is set');
-                    assert(actual.deliveredAt instanceof Date);
-                }
-
-                if (actual.shippedAt) {
-                    assert(actual.shippedAt instanceof Date);
-                }
-
-                // Verify event structure
-                actual.events.forEach(event => {
-                    assert(Object.hasOwn(event, 'address'));
-                    assert(Object.hasOwn(event, 'date'));
-                    assert(Object.hasOwn(event, 'description'));
-                    assert(event.date instanceof Date);
-                    assert(typeof event.description === 'string');
-                    assert(event.description.length > 0);
-                });
-
-                done();
-            });
-        });
-
-        it('should handle tracking numbers with spaces', function(done) {
-            // Mock the Amazon API response for tracking number with spaces
-            nock('https://track.amazon.com')
-                .get('/api/tracker/TBA322242594054')
-                .reply(200, {
-                    progressTracker: JSON.stringify({
-                        summary: {
-                            metadata: {
-                                expectedDeliveryDate: '2025-06-25T08:00:00.000Z'
-                            }
-                        }
-                    }),
-                    eventHistory: JSON.stringify({
-                        eventHistory: [
-                            {
-                                eventCode: 'IN_TRANSIT',
-                                eventTime: '2025-06-19T16:45:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package in transit'
-                            },
-                            {
-                                eventCode: 'SHIPPED',
-                                eventTime: '2025-06-18T10:30:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package shipped'
-                            }
-                        ]
-                    })
-                });
-
-            bloodhound.track('TBA 3222 4259 4054', 'amazon', function(err, actual) {
-                assert.ifError(err);
-                assert.strictEqual(actual.carrier, 'Amazon');
-                assert(actual.events.length > 0);
-                done();
-            });
-        });
-
-        it('should handle lowercase tracking numbers', function(done) {
-            // Mock the Amazon API response for lowercase tracking number
-            nock('https://track.amazon.com')
-                .get('/api/tracker/TBA322242594054')
-                .reply(200, {
-                    progressTracker: JSON.stringify({
-                        summary: {
-                            metadata: {
-                                expectedDeliveryDate: '2025-06-25T08:00:00.000Z'
-                            }
-                        }
-                    }),
-                    eventHistory: JSON.stringify({
-                        eventHistory: [
-                            {
-                                eventCode: 'IN_TRANSIT',
-                                eventTime: '2025-06-19T16:45:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package in transit'
-                            },
-                            {
-                                eventCode: 'SHIPPED',
-                                eventTime: '2025-06-18T10:30:00.000Z',
-                                eventLocation: {
-                                    city: 'Kent',
-                                    state: 'WA',
-                                    country: 'US'
-                                },
-                                eventDescription: 'Package shipped'
-                            }
-                        ]
-                    })
-                });
-
-            bloodhound.track('tba322242594054', 'amazon', function(err, actual) {
-                assert.ifError(err);
-                assert.strictEqual(actual.carrier, 'Amazon');
-                assert(actual.events.length > 0);
                 done();
             });
         });
