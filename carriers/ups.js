@@ -1,7 +1,6 @@
 const async = require('async');
 const moment = require('moment-timezone');
-const request = require('request');
-const xml2json = require('fast-xml-parser');
+const UPS = require('@mediocre/ups');
 
 const geography = require('../util/geography');
 const USPS = require('./usps');
@@ -39,8 +38,9 @@ function getActivities(package) {
     return activitiesList;
 }
 
-function UPS(options) {
-    const usps = new USPS(options && options.usps);
+module.exports = function(options) {
+    const ups = new UPS(options?.ups);
+    const usps = new USPS(options?.usps);
 
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -59,7 +59,7 @@ function UPS(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, _options, callback) {
+    this.track = async function(trackingNumber, _options, callback) {
         // Options are optional
         if (typeof _options === 'function') {
             callback = _options;
@@ -70,73 +70,29 @@ function UPS(options) {
             _options.minDate = new Date(0);
         }
 
-        const req = {
-            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-            forever: true,
-            gzip: true,
-            json: {
-                Security: {
-                    UPSServiceAccessToken: {
-                        AccessLicenseNumber: options.accessKey
-                    },
-                    UsernameToken: {
-                        Username: options.username,
-                        Password: options.password
-                    }
-                },
-                TrackRequest: {
-                    InquiryNumber: trackingNumber,
-                    Request: {
-                        RequestAction: 'Track',
-                        RequestOption: 'activity',
-                        SubVersion: '1907'
-                    }
-                }
-            },
-            method: 'POST',
-            timeout: 5000,
-            url: '/rest/Track'
-        };
+        try {
+            const trackingData = await ups.track(trackingNumber, _options);
 
-        // The REST API doesn't support UPS Mail Innovations. Use the XML API instead.
-        if (usps.isTrackingNumberValid(trackingNumber)) {
-            delete req.json;
-
-            req.body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
-            req.url = '/ups.app/xml/Track';
-        }
-
-        async.retry(function(callback) {
-            request(req, function(err, res, body) {
-                if (err) {
-                    return callback(err);
-                }
-
-                // Convert XML to JSON if necessary
-                if (body?.startsWith?.('<?xml version="1.0"?>')) {
-                    body = xml2json.parse(body, { parseNodeValue: false });
-                }
-
-                if (!body?.TrackResponse) {
-                    if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
-                        return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                    } else {
-                        return callback(new Error(body || 'Invalid response from UPS'));
-                    }
-                }
-
-                if (body?.TrackResponse?.Response?.Error) {
-                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription));
-                }
-
-                callback(null, body);
-            });
-        }, function(err, body) {
             const results = {
                 carrier: 'UPS',
                 events: [],
-                raw: body
+                raw: trackingData
             };
+
+            callback(null, results);
+        } catch (err) {
+            if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
+                return usps.track(trackingNumber, _options, callback);
+            }
+
+            callback(err);
+        }
+
+
+        async.retry(function(callback) {
+
+        }, function(err, body) {
+            
 
 
             if (err) {
@@ -257,6 +213,4 @@ function UPS(options) {
             });
         });
     };
-}
-
-module.exports = UPS;
+};
