@@ -1,5 +1,6 @@
-.eslintignore
-.eslintrc.js
-.github
-.travis.yml
-test
+.claude/
+.github/
+test/
+CLAUDE.md
+eslint.config.js
+package-lock.json

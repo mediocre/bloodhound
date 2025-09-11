@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Bloodhound is a Node.js package that provides a unified interface for retrieving tracking data from multiple shipping carriers (Amazon, DHL, FedEx, UPS, USPS) in a common format. The package focuses on proper timestamp parsing with timezone handling and automatic carrier detection.
 
+**Note**: As of v2.3.0, the UPS integration uses the new OAuth 2.0 API via the @mediocre/ups package, requiring `client_id` and `client_secret` for configuration.
+
 ## Key Commands
 
 ### Testing
