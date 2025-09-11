@@ -49,9 +49,8 @@ jobs:
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         PITNEY_BOWES_API_KEY: ${{ secrets.PITNEY_BOWES_API_KEY }}
         PITNEY_BOWES_API_SECRET: ${{ secrets.PITNEY_BOWES_API_SECRET }}
-        UPS_ACCESS_KEY: ${{ secrets.UPS_ACCESS_KEY }}
-        UPS_PASSWORD: ${{ secrets.UPS_PASSWORD }}
-        UPS_USERNAME: ${{ secrets.UPS_USERNAME }}
+        UPS_CLIENT_ID: ${{ secrets.UPS_CLIENT_ID }}
+        UPS_CLIENT_SECRET: ${{ secrets.UPS_CLIENT_SECRET }}
         USPS_USERID: ${{ secrets.USPS_USERID }}
 
       run: |

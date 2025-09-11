@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2025-09-11
+### Changed
+- Migrated UPS carrier integration to use the new OAuth 2.0 API via @mediocre/ups package.
+  - **BREAKING**: Configuration changed from `accessKey`, `username`, `password` to `client_id`, `client_secret`
+  - Improved timezone handling using GMT offsets provided by the new API
+  - Simplified implementation by delegating to @mediocre/ups package
+
+### Improved
+- UPS tracking now uses the modern REST API with better reliability
+- Timezone handling for UPS events is now more accurate with GMT offsets
+
 ## [2.2.0] - 2025-07-30
 ### Added
 - Added estimatedDeliveryDate support across Amazon, DHL, FedEx, UPS and USPS carriers.

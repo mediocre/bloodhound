@@ -1,46 +1,10 @@
-const async = require('async');
-const moment = require('moment-timezone');
-const request = require('request');
-const xml2json = require('fast-xml-parser');
+const UPS = require('@mediocre/ups');
 
-const geography = require('../util/geography');
 const USPS = require('./usps');
 
-function getActivities(package) {
-    var activitiesList = package.Activity;
-
-    if (!Array.isArray(package.Activity)) {
-        activitiesList = [package.Activity];
-    }
-
-    // Filter undefined activities
-    activitiesList = activitiesList.filter(a => a);
-
-    if (activitiesList.length) {
-        activitiesList.forEach(activity => {
-            if (activity.ActivityLocation) {
-                activity.address = {
-                    city: activity.ActivityLocation.City || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.City),
-                    country: activity.ActivityLocation.CountryCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.CountryCode),
-                    state: activity.ActivityLocation.StateProvinceCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.StateProvinceCode),
-                    zip: activity.ActivityLocation.PostalCode || (activity.ActivityLocation.Address && activity.ActivityLocation.Address.PostalCode)
-                };
-
-                if ((activity.address.city && activity.address.state) || activity.address.zip) {
-                    activity.location = geography.addressToString(activity.address);
-                }
-            } else {
-                activity.address = {};
-                activity.location = undefined;
-            }
-        });
-    }
-
-    return activitiesList;
-}
-
-function UPS(options) {
-    const usps = new USPS(options && options.usps);
+module.exports = function(options) {
+    const ups = new UPS(options);
+    const usps = new USPS(options?.usps);
 
     this.isTrackingNumberValid = function(trackingNumber) {
         // Remove whitespace
@@ -59,7 +23,7 @@ function UPS(options) {
         return false;
     };
 
-    this.track = function(trackingNumber, _options, callback) {
+    this.track = async function(trackingNumber, _options, callback) {
         // Options are optional
         if (typeof _options === 'function') {
             callback = _options;
@@ -70,193 +34,43 @@ function UPS(options) {
             _options.minDate = new Date(0);
         }
 
-        const req = {
-            baseUrl: options.baseUrl || 'https://onlinetools.ups.com',
-            forever: true,
-            gzip: true,
-            json: {
-                Security: {
-                    UPSServiceAccessToken: {
-                        AccessLicenseNumber: options.accessKey
-                    },
-                    UsernameToken: {
-                        Username: options.username,
-                        Password: options.password
-                    }
-                },
-                TrackRequest: {
-                    InquiryNumber: trackingNumber,
-                    Request: {
-                        RequestAction: 'Track',
-                        RequestOption: 'activity',
-                        SubVersion: '1907'
-                    }
-                }
-            },
-            method: 'POST',
-            timeout: 5000,
-            url: '/rest/Track'
-        };
+        try {
+            const trackingData = await ups.getTracking(trackingNumber, _options);
 
-        // The REST API doesn't support UPS Mail Innovations. Use the XML API instead.
-        if (usps.isTrackingNumberValid(trackingNumber)) {
-            delete req.json;
-
-            req.body = `<?xml version="1.0"?><AccessRequest xml:lang="en-US"><AccessLicenseNumber>${options.accessKey}</AccessLicenseNumber><UserId>${options.username}</UserId><Password>${options.password}</Password></AccessRequest><?xml version="1.0"?><TrackRequest xml:lang="en-US"><Request><RequestAction>Track</RequestAction><RequestOption>1</RequestOption></Request><TrackingNumber>${trackingNumber}</TrackingNumber><TrackingOption>03</TrackingOption></TrackRequest>`;
-            req.url = '/ups.app/xml/Track';
-        }
-
-        async.retry(function(callback) {
-            request(req, function(err, res, body) {
-                if (err) {
-                    return callback(err);
-                }
-
-                // Convert XML to JSON if necessary
-                if (body?.startsWith?.('<?xml version="1.0"?>')) {
-                    body = xml2json.parse(body, { parseNodeValue: false });
-                }
-
-                if (!body?.TrackResponse) {
-                    if (body?.Fault?.detail?.Errors?.ErrorDetail?.PrimaryErrorCode?.Description) {
-                        return callback(new Error(body.Fault.detail.Errors.ErrorDetail.PrimaryErrorCode.Description));
-                    } else {
-                        return callback(new Error(body || 'Invalid response from UPS'));
-                    }
-                }
-
-                if (body?.TrackResponse?.Response?.Error) {
-                    return callback(new Error(body.TrackResponse.Response.Error.ErrorDescription));
-                }
-
-                callback(null, body);
-            });
-        }, function(err, body) {
             const results = {
                 carrier: 'UPS',
                 events: [],
-                raw: body
+                raw: trackingData,
+                url: `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`
             };
 
-
-            if (err) {
-                if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
-                    return usps.track(trackingNumber, _options, callback);
-                }
-
-                if (err.message === 'No tracking information available') {
-                    return callback(null, results);
-                }
-
-                return callback(err);
-            }
-
-            const packageInfo = body?.TrackResponse?.Shipment?.Package ?? body.TrackResponse.Shipment;
-
-            // Add estimatedDeliveryDate if DeliveryDetail.Date is present
-            if (packageInfo?.DeliveryDetail?.Date) {
-                const dateStr = packageInfo.DeliveryDetail.Date;
-                const isoDate = new Date(
-                    `${dateStr.substring(0,4)}-${dateStr.substring(4,6)}-${dateStr.substring(6,8)}T00:00:00Z`
-                );
-                results.estimatedDeliveryDate = {
-                    earliest: isoDate,
-                    latest: isoDate
+            trackingData?.trackResponse?.shipment?.[0]?.package?.[0]?.activity?.forEach(activity => {
+                const event = {
+                    address: {
+                        city: activity.location?.address?.city,
+                        country: activity.location?.address?.countryCode,
+                        state: activity.location?.address?.state
+                    },
+                    date: new Date(`${activity.gmtDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')}T${activity.gmtTime}${activity.gmtOffset}`),
+                    description: activity.status?.description?.trim()
                 };
-            }
 
-            var activitiesList = [];
+                if (activity?.status?.type === 'D') {
+                    results.deliveredAt = event.date;
+                } else if (activity?.status?.type === 'I') {
+                    results.shippedAt = event.date;
+                }
 
-            if (Array.isArray(packageInfo)) {
-                activitiesList = packageInfo.map(package => getActivities(package)).flat();
-            } else {
-                activitiesList = getActivities(packageInfo);
-            }
+                results.events.push(event);
+            });
 
-            // Filter undefined activities
-            activitiesList = activitiesList.filter(a => a);
-
-            // UPS Mail Innovations doesn't import USPS data reliably. Fallback to USPS when UPS doesn't provide enough data.
-            if (options.usps && activitiesList.length <= 1 && usps.isTrackingNumberValid(trackingNumber)) {
+            callback(null, results);
+        } catch (err) {
+            if (options.usps && usps.isTrackingNumberValid(trackingNumber)) {
                 return usps.track(trackingNumber, _options, callback);
             }
 
-            // Get the activity locations for all activities that don't have a GMTDate or GMTTime
-            async.mapLimit(Array.from(new Set(activitiesList.filter(activity => (!activity.GMTDate || !activity.GMTTime) && activity.location).map(activity => activity.location))), 10, function(location, callback) {
-                geography.parseLocation(location, options, function(err, address) {
-                    if (err || !address) {
-                        return callback(err);
-                    }
-
-                    address.location = location;
-
-                    callback(null, address);
-                });
-            }, function(err, addresses) {
-                if (err) {
-                    return callback(err);
-                }
-
-                let address = null;
-
-                activitiesList.forEach(activity => {
-                    if (addresses) {
-                        address = addresses.find(a => a && a.location === activity.location);
-                    }
-
-                    let timezone = 'America/New_York';
-
-                    if (address && address.timezone) {
-                        timezone = address.timezone;
-                    }
-
-                    const event = {
-                        address: activity.address,
-                        description: activity.Description || (activity.Status && activity.Status.Description) || (activity.Status && activity.Status.StatusType && activity.Status.StatusType.Description)
-                    };
-
-                    if (activity.GMTDate && activity.GMTTime) {
-                        event.date = moment.tz(`${activity.GMTDate} ${activity.GMTTime}`, 'YYYY-MM-DD HH.mm.ss', 'UTC').toDate();
-                    } else {
-                        event.date = moment.tz(`${activity.Date} ${activity.Time}`, 'YYYYMMDD HHmmss', timezone).toDate();
-                    }
-
-                    // Ensure event is after minDate (used to prevent data from reused tracking numbers)
-                    if (event.date < _options.minDate) {
-                        return;
-                    }
-
-                    if (activity.Status && activity.Status.Type === 'D' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'D' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'D') {
-                        results.deliveredAt = event.date;
-                    } else if (activity.Status && activity.Status.Type === 'I' || activity.Status && activity.Status.StatusType && activity.Status.StatusType.Code === 'I' || activity.Status && activity.Status.StatusCode && activity.Status.StatusCode.Code === 'I') {
-                        results.shippedAt = event.date;
-                    }
-
-                    // Use the city and state from the parsed address (for scenarios where the city includes the state like "New York, NY")
-                    if (address) {
-                        if (address.city) {
-                            event.address.city = address.city;
-                        }
-
-                        if (address.state) {
-                            event.address.state = address.state;
-                        }
-                    }
-
-                    results.events.push(event);
-                });
-
-                // Add URL to carrier tracking page
-                results.url = `https://www.ups.com/track?tracknum=${encodeURIComponent(trackingNumber)}`;
-
-                if (!results.shippedAt && results.deliveredAt) {
-                    results.shippedAt = results.deliveredAt;
-                }
-
-                callback(null, results);
-            });
-        });
+            callback(err);
+        }
     };
-}
-
-module.exports = UPS;
+};

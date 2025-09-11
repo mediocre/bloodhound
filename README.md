@@ -96,9 +96,8 @@ const bloodhound = new Bloodhound({
         port: 6379
     },
     ups: {
-        accessKey: 'ABCDEFGHIJKLMNOPQ',
-        password: 'password',
-        username: 'username',
+        client_id: 'YOUR_UPS_CLIENT_ID',
+        client_secret: 'YOUR_UPS_CLIENT_SECRET'
     },
     usps: {
         userId: 'USPS_USER_ID'
@@ -128,7 +127,7 @@ By default Bloodhound caches geocode results in-memory locally. You can optional
 
 **ups**
 
-The UPS API requires a username, password, and an access key.
+The UPS API requires OAuth 2.0 credentials (client_id and client_secret). You can obtain these credentials from the UPS Developer Portal: https://developer.ups.com/
 
 **usps**
 
@@ -158,6 +157,10 @@ bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
 ```json
 {
     "deliveredAt": "2019-06-30T18:03:00.000Z",
+    "estimatedDeliveryDate": {
+        "earliest": "2019-06-28T13:00:00.000Z",
+        "latest": "2019-06-30T21:00:00.000Z"
+    },
     "events": [
         {
             "address": {
@@ -178,10 +181,6 @@ bloodhound.track('tracking number', { carrier: 'USPS' }, function(err, data) {
             "description": "Sorting Complete"
         }
     ],
-    "estimatedDeliveryDate": {
-        "earliest": "2019-06-28T13:00:00.000Z",
-        "latest": "2019-06-30T21:00:00.000Z"
-    },
     "shippedAt": "2019-05-13T17:32:00.000Z"
 }
 ```
