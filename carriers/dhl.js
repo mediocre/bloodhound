@@ -168,9 +168,9 @@ function DHL(options) {
                         const _event = {
                             address: {
                                 city: address?.city,
-                                country: event.location.address.countryCode,
+                                country: event.location.address?.countryCode,
                                 state: address?.state,
-                                zip: event.location.address.postalCode
+                                zip: event.location.address?.postalCode
                             },
                             date: moment.tz(event.timestamp, 'YYYY-MM-DDTHH:mm:ss', timezone).toDate(),
                             description: event.description
