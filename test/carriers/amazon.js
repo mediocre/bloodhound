@@ -144,6 +144,46 @@ describe('Amazon', function() {
         });
 
         it('should include location information when available', function(done) {
+            nock('https://track.amazon.com')
+                .get('/api/tracker/TBA321677302718')
+                .reply(200, {
+                    progressTracker: JSON.stringify({
+                        summary: {
+                            metadata: {}
+                        }
+                    }),
+                    eventHistory: JSON.stringify({
+                        eventHistory: [
+                            {
+                                eventTime: '2025-06-20T10:30:00.000Z',
+                                eventCode: 'PickupDone',
+                                statusSummary: {
+                                    localisedStringId: 'swa_rex_detail_pickedUp'
+                                },
+                                location: {
+                                    city: 'Seattle',
+                                    stateProvince: 'WA',
+                                    countryCode: 'US',
+                                    postalCode: '98109'
+                                }
+                            },
+                            {
+                                eventTime: '2025-06-21T14:20:00.000Z',
+                                eventCode: 'InTransit',
+                                statusSummary: {
+                                    localisedStringId: 'swa_rex_intransit'
+                                },
+                                location: {
+                                    city: 'Portland',
+                                    stateProvince: 'OR',
+                                    countryCode: 'US',
+                                    postalCode: '97204'
+                                }
+                            }
+                        ]
+                    })
+                });
+
             bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
                 assert.ifError(err);
 
@@ -152,28 +192,41 @@ describe('Amazon', function() {
                     event.address.city || event.address.state || event.address.country
                 );
 
-                if (eventsWithLocation.length > 0) {
-                    eventsWithLocation.forEach(event => {
-                        if (event.address.city) {
-                            assert(typeof event.address.city === 'string');
-                            assert(event.address.city.length > 0);
-                        }
-                        if (event.address.state) {
-                            assert(typeof event.address.state === 'string');
-                            assert(event.address.state.length > 0);
-                        }
-                        if (event.address.country) {
-                            assert(typeof event.address.country === 'string');
-                            assert(event.address.country.length > 0);
-                        }
-                    });
-                }
+                assert(eventsWithLocation.length > 0, 'Should have at least one event with location data');
+
+                eventsWithLocation.forEach(event => {
+                    if (event.address.city) {
+                        assert(typeof event.address.city === 'string');
+                        assert(event.address.city.length > 0);
+                    }
+                    if (event.address.state) {
+                        assert(typeof event.address.state === 'string');
+                        assert(event.address.state.length > 0);
+                    }
+                    if (event.address.country) {
+                        assert(typeof event.address.country === 'string');
+                        assert(event.address.country.length > 0);
+                    }
+                });
 
                 done();
             });
         });
 
         it('should return raw data in results', function(done) {
+            nock('https://track.amazon.com')
+                .get('/api/tracker/TBA321677302718')
+                .reply(200, {
+                    progressTracker: JSON.stringify({
+                        summary: {
+                            metadata: {}
+                        }
+                    }),
+                    eventHistory: JSON.stringify({
+                        eventHistory: []
+                    })
+                });
+
             bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
                 assert.ifError(err);
                 assert(Object.hasOwn(actual, 'raw'));
@@ -190,6 +243,41 @@ describe('Amazon', function() {
         });
 
         it('should sort events chronologically', function(done) {
+            nock('https://track.amazon.com')
+                .get('/api/tracker/TBA321677302718')
+                .reply(200, {
+                    progressTracker: JSON.stringify({
+                        summary: {
+                            metadata: {}
+                        }
+                    }),
+                    eventHistory: JSON.stringify({
+                        eventHistory: [
+                            {
+                                eventTime: '2025-06-21T14:20:00.000Z',
+                                eventCode: 'InTransit',
+                                statusSummary: {
+                                    localisedStringId: 'swa_rex_intransit'
+                                }
+                            },
+                            {
+                                eventTime: '2025-06-22T18:00:00.000Z',
+                                eventCode: 'Delivered',
+                                statusSummary: {
+                                    localisedStringId: 'swa_rex_delivered'
+                                }
+                            },
+                            {
+                                eventTime: '2025-06-20T10:30:00.000Z',
+                                eventCode: 'PickupDone',
+                                statusSummary: {
+                                    localisedStringId: 'swa_rex_detail_pickedUp'
+                                }
+                            }
+                        ]
+                    })
+                });
+
             bloodhound.track('TBA321677302718', 'amazon', function(err, actual) {
                 assert.ifError(err);
 
